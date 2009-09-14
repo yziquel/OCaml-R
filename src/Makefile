@@ -70,19 +70,20 @@ lib_byte: $(LIB_BYTE) $(LIB_CMI) $(LIBMATH_BYTE) $(LIBMATH_CMI)
 all: byte opt
 
 $(LIB): $(LIB_CMIFILES) $(LIB_CMXFILES) $(LIB_COBJ_FILES)
-	$(OCAMLMKLIB) -o `basename $@ .cmxa` $(LINKFLAGS) \
+	echo $(LIB)
+	$(OCAMLOPT) -a -o $@ $(LINKFLAGS) \
 	$(LIB_COBJ_FILES) $(LIB_CMXFILES)
 
 $(LIB_BYTE): $(LIB_CMIFILES) $(LIB_CMOFILES) $(LIB_COBJ_FILES)
-	$(OCAMLMKLIB) -custom -o `basename $@ .cma` $(LINKFLAGS_BYTE) \
+	$(OCAMLC) -custom -a -o $@ $(LINKFLAGS_BYTE) \
 	$(LIB_COBJ_FILES) $(LIB_CMOFILES)
 
 $(LIBMATH): $(LIBMATH_CMIFILES) $(LIBMATH_CMXFILES) $(LIBMATH_COBJ_FILES)
-	$(OCAMLMKLIB) -o `basename $@ .cmxa` $(LINKFLAGS_MATH) \
+	$(OCAMLOPT) -a -o $@ $(LINKFLAGS_MATH) \
 	$(LIBMATH_COBJ_FILES) $(LIBMATH_CMXFILES)
 
 $(LIBMATH_BYTE): $(LIBMATH_CMIFILES) $(LIBMATH_CMOFILES) $(LIBMATH_COBJ_FILES)
-	$(OCAMLMKLIB) -custom -o `basename $@ .cma` $(LINKFLAGS_MATH_BYTE) \
+	$(OCAMLC) -custom -a -o $@ $(LINKFLAGS_MATH_BYTE) \
 	$(LIBMATH_COBJ_FILES) $(LIBMATH_CMOFILES)
 
 $(PA_R): pa_ocamlr.ml
@@ -127,7 +128,7 @@ distclean: clean
 
 clean:: dummy
 	$(RM) *~ \#*\#
-	$(RM) */*.a */*.so
+	$(RM) *.a *.so
 	$(RM) *~ \#*\# *.cmo *.cmi *.cmx *.a *.o *.cma *.cmxa *.annot
 	$(RM) test.x
 
