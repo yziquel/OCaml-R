@@ -1,0 +1,123 @@
+#################################################################################
+#                OCaml-R                                                        #
+#                                                                               #
+#    Copyright (C) 2008 Institut National de Recherche en Informatique et       #
+#    en Automatique. All rights reserved.                                       #
+#                                                                               #
+#    This program is free software; you can redistribute it and/or modify       #
+#    it under the terms of the GNU General Public License as                    #
+#    published by the Free Software Foundation; either version 2 of the         #
+#    License, or  any later version.                                            #
+#                                                                               #
+#    This program is distributed in the hope that it will be useful,            #
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of             #
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              #
+#    GNU Library General Public License for more details.                       #
+#                                                                               #
+#    You should have received a copy of the GNU General Public                  #
+#    License along with this program; if not, write to the Free Software        #
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA                   #
+#    02111-1307  USA                                                            #
+#                                                                               #
+#    Contact: Maxence.Guesdon@inria.fr                                          #
+#                                                                               #
+#################################################################################
+
+# check for one particular file of the sources
+AC_INIT(master.Makefile.in)
+
+VERSION=0.1
+
+# The root directory where we will compile
+ROOT=`pwd`
+
+# Check for Ocaml compilers
+
+ocaml unix.cma str.cma checkocaml.ml ocaml_config.sh || exit 1
+. ./ocaml_config.sh
+
+echo "ocaml library path is $OCAMLLIB"
+
+
+############################
+# Flags
+############################
+COMPFLAGS=
+
+
+##############################
+# Check needed libs
+##############################
+
+##########################
+# debugging
+##########################
+
+DEBUG_LEVEL=0
+AC_ARG_WITH(debug-level,
+[  --with-debug-level=n   Set debug level to n [[default=0]]
+],
+[ DEBUG_LEVEL="$withval"])
+
+#######################
+# Main produced files
+#######################
+LIB=r.cmxa
+LIB_BYTE=r.cma
+LIB_CMI=r.cmi
+
+LIBMATH=rmath.cmxa
+LIBMATH_BYTE=rmath.cma
+LIBMATH_CMI=rmath.cmi
+
+LIBDIR=${OCAMLLIB}/R
+
+#############################
+# substitutions to perform
+
+AC_SUBST(VERSION)
+
+AC_SUBST(OCAMLC)
+AC_SUBST(OCAMLOPT)
+AC_SUBST(OCAMLDEP)
+AC_SUBST(OCAMLLEX)
+AC_SUBST(OCAMLYACC)
+AC_SUBST(OCAMLBEST)
+AC_SUBST(OCAMLVERSION)
+AC_SUBST(OCAMLLIB)
+AC_SUBST(OCAMLMKTOP)
+AC_SUBST(OCAMLMKLIB)
+AC_SUBST(CAMMKTOP)
+AC_SUBST(OCAMLBIN)
+AC_SUBST(OCAMLDOC)
+AC_SUBST(OCAMLDOC_OPT)
+AC_SUBST(EXEC_PREFIX)
+AC_SUBST(INSTALLBIN)
+AC_SUBST(ROOT)
+AC_SUBST(LIBDIR)
+AC_SUBST(DESTDIR)
+
+AC_SUBST(DEBUG_LEVEL)
+
+AC_SUBST(LIB)
+AC_SUBST(LIB_BYTE)
+AC_SUBST(LIB_CMI)
+
+AC_SUBST(LIBMATH)
+AC_SUBST(LIBMATH_BYTE)
+AC_SUBST(LIBMATH_CMI)
+
+# Finally create the master.Makefile.in
+ACFILES="master.Makefile"
+
+AC_OUTPUT($ACFILES)
+chmod a-w master.Makefile
+
+# List values
+echo "
+### Results of configuration ###
+
+Libraries will be installed in ${LIBDIR}
+
+Debug level is set to $DEBUG_LEVEL
+"

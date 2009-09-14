@@ -1,0 +1,6 @@
+- various ways to build sexp values from ocaml values
+- various ways to build a new variable
+
+
+- sexp_of_string
+- set_var : symbol -> sexp -> unit
