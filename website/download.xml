@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<page name="downloads" sidebar="true">
+<title><en>Downloads</en><fr>Téléchargements</fr>
+</title>
+<section name="downloads:general">
+<title>
+<en>General information</en>
+<fr>Informations générales</fr>
+</title>
+<p>
+<en>OCaml-R is </en>
+<fr>OCaml-R est </fr>
+<link href="http://download.gna.org/ocaml-r/"><en>downloadable here</en>
+<fr>téléchargeable ici</fr></link>.
+<br/>
+<en>You can also access the </en>
+<fr>Vous pouvez aussi accéder au </fr>
+<link href="https://gna.org/svn/?group=ocaml-r"><en>Subversion repository</en>
+<fr>Dépôt Subversion</fr></link>.
+</p>
+<p>
+<en>See the INSTALL file for installation procedure.</en>
+<fr>Voir le fichier INSTALL pour la procédure d'installation.</fr>
+</p>
+<p>
+<en>You can read the </en>
+<fr>Vous pouvez consulter le </fr>
+<a href="ChangeLog"><tt>ChangeLog</tt></a>.
+</p>
+</section>
+<include file="latest.xml"/>
+<section name="downloads:requirements">
+<title>
+<en>Requirements</en>
+<fr>Pré-requis</fr>
+</title>
+<p>
+<en>These are are required to compile OCaml-R:</en>
+<fr>La compilation de OCaml-R requiert:</fr>
+</p>
+<ul>
+<li><link href="http://caml.inria.fr/">OCaml 3.11.0</link><en> or above,</en><fr> ou supérieur,</fr></li>
+<li><link href="http://www.r-project.org">R &gt;= 2.9, with development libraries </link>.</li>
+</ul>
+<p>
+<tt>make</tt>
+<en> is also required for the compilation process.</en>
+<fr> est également requis pour la compilation.</fr>
+</p>
+</section>
+
+<!--
+<section name="downloads:previous-releases">
+<title>
+<en>Previous releases</en>
+<fr>Versions précédentes</fr>
+</title>
+<p class="release">
+<a href="http://download.gna.org/cameleon/cameleon_1.9.16.tar.gz">1.9.17</a> (27 Nov 2006)<br/>
+Bug fixes and enhancements in Chamo. Search, query-replace and completion are available
+in Chamo, with regular expressions based on PCRE.
+</p>
+
+<p class="release">
+<a href="http://download.gna.org/cameleon/cameleon_1.9.16.tar.gz">1.9.16</a> (10 Oct 2006)<br/>
+The chamo editor is included and usable in cameleon. Many fixes and enhancements.
+</p>
+
+<p class="release">
+<a href="http://download.gna.org/cameleon/cameleon_1.9.15.tar.gz">1.9.15</a> (06 Oct 2006)<br/>
+Cameleon now includes chamo, a powerful text editor with OCaml as scripting language.
+</p>
+
+<p class="release">
+<a href="http://download.gna.org/cameleon/cameleon_1.9.13.tar.gz">1.9.13</a> (10 <en>May</en><fr>Mai</fr> 2006)<br/>
+A new configuration process which uses an OCaml script to detect required tools and libraries. Fixes and enhancements.
+</p>
+</section>
+-->
+</page>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<page name="about">
+<title><en>About this site</en><fr>A propos de ce site</fr></title>
+<section>
+<p>
+<fr>Ce site est réalisé avec </fr>
+<en>This site is made with </en><link href="http://www.cduce.org">CDuce</link>.
+</p>
+
+<xhtml>
+<img src="http://www.cduce.org/img/cducepower2.jpg" alt="Powered by CDuce!"/>
+</xhtml>
+
+</section>
+</page>

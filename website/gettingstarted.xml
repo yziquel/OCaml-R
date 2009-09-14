@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<page name="gettingstarted">
+<title><en>Getting started</en><fr>Guide de démarrage</fr></title>
+<section name="gs:intro">
+<title>Introduction</title>
+<p>
+OCaml-R provides (by now) two libraries:
+</p>
+<ul>
+<li><a href="refdoc/Rmath.html">Rmath</a>, with bindings to the functions of the
+R math library,</li>
+<li><a href="refdoc/R.html">R</a>, giving an interface to the R interpreter
+to define and evaluate R code, access R data from OCaml code and push OCaml values
+to R variables.</li>
+</ul>
+<p>
+The usage of these two libraries is described in the sections below.
+They are installed in a "R" subdirectory of the OCaml library directory.
+</p>
+</section>
+
+<section name="gs:rmath">
+<title>The Rmath library</title>
+<p>
+The Rmath library gives access to the functions of the R math library. It can be used
+as any other OCaml library. Here is an example, in file <tt>testr.ml</tt>:
+</p>
+<sample>
+let x = Rmath.dnorm ~mean: 0.0 ~sd: 10.0 3.0;;
+Printf.printf "Result is %f\n" x;;
+</sample>
+<p>
+We can compile and link this simple program with the following command:
+</p>
+<command-line>
+ocamlc -I +R -custom -o testr.x r.cma rmath.cma testr.ml
+</command-line>
+<p>
+Then, we can execute it as any other program:
+</p>
+<command-line>
+./testr.x
+Result is 0.038139
+</command-line>
+<p>
+It is also possible to use this library in an OCaml toplevel. To do so, one must
+create a custom toplevel including the library:
+</p>
+<command-line>
+ocamlmktop -I +R -custom r.cma rmath.cma -o ocaml-r
+</command-line>
+<linkline>
+<link href="refdoc/Rmath.html">Reference documentation</link>
+</linkline>
+</section>
+
+<section name="gs:r">
+<title>The R library</title>
+<p>
+The R library offers an interface to the R interpreter, and a way to exchange data
+between R and OCaml "sides".
+</p>
+<linkline>
+<link href="refdoc/R.html">Reference documentation</link>
+</linkline>
+
+<section name="gs:r:compile">
+<title>Compilation and execution</title>
+<p>
+To compile programs using R,
+you can use the following command (with your code in file <tt>test.ml</tt>):
+</p>
+<command-line>
+ocamlc -o test.x -I +R -custom r.cma test.ml
+</command-line>
+<p>
+To use the R interpreter, the environement must be correctly set up. This is done by
+the <tt>R</tt> command, even though it could be done by hand. So you can launch your
+program with the command
+</p>
+<command-line>
+R CMD ./test.x
+</command-line>
+<p>
+eventually followed by some arguments.
+</p>
+</section>
+
+<section name="gs:r:init">
+<title>Initialization, termination</title>
+<p>The R interpreter must be initialized by calling
+</p>
+<sample>
+R.init_r : string array -&gt; int
+</sample>
+<p>
+<code>R.init</code> is just a shortcut to call <code>R.init_r</code> with an empty
+array.
+</p>
+</section>
+
+<section name="gs:r:eval">
+<title>Evaluation of R code</title>
+</section>
+
+</section>
+
+</page>
