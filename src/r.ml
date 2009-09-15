@@ -34,7 +34,7 @@ type sexp;;
 type symbol = string;;
 
 type arg = [
-    `Named of sexp * symbol
+    `Named of symbol * sexp
   | `Anon of sexp
   ]
 

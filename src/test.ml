@@ -453,8 +453,8 @@ let main () =
   R.exec "plot" [|
    `Anon (R.sexp "1:10") ;
    `Anon (R.sexp "11:20") ;
-   `Named (R.sexp "3", "col") ;
-   `Named (R.sexp "\"1\"", "ty") ;
+   `Named ("col", R.sexp "3") ;
+   `Named ("ty", R.sexp "\"l\"") ;
   |] ;
 (*  Unix.sleep 5;*)
   prerr_endline "Ending";

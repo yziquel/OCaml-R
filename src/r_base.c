@@ -129,19 +129,31 @@ CAMLprim void r_exec (value fun_name, value args) {
     if (Is_block(tmpval)) {
       tmpval2 = Field(tmpval,1);
       if (Field(tmpval,0) == hash_variant("Named")) {
+/*
         prerr_endline("Named");
-        prerr_endline(String_val(Field(tmpval2,1)));
-        SET_TAG(t, install(String_val(Field(tmpval2,1))));
-        u = Long_val(Field(Field(tmpval2,0),0));
+        prerr_endline(String_val(Field(tmpval2,0)));
+*/
+        SET_TAG(t, install(String_val(Field(tmpval2,0))));
+        u = Long_val(Field(Field(tmpval2,1),0));
+/*
         PrintValue(u);
+*/
         SETCAR(t, duplicate(u));
+/*
         prerr_endline("Named ok");
+*/
       } else if (Field(tmpval,0) == hash_variant("Anon")) {
+/*
         prerr_endline ("Anon");
+*/
         u = Long_val(Field(tmpval2,0));
+/*
         PrintValue(u);
+*/
         SETCAR(t, duplicate(u));
+/*
         prerr_endline ("Anon ok");
+*/
       } else {
         prerr_endline("bad constructor");
         /* bad constructor */
