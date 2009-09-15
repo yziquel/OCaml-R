@@ -2,18 +2,13 @@
 <section>
 <en>Latest release is </en>
 <fr>La dernière version est </fr>
-<link href="http://download.gna.org/ocaml-r/ocaml-r-0.1.tar.gz">0.1</link> (2009-09-15).
+<link href="http://download.gna.org/ocaml-r/ocaml-r_0.1.tar.gz">0.1</link> (2009-09-15).
 
 <p class="warning">
-<en> Do not hesitate to download the current development version, from </en>
-<link href="https://gna.org/svn/?group=ocaml-r"><en>the subversion trunk</en></link>.
-</p>
-
-<!--<p class="warning">
 <en> Do not hesitate to download the nightly snapshot of the subversion trunk,
 with more features and bug fixes: </en>
 <fr> N'hésitez pas à télécharger la dernière version du dépôt, dans une archive créée chaque
 nuit: </fr>
-<link href="http://download.gna.org/ocaml/ocaml-r_snapshot.tar.gz">Nightly snapshot</link>.
-</p>-->
+<link href="http://download.gna.org/ocaml-r/ocaml-r_snapshot.tar.gz">Nightly snapshot</link>.
+</p>
 </section>

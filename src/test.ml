@@ -456,6 +456,16 @@ let main () =
    `Named ("col", R.sexp "3") ;
    `Named ("ty", R.sexp "\"l\"") ;
   |] ;
+
+  (* create an array of int from 1 to 20, using R *)
+  let r_t = R.sexp "1:20" in
+  (* create a simple function *)
+  let f x = x + 1 in
+  (* copy the R array to an OCaml int array and apply (Array.map f) on it *)
+  let u = Array.map f (R.to_int_array r_t) in
+  (* get a R expression from the resulting OCaml int array *)
+  let r_u = R.of_int_array u in
+  R.r_print_value r_u;
 (*  Unix.sleep 5;*)
   prerr_endline "Ending";
   R.terminate()

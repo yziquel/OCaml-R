@@ -27,7 +27,7 @@ library usable to embed R in your application.
 <p>
 <en>OCaml-R is still in development. Most of the
 R math library functions are available. With the embedded R, it is
-already possible to create variables and exchange basic data
+already possible to evaluate R code, create R variables and exchange basic data
 between embedded R and OCaml sides.
 </en>
 </p>

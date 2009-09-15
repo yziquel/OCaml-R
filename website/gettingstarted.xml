@@ -22,7 +22,8 @@ They are installed in a "R" subdirectory of the OCaml library directory.
 <section name="gs:rmath">
 <title>The Rmath library</title>
 <p>
-The Rmath library gives access to the functions of the R math library. It can be used
+The <a href="refdoc/Rmath.html">Rmath library</a>
+gives access to the functions of the R math library. It can be used
 as any other OCaml library. Here is an example, in file <tt>testr.ml</tt>:
 </p>
 <sample>
@@ -49,20 +50,15 @@ create a custom toplevel including the library:
 <command-line>
 ocamlmktop -I +R -custom r.cma rmath.cma -o ocaml-r
 </command-line>
-<linkline>
-<link href="refdoc/Rmath.html">Reference documentation</link>
-</linkline>
 </section>
 
 <section name="gs:r">
 <title>The R library</title>
 <p>
-The R library offers an interface to the R interpreter, and a way to exchange data
+The <a href="refdoc/R.html">R library</a>
+offers an interface to the R interpreter, and a way to exchange data
 between R and OCaml "sides".
 </p>
-<linkline>
-<link href="refdoc/R.html">Reference documentation</link>
-</linkline>
 
 <section name="gs:r:compile">
 <title>Compilation and execution</title>
@@ -74,7 +70,7 @@ you can use the following command (with your code in file <tt>test.ml</tt>):
 ocamlc -o test.x -I +R -custom r.cma test.ml
 </command-line>
 <p>
-To use the R interpreter, the environement must be correctly set up. This is done by
+To use the R interpreter, the environment must be correctly set up. This is done by
 the <tt>R</tt> command, even though it could be done by hand. So you can launch your
 program with the command
 </p>
@@ -82,7 +78,7 @@ program with the command
 R CMD ./test.x
 </command-line>
 <p>
-eventually followed by some arguments.
+eventually followed by your program's arguments.
 </p>
 </section>
 
@@ -95,14 +91,106 @@ R.init_r : string array -&gt; int
 </sample>
 <p>
 <code>R.init</code> is just a shortcut to call <code>R.init_r</code> with an empty
-array.
+array. To terminate properly, just call <code>R.terminate : unit -> unit</code>.
 </p>
 </section>
 
 <section name="gs:r:eval">
 <title>Evaluation of R code</title>
+<p>
+The OCaml type <code>R.sexp</code> represents R expressions. Such expressions can be defined
+by giving R code to the function <code>R.sexp : string -> sexp</code>. This makes R interpret
+the given code.
+</p>
+<p>
+The OCaml type <code>R.symbol</code> is used to represent the name of R variables.
+The expression of a R variable can be retrieved with the function
+<code>R.sexp_of_symbol : symbol -> sexp</code>. You can also set the expression of
+a R variable by using the function <code>R.set_var : symbol -> sexp -> unit</code>.
+</p>
+<p>For example, the following R (on the left) and OCaml (on the right) codes
+are equivalent:
+</p>
+<two-columns>
+<left>
+<pre class="r">
+x = 1 : 10;
+y = x + 1 ;
+z = y ;
+</pre>
+</left>
+<right>
+<sample>
+R.set_var "x" (R.sexp "1:10"); (* or: ignore(R.sexp "x = 1:10"); *)
+R.set_var "y" (R.sexp "x + 1");
+R.set_var "z" (R.sexp_of_symbol "y"); (* or: ignore(R.sexp "z=y"); *)
+</sample>
+</right>
+</two-columns>
+<p>To call a R function, you can use the function
+<code>R.exec : string -> arg array -> unit</code>.
+The OCaml type <a href="refdoc/R.html#TYPEarg"><code>R.arg</code></a>
+is used to give named or anonymous parameters when calling a function.
+</p>
+<p>Here is a way of calling the <tt>plot</tt> R function from OCaml:</p>
+<sample>
+R.exec "plot" [|
+   `Anon (R.sexp "1:10") ;
+   `Anon (R.sexp_of_symbol "y") ;
+   `Named ("col", R.sexp "3") ;
+   `Named ("ty", R.sexp "\"l\"") ;
+  |] ;
+</sample>
+</section>
+
+<section name="gs:data">
+<title>Data exchange</title>
+<p>
+The R library provides functions to copy simple data from R to OCaml and from OCaml to R.
+</p>
+<p>
+Copying data from R to OCaml is done by the functions below. For the basic types:<br/>
+<code>R.to_bool : sexp -> bool</code><br/>
+<code>R.to_int : sexp -> int</code><br/>
+<code>R.to_float : sexp -> float</code><br/>
+<code>R.to_string : sexp -> string</code>
+</p>
+<p>
+and for arrays containing values of basic types:<br/>
+<code>R.to_bool_array : sexp -> bool array</code><br/>
+<code>R.to_int_array : sexp -> int array</code><br/>
+<code>R.to_float_array : sexp -> float array</code><br/>
+<code>R.to_string_array : sexp -> string array</code><br/>
+</p>
+<p>The following functions create R expressions from OCaml values of basic types:<br/>
+<code>R.of_bool : bool -> sexp</code><br/>
+<code>R.of_int : int -> sexp</code><br/>
+<code>R.of_float : float -> sexp</code><br/>
+<code>R.of_string : string -> sexp</code>
+</p>
+<p>
+and arrays of values of basic types:<br/>
+<code>R.of_bool_array : bool array -> sexp</code><br/>
+<code>R.of_int_array : int array -> sexp</code><br/>
+<code>R.of_float_array : float array -> sexp</code><br/>
+<code>R.of_string_array : string array -> sexp</code>
+</p>
+<p>
+The following code is an example of data exchange:
+</p>
+<sample>
+(* create an array of int from 1 to 20, using R *)
+let r_t = R.sexp "1:20";;
+(* create a simple function *)
+let f x = x + 1;;
+(* copy the R array to an OCaml int array and apply (Array.map f) on it *)
+let u = Array.map f (R.to_int_array r_t);;
+(* get a R expression from the resulting OCaml int array *)
+let r_u = R.of_int_array u;;
+(* print the R value on standard output *)
+R.r_print_value r_u;;
+</sample>
 </section>
 
 </section>
-
 </page>
