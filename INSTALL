@@ -2,16 +2,12 @@
 
 
 *** What you need ***
-- OCaml 3.09.0 or above installed
-- LablGtk 2.6.0 or above installed (with lablglade enabled)
-- XML-light 2 or above installed
-- Cameleon 1.9.13 or above installed (including native code libraries)
-- OCaml-MySQL 1.0.3 or above installed
+- OCaml 3.11.0 or above installed
+- R >= 2.9 with development libraries
 - make ;-)
 
 *** How to compile ***
-- ./configure [--prefix=/path/to/install]
-  By default, install all in /usr/local/bin
+- ./configure
 - make depend
 - make all [or only 'make byte' if the native code compiler is not installed]
 - make install
