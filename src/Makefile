@@ -69,24 +69,42 @@ lib_byte: $(LIB_BYTE) $(LIB_CMI) $(LIBMATH_BYTE) $(LIBMATH_CMI)
 
 all: byte opt
 
-$(LIB): $(LIB_CMIFILES) $(LIB_CMXFILES) $(LIB_COBJ_FILES)
-	$(OCAMLMKLIB) -o `basename $@ .cmxa` $(LINKFLAGS) \
-	$(LIB_COBJ_FILES) $(LIB_CMXFILES)
+r.cma: dllr_base_stubs.so dllr_data_stubs.so rdevices.cmo rdevices.cmi r.cmo r.cmi rstdenv.cmo rstdenv.cmi
+	ocamlc -a -dllpath /usr/lib/R/lib -dllib dllr_base_stubs.so -dllib dllr_data_stubs.so -dllib libR.so -o r.cma rdevices.cmo r.cmo rstdenv.cmo
 
-$(LIB_BYTE): $(LIB_CMIFILES) $(LIB_CMOFILES) $(LIB_COBJ_FILES)
-	$(OCAMLMKLIB) -custom -o `basename $@ .cma` $(LINKFLAGS_BYTE) \
-	$(LIB_COBJ_FILES) $(LIB_CMOFILES)
+r.cmxa: dllr_base_stubs.so dllr_data_stubs.so rdevices.cmx rdevices.cmi r.cmx r.cmi rstdenv.cmx rstdenv.cmi
+	ocamlopt -a -ccopt -L/usr/lib/R/lib -cclib -lr_base_stubs -cclib -lr_data_stubs -cclib -lR -o r.cmxa rdevices.cmx r.cmx rstdenv.cmx
 
-$(LIBMATH): $(LIBMATH_CMIFILES) $(LIBMATH_CMXFILES) $(LIBMATH_COBJ_FILES)
-	$(OCAMLMKLIB) -o `basename $@ .cmxa` $(LINKFLAGS_MATH) \
-	$(LIBMATH_COBJ_FILES) $(LIBMATH_CMXFILES)
+rmath.cma: dllr_math_stubs.so rmath.cmo rmath.cmi
+	ocamlc -a -dllib dllr_math_stubs.so -dllib libRmath.so -o rmath.cma rmath.cmo
 
-$(LIBMATH_BYTE): $(LIBMATH_CMIFILES) $(LIBMATH_CMOFILES) $(LIBMATH_COBJ_FILES)
-	$(OCAMLMKLIB) -custom -o `basename $@ .cma` $(LINKFLAGS_MATH_BYTE) \
-	$(LIBMATH_COBJ_FILES) $(LIBMATH_CMOFILES)
+rmath.cmxa: dllr_math_stubs.so rmath.cmx rmath.cmi
+	ocamlopt -a -cclib -lr_math_stubs -cclib -lRmath -o rmath.cmxa rmath.cmx
+
+dllr_base_stubs.so: libr_base_stubs.a r_base.o
+	ocamlmklib -o r_base_stubs r_base.o
+
+dllr_data_stubs.so: libr_data_stubs.a r_data.o
+	ocamlmklib -o r_data_stubs r_data.o
+
+dllr_math_stubs.so: libr_math_stubs.a r_math.o
+	ocamlmklib -o r_math_stubs r_math.o
+
+libr_base_stubs.a: r_base.o
+	ar rcs libr_base_stubs.a r_base.o
+
+libr_data_stubs.a: r_data.o
+	ar rcs libr_data_stubs.a r_data.o
+
+libr_math_stubs.a: r_math.o
+	ar rcs libr_math_stubs.a r_math.o
 
 $(PA_R): pa_ocamlr.ml
 	$(OCAMLC) -I +camlp4 -I +camlp4/Camlp4Parsers -c -pp camlp4of.opt $<
+
+.PHONY: rstdenv.ml
+rstdenv.ml: rstdenv.R
+	/usr/bin/R --silent --vanilla --slave < rstdenv.R > rstdenv.ml
 
 test.x: $(LIB) $(LIBMATH) test.cmx
 	$(OCAMLOPT) -verbose -o $@ unix.cmxa $(LIBMATH) $(LIB) test.cmx

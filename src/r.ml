@@ -25,6 +25,14 @@
 
 (** Interface to R. *)
 
+(** Intialises the R interpreter. This fuction is a simple wrapper around the
+  * Rf_initEmbeddedR function of the R API.
+  *
+  * The appropriate environment variables should be set properly before calling
+  * function. 
+  *
+  * The first parameter is an array of command-line-like arguments passed to R.
+  * @return 1 if successfully initialised. *)
 external init_r : string array -> int = "init_r"
 let init ?(argv=Sys.argv) () = init_r argv;;
 external terminate : unit -> unit = "end_r"
@@ -86,3 +94,23 @@ let of_int_matrix = of_matrix of_int;;
 let of_float_matrix = of_matrix of_float;;
 let of_string_matrix = of_matrix of_string;;
 *)
+
+(** Functor to properly set up R environment variables. *)
+
+module type R_Environment =
+sig
+  val variables : (string * string) list
+end
+
+module Interpreter (Env : R_Environment) : sig end =
+struct
+
+  exception Initialisation_failed
+
+  let () = List.iter (function name, value -> Unix.putenv name value)
+    Env.variables
+
+  let () = match init_r [|"R"|] with
+    | 1 -> () | _ -> raise Initialisation_failed
+
+end
