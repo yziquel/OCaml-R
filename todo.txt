@@ -1,6 +1,55 @@
+- deal with R's signal handlers. R_SignalHandlers = 0 ?
+
+- provide a way to deal (in a statically-typed way) with the
+  packages that are loaded when the interpreter starts. See the
+  following piece of code from littler.c:
+
+        /* We don't require() default packages upon startup; rather, we
+         * set up delayedAssign's instead. see autoloads().
+         */
+        if (setenv("R_DEFAULT_PACKAGES","NULL",1) != 0){
+                perror("ERROR: couldn't set/replace R_DEFAULT_PACKAGES");
+                exit(1);
+        }
+
+        /* Force all default package to be dynamically required, unless chosen not to */
+        if (quick != 1) {
+                autoloads();
+        }
+
+        /* deal with libraries, if requested */
+        if (libstr != NULL) {
+                char *ptr, *token, *strptr;
+                char buf[128];
+
+                ptr = token = libstr;
+                membuf_t pb = init_membuf(512);
+                while (token != NULL) {
+                        token = strtok_r(ptr, ",", &strptr);
+                        ptr = NULL;                     /* after initial call strtok expects NULL */
+                        if (token != NULL) {
+                                snprintf(buf, 127-27-strlen(token), "suppressMessages(library(%s));", token);
+                                parse_eval(&pb, buf, 1);
+                        }
+                }
+                destroy_membuf(pb);
+        }
+
+- investigate how littler.c deals with tempdir and tempfiles:
+
+        littler_InitTempDir();
+
+        /* for tempfile() to work correctly */
+        init_rand();
+
+- investigate these two littler.c features:
+
+        R_ReplDLLinit(); /* this is to populate the repl console buffers */
+
+        littler_CleanUp(SA_NOSAVE, exit_val,0);
+
 - various ways to build sexp values from ocaml values
 - various ways to build a new variable
-
 
 - sexp_of_string
 - set_var : symbol -> sexp -> unit
