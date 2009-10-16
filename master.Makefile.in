@@ -43,6 +43,7 @@ EXTRAC_CRC = $(OCAMLLIB)/extract_crc
 OCAMLDOC= @OCAMLDOC@
 OCAMLDOCOPT= @OCAMLDOC_OPT@
 OCAMLPP=
+R=@R@
 LATEX=TEXINPUTS=$(ROOT)/doc: latex
 HEVEA=hevea -fix -francais -I $(ROOT)/doc -exec xxdate.exe
 HACHA=hacha

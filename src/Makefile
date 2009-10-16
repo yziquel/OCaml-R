@@ -42,7 +42,8 @@ LINKFLAGS_MATH_BYTE=$(INCLUDES) -ccopt -L$(RLIBDIR)  -cclib -lRmath
 
 LIB_CMOFILES=\
 	rdevices.cmo \
-	r.cmo
+	r.cmo \
+	rstdenv.cmo
 
 LIB_CMXFILES=$(LIB_CMOFILES:.cmo=.cmx)
 LIB_CMIFILES= $(LIB_CMOFILES:.cmo=.cmi)
@@ -69,26 +70,35 @@ lib_byte: $(LIB_BYTE) $(LIB_CMI) $(LIBMATH_BYTE) $(LIBMATH_CMI)
 
 all: byte opt
 
-r.cma: dllr_base_stubs.so dllr_data_stubs.so rdevices.cmo rdevices.cmi r.cmo r.cmi rstdenv.cmo rstdenv.cmi
-	ocamlc -a -dllpath /usr/lib/R/lib -dllib dllr_base_stubs.so -dllib dllr_data_stubs.so -dllib libR.so -o r.cma rdevices.cmo r.cmo rstdenv.cmo
+$(LIB_BYTE): dllr_base_stubs.so dllr_data_stubs.so $(LIB_CMIFILES) $(LIB_CMOFILES)
+	$(OCAMLC) -a -dllpath /usr/lib/R/lib \
+	-dllib dllr_base_stubs.so \
+	-dllib dllr_data_stubs.so \
+	-dllib libR.so -o $@ \
+	$(LIB_CMOFILES)
 
-r.cmxa: dllr_base_stubs.so dllr_data_stubs.so rdevices.cmx rdevices.cmi r.cmx r.cmi rstdenv.cmx rstdenv.cmi
-	ocamlopt -a -ccopt -L/usr/lib/R/lib -cclib -lr_base_stubs -cclib -lr_data_stubs -cclib -lR -o r.cmxa rdevices.cmx r.cmx rstdenv.cmx
+$(LIB): dllr_base_stubs.so dllr_data_stubs.so $(LIB_CMIFILES) $(LIB_CMXFILES)
+	$(OCAMLOPT) -a -ccopt -L/usr/lib/R/lib \
+	-cclib -lr_base_stubs -cclib -lr_data_stubs \
+	-cclib -lR \
+	-o $@ $(LIB_CMXFILES)
 
-rmath.cma: dllr_math_stubs.so rmath.cmo rmath.cmi
-	ocamlc -a -dllib dllr_math_stubs.so -dllib libRmath.so -o rmath.cma rmath.cmo
+$(LIBMATH_BYTE): dllr_math_stubs.so $(LIBMATH_CMIFILES) $(LIBMATH_CMOFILES)
+	$(OCAMLC) -a -dllib dllr_math_stubs.so -dllib libRmath.so \
+	-o $@ $(LIBMATH_CMOFILES)
 
-rmath.cmxa: dllr_math_stubs.so rmath.cmx rmath.cmi
-	ocamlopt -a -cclib -lr_math_stubs -cclib -lRmath -o rmath.cmxa rmath.cmx
+$(LIBMATH): dllr_math_stubs.so $(LIBMATH_CMIFILES) $(LIBMATH_CMXFILES)
+	$(OCAMLOPT) -a -cclib -lr_math_stubs -cclib -lRmath \
+	-o $@ $(LIBMATH_CMXFILES)
 
 dllr_base_stubs.so: libr_base_stubs.a r_base.o
-	ocamlmklib -o r_base_stubs r_base.o
+	$(OCAMLMKLIB) -o r_base_stubs r_base.o
 
 dllr_data_stubs.so: libr_data_stubs.a r_data.o
-	ocamlmklib -o r_data_stubs r_data.o
+	$(OCAMLMKLIB) -o r_data_stubs r_data.o
 
 dllr_math_stubs.so: libr_math_stubs.a r_math.o
-	ocamlmklib -o r_math_stubs r_math.o
+	$(OCAMLMKLIB) -o r_math_stubs r_math.o
 
 libr_base_stubs.a: r_base.o
 	ar rcs libr_base_stubs.a r_base.o
@@ -104,12 +114,12 @@ $(PA_R): pa_ocamlr.ml
 
 .PHONY: rstdenv.ml
 rstdenv.ml: rstdenv.R
-	/usr/bin/R --silent --vanilla --slave < rstdenv.R > rstdenv.ml
+	$(R) --silent --vanilla --slave < rstdenv.R > rstdenv.ml
 
 test.x: $(LIB) $(LIBMATH) test.cmx
 	$(OCAMLOPT) -verbose -o $@ unix.cmxa $(LIBMATH) $(LIB) test.cmx
 test.byte: $(LIB_BYTE) $(LIBMATH_BYTE) test.cmo
-	$(OCAMLC) -verbose -o $@ unix.cma $(LIBMATH_BYTE) $(LIB_BYTE) test.cmo
+	$(OCAMLC) -verbose -o $@ unix.cma $(LIB_BYTE) $(LIBMATH_BYTE) test.cmo
 
 # Documentation :
 #################
@@ -123,7 +133,6 @@ doc: all dump.odoc
 	-html \
 	-load dump.odoc \
 	-d ocamldoc -v -t "OCaml-R"
-#	-intro $(ROOT)/doc/reference_doc_intro.text \
 
 dot: dep.dot
 dep.dot: dump.odoc
@@ -134,7 +143,7 @@ dep.ps:dep.dot
 # backup, clean and depend :
 ############################
 
-GENERATED_FILES=
+GENERATED_FILES=rstdenv.ml
 
 cleanocamldoc:
 	$(RM) -r ocamldoc
@@ -148,6 +157,7 @@ clean:: dummy
 	$(RM) *.a *.so
 	$(RM) *~ \#*\# *.cmo *.cmi *.cmx *.a *.o *.cma *.cmxa *.annot
 	$(RM) test.x
+	$(RM) $(GENERATED_FILES)
 
 .depend depend:
 	$(RM) .depend

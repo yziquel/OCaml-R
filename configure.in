@@ -44,6 +44,13 @@ echo "ocaml library path is $OCAMLLIB"
 ############################
 COMPFLAGS=
 
+# Looking for R
+###############
+AC_PATH_PROG(R,R,no)
+if test "$R" = no ; then
+        AC_MSG_ERROR(Cannot find R.)
+fi
+
 
 ##############################
 # Check needed libs
@@ -96,7 +103,7 @@ AC_SUBST(INSTALLBIN)
 AC_SUBST(ROOT)
 AC_SUBST(LIBDIR)
 AC_SUBST(DESTDIR)
-
+AC_SUBST(R)
 AC_SUBST(DEBUG_LEVEL)
 
 AC_SUBST(LIB)
