@@ -27,10 +27,10 @@
 
 let main () =
   prerr_endline "Initialization";
-  R.init();;
+  R.init();
 
   for i = 0 to 30 do
-    prerr_endline "defining sexp";
+    prerr_endline "defining sexp!!";
     let sexp = R.sexp (Printf.sprintf "0:%d" i) in
     R.r_print_value sexp;
     Gc.full_major();

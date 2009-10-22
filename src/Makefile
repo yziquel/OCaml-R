@@ -112,7 +112,6 @@ libr_math_stubs.a: r_math.o
 $(PA_R): pa_ocamlr.ml
 	$(OCAMLC) -I +camlp4 -I +camlp4/Camlp4Parsers -c -pp camlp4of.opt $<
 
-.PHONY: rstdenv.ml
 rstdenv.ml: rstdenv.R
 	$(R) --silent --vanilla --slave < rstdenv.R > rstdenv.ml
 
