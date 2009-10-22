@@ -23,6 +23,6 @@
 (*                                                                               *)
 (*********************************************************************************)
 
-(** Environement variables to initialize the environement
+(** Environment variables to initialize the environment
    to the R detected at compilation time. *)
 val env : (string * string) list

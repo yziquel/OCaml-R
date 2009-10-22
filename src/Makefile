@@ -122,7 +122,7 @@ test.byte: $(LIB_BYTE) $(LIBMATH_BYTE) test.cmo
 
 # Documentation :
 #################
-dump.odoc: *.ml *.mli
+dump.odoc: *.mli
 	$(OCAMLDOCOPT) $(INCLUDES) -keep-code $(OCAMLPP) $(COMPFLAGS) -sort -dump $@ \
 	`ls $^ | grep -v example.ml | grep -v example2.ml | grep -v test`
 
