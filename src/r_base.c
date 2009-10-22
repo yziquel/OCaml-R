@@ -174,10 +174,3 @@ CAMLprim void r_exec (value fun_name, value args) {
   CAMLreturn0;
 }
 
-CAMLprim void r_current_test() {
-  CAMLparam0();
-  SEXP tmp;
-  PROTECT(tmp=mkString("1:10"));
-  UNPROTECT(1);
-  CAMLreturn0;
-  }
