@@ -42,8 +42,8 @@ LINKFLAGS_MATH_BYTE=$(INCLUDES) -ccopt -L$(RLIBDIR)  -cclib -lRmath
 
 LIB_CMOFILES=\
 	rdevices.cmo \
+	rstdenv.cmo \
 	r.cmo \
-	rstdenv.cmo
 
 LIB_CMXFILES=$(LIB_CMOFILES:.cmo=.cmx)
 LIB_CMIFILES= $(LIB_CMOFILES:.cmo=.cmi)

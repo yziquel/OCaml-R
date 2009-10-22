@@ -25,17 +25,19 @@
 
 (** Interface to R. *)
 
-(** Intialises the R interpreter. This fuction is a simple wrapper around the
-  * Rf_initEmbeddedR function of the R API.
-  *
-  * The appropriate environment variables should be set properly before calling
-  * function.
-  *
-  * The first parameter is an array of command-line-like arguments passed to R.
-  * @return 1 if successfully initialised. *)
-external init_r : string array -> int = "init_r"
-val init : ?argv:string array -> unit -> int
-external terminate : unit -> unit = "end_r"
+exception Initialisation_failed;;
+
+(** Intialize the R interpreter.
+   @param env can be used to specify alternative environement variables. Default
+    environement is the one defined by the detected R at compile time.
+   @param argv can be used to pass command line arguments to the R
+    initialization function in C.
+   @raise Initialisation_failed if an error occurs.
+ *)
+val init : ?env:(string * string) list -> ?argv:string array -> unit -> unit
+
+(** Call this function to terminate properly the interpreter. *)
+val terminate : unit -> unit
 
 module type Rinterface =
   sig
@@ -70,5 +72,13 @@ module type Rinterface =
 
 include Rinterface;;
 
-module type R_Environment = sig val variables : (string * string) list end
+(** {2 Functor interface}
+
+A functor interface is provided so it is possible to ensure that the interpreter
+   is initialized before using the interface. The creation of the interface
+   module using the {!Rinterpreter} functor performs the initialization using
+   {!init}. As environement, you can specify your own or use the {!Rstdenv} module.
+*)
+
+module type R_Environment = sig val env : (string * string) list end
 module Interpreter : functor (Env : R_Environment) -> Rinterface

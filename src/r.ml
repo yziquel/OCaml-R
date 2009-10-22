@@ -23,9 +23,19 @@
 (*                                                                               *)
 (*********************************************************************************)
 
+(** *)
+
 external init_r : string array -> int = "init_r";;
-let init ?(argv=Sys.argv) () = init_r argv;;
 external terminate : unit -> unit = "end_r";;
+
+exception Initialisation_failed
+
+let init ?(env=Rstdenv.env) ?(argv=Sys.argv) () =
+(*  List.iter (function name, value -> Unix.putenv name value) env;*)
+  match init_r argv with
+  | 1 -> ()
+  | _ -> raise Initialisation_failed
+;;
 
 
 module type Rinterface = sig
@@ -121,7 +131,7 @@ include Rinterface_impl;;
 
 module type R_Environment =
 sig
-  val variables : (string * string) list
+  val env : (string * string) list
 end
 
 module Interpreter (Env : R_Environment) : sig
@@ -129,10 +139,5 @@ module Interpreter (Env : R_Environment) : sig
   end =
 struct
   include Rinterface_impl
-  exception Initialisation_failed
-  let () = List.iter (function name, value -> Unix.putenv name value)
-    Env.variables
-
-  let () = match init_r [|"R"|] with
-    | 1 -> () | _ -> raise Initialisation_failed
+  let () = init ~env: Env.env ()
 end

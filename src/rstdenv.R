@@ -1,7 +1,7 @@
 ExcludeVars <- c("R_SESSION_TMPDIR","R_HISTFILE")
 IncludeVars <- Sys.getenv()
 IncludeVars <- IncludeVars[grep("^R_",names(IncludeVars),perl=TRUE)]
-cat("let variables = [\n")
+cat("let env = [\n")
 for (i in 1:length(IncludeVars)){
 	if (names(IncludeVars)[i] %in% ExcludeVars)
 		next

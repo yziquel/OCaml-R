@@ -27,8 +27,7 @@
 
 let main () =
   prerr_endline "Initialization";
-  let n = R.init() in
-  prerr_endline ("Returned: "^(string_of_int n));
+  R.init();;
 
   for i = 0 to 30 do
     prerr_endline "defining sexp";
