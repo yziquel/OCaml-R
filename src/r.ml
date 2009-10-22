@@ -31,7 +31,7 @@ external terminate : unit -> unit = "end_r";;
 exception Initialisation_failed
 
 let init ?(env=Rstdenv.env) ?(argv=Sys.argv) () =
-(*  List.iter (function name, value -> Unix.putenv name value) env;*)
+  List.iter (function name, value -> Unix.putenv name value) env;
   match init_r argv with
   | 1 -> ()
   | _ -> raise Initialisation_failed
