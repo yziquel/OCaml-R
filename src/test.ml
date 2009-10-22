@@ -446,7 +446,7 @@ let main () =
 
   print_newline();
 
-  prerr_endline "### Trying plots and error handling";
+  prerr_endline "### Trying plots and error handling";
 
   R.exec "plot" [|
    `Anon (R.sexp "1:10") ;
