@@ -42,8 +42,7 @@ LINKFLAGS_MATH_BYTE=$(INCLUDES) -ccopt -L$(RLIBDIR)  -cclib -lRmath
 
 LIB_CMOFILES=\
 	rdevices.cmo \
-	r.cmo \
-	oCamlR.cmo
+	r.cmo
 
 LIB_CMXFILES=$(LIB_CMOFILES:.cmo=.cmx)
 LIB_CMIFILES= $(LIB_CMOFILES:.cmo=.cmi)
