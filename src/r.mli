@@ -23,6 +23,12 @@
 (*                                                                               *)
 (*********************************************************************************)
 
+module type Environment = sig val env : (string * string) list end
+
+(** Module containing standard environment variables for R. *)
+
+module Standard : Environment
+
 (** Interface to R. *)
 
 exception Initialisation_failed;;
@@ -39,7 +45,7 @@ val init : ?env:(string * string) list -> ?argv:string array -> unit -> unit
 (** Call this function to terminate properly the interpreter. *)
 val terminate : unit -> unit
 
-module type Rinterface =
+module type Interface =
   sig
     type sexp
     type symbol = string
@@ -70,7 +76,7 @@ module type Rinterface =
     val dimnames : sexp -> string array
   end
 
-include Rinterface;;
+include Interface;;
 
 (** {2 Functor interface}
 
@@ -80,5 +86,4 @@ A functor interface is provided so it is possible to ensure that the interpreter
    {!init}. As environement, you can specify your own or use the {!Rstdenv} module.
 *)
 
-module type R_Environment = sig val env : (string * string) list end
-module Interpreter : functor (Env : R_Environment) -> Rinterface
+module Interpreter : functor (Env : Environment) -> Interface

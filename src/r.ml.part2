@@ -30,7 +30,7 @@ external terminate : unit -> unit = "end_r";;
 
 exception Initialisation_failed
 
-let init ?(env=Rstdenv.env) ?(argv=Sys.argv) () =
+let init ?(env=Standard.env) ?(argv=Sys.argv) () =
   List.iter (function name, value -> Unix.putenv name value) env;
   match init_r argv with
   | 1 -> ()
@@ -38,7 +38,7 @@ let init ?(env=Rstdenv.env) ?(argv=Sys.argv) () =
 ;;
 
 
-module type Rinterface = sig
+module type Interface = sig
     type sexp
     type symbol = string
     type arg = [ `Anon of sexp | `Named of symbol * sexp ]
@@ -68,7 +68,7 @@ module type Rinterface = sig
     val dimnames : sexp -> string array
 end;;
 
-module Rinterface_impl : Rinterface =
+module Interface_impl : Interface =
   struct
     type sexp
     type symbol = string
@@ -125,19 +125,9 @@ let of_string_matrix = of_matrix of_string;;
 *)
 end
 
-include Rinterface_impl;;
+include Interface_impl;;
 
-(** Functor to properly set up R environment variables. *)
-
-module type R_Environment =
-sig
-  val env : (string * string) list
-end
-
-module Interpreter (Env : R_Environment) : sig
-    include Rinterface
-  end =
-struct
-  include Rinterface_impl
+module Interpreter (Env : Environment) : Interface = struct
+  include Interface_impl
   let () = init ~env: Env.env ()
 end

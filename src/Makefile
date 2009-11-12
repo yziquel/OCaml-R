@@ -42,7 +42,6 @@ LINKFLAGS_MATH_BYTE=$(INCLUDES) -ccopt -L$(RLIBDIR)  -cclib -lRmath
 
 LIB_CMOFILES=\
 	rdevices.cmo \
-	rstdenv.cmo \
 	r.cmo \
 
 LIB_CMXFILES=$(LIB_CMOFILES:.cmo=.cmx)
@@ -112,8 +111,11 @@ libr_math_stubs.a: r_math.o
 $(PA_R): pa_ocamlr.ml
 	$(OCAMLC) -I +camlp4 -I +camlp4/Camlp4Parsers -c -pp camlp4of.opt $<
 
-rstdenv.ml: rstdenv.R
-	$(R) --silent --vanilla --slave < rstdenv.R > rstdenv.ml
+r.ml.part1: rstdenv.R
+	$(R) --silent --vanilla --slave < rstdenv.R > r.ml.part1
+
+r.ml: r.ml.part1 r.ml.part2
+	cat r.ml.part1 r.ml.part2 > r.ml
 
 test.x: $(LIB) $(LIBMATH) test.cmx
 	$(OCAMLOPT) -verbose -o $@ unix.cmxa $(LIBMATH) $(LIB) test.cmx
