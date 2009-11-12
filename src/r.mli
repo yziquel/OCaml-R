@@ -83,7 +83,7 @@ include Interface;;
 A functor interface is provided so it is possible to ensure that the interpreter
    is initialized before using the interface. The creation of the interface
    module using the {!Interpreter} functor performs the initialization using
-   {!init}. As environement, you can specify your own or use the {!Rstdenv} module.
+   {!init}. As environement, you can specify your own or use the {!Standard} module.
 *)
 
 module Interpreter : functor (Env : Environment) -> Interface
