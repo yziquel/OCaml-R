@@ -1775,9 +1775,9 @@ fi
 #######################
 # Main produced files
 #######################
-LIB=r.cmxa
-LIB_BYTE=r.cma
-LIB_CMI=r.cmi
+LIB=r.cmxa oCamlR.cmxa
+LIB_BYTE=r.cma oCamlR.cmxa
+LIB_CMI=r.cmi oCamlR.cmi
 
 LIBMATH=rmath.cmxa
 LIBMATH_BYTE=rmath.cma
