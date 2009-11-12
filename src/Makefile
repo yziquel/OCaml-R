@@ -65,8 +65,8 @@ LIBMATH_COBJ_FILES=r_math.o
 ############
 opt: lib
 byte: lib_byte $(PA_R)
-lib: $(LIB) $(LIB_CMI) $(LIBMATH) $(LIBMATH_CMI)
-lib_byte: $(LIB_BYTE) $(LIB_CMI) $(LIBMATH_BYTE) $(LIBMATH_CMI)
+lib: $(LIB) $(LIB_CMI) $(LIBINTERP) $(LIBINTERP_CMI) $(LIBMATH) $(LIBMATH_CMI)
+lib_byte: $(LIB_BYTE) $(LIB_CMI) $(LIBINTERP_BYTE) $(LIBINTERP_CMI) $(LIBMATH_BYTE) $(LIBMATH_CMI)
 
 all: byte opt
 
@@ -82,6 +82,12 @@ $(LIB): dllr_base_stubs.so dllr_data_stubs.so $(LIB_CMIFILES) $(LIB_CMXFILES)
 	-cclib -lr_base_stubs -cclib -lr_data_stubs \
 	-cclib -lR \
 	-o $@ $(LIB_CMXFILES)
+
+$(LIBINTERP_BYTE): oCamlR.cmi oCamlR.cmo
+	$(OCAMLC) -a -o $@ oCamlR.cmo
+
+$(LIBINTERP): oCamlR.cmi oCamlR.cmx
+	$(OCAMLOPT) -a -o $@ oCamlR.cmx
 
 $(LIBMATH_BYTE): dllr_math_stubs.so $(LIBMATH_CMIFILES) $(LIBMATH_CMOFILES)
 	$(OCAMLC) -a -dllib dllr_math_stubs.so -dllib libRmath.so \
