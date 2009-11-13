@@ -23,6 +23,9 @@
 (*                                                                               *)
 (*********************************************************************************)
 
+(* This is the end of the Standard module, constructed via r.ml.part1 and .part2. *)
+end
+
 (** *)
 
 external init_r : string array -> int = "init_r";;
