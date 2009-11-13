@@ -23,7 +23,11 @@
 (*                                                                               *)
 (*********************************************************************************)
 
-module type Environment = sig val env : (string * string) list end
+module type Environment = sig
+  val name : string
+  val options : string list
+  val env : (string * string) list
+end
 
 (** Module containing standard environment variables for R. *)
 
@@ -33,14 +37,14 @@ module Standard : Environment
 
 exception Initialisation_failed;;
 
-(** Intialize the R interpreter.
-   @param env can be used to specify alternative environement variables. Default
-    environement is the one defined by the detected R at compile time.
+(** Initialize the R interpreter.
+   @param env can be used to specify alternative environment variables. Default
+    environment is the one defined by the detected R at compile time.
    @param argv can be used to pass command line arguments to the R
     initialization function in C.
    @raise Initialisation_failed if an error occurs.
  *)
-val init : ?env:(string * string) list -> ?argv:string array -> unit -> unit
+val init : ?name:string -> ?argv:string list -> ?env:(string * string) list -> unit -> unit
 
 (** Call this function to terminate properly the interpreter. *)
 val terminate : unit -> unit
