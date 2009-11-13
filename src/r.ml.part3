@@ -33,9 +33,11 @@ external terminate : unit -> unit = "end_r";;
 
 exception Initialisation_failed
 
-let init ?(env=Standard.env) ?(argv=Sys.argv) () =
+let init ?(name = try Sys.argv.(0) with _ -> "OCaml-R")
+         ?(argv = try List.tl (Array.to_list Sys.argv) with _ -> [])
+         ?(env  = Standard.env) () =
   List.iter (function name, value -> Unix.putenv name value) env;
-  match init_r argv with
+  match init_r (Array.of_list (name::argv)) with
   | 1 -> ()
   | _ -> raise Initialisation_failed
 ;;
@@ -132,5 +134,5 @@ include Interface_impl;;
 
 module Interpreter (Env : Environment) : Interface = struct
   include Interface_impl
-  let () = init ~env: Env.env ()
+  let () = init ~name: Env.name ~argv: Env.options ~env: Env.env ()
 end
