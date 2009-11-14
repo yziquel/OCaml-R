@@ -110,6 +110,25 @@ CAMLprim void r_print_value (value sexp) {
   CAMLreturn0;
 }
 
+CAMLprim value eval_sexp_list (value sexp_list) {
+  CAMLparam1(sexp_list);
+  CAMLlocal1(result);
+
+  SEXP sexp2eval = (SEXP) Long_val(Field(sexp,0));
+  SEXP e;
+  int error = 0;
+
+  /* Should this be wrapped with a PROTECT() and
+     an UNPROTECT(1)? */
+  e = R_tryEval(sexp2eval, R_GlobalEnv, &error);
+
+  if (error) {caml_failwith("OCaml-R error in eval_sexp_list C stub.")};
+
+  result = alloc(1,Abstract_tag);
+  Field(result,0) = Val_long(e);
+  CAMLreturn(result);
+}
+
 CAMLprim void r_exec (value fun_name, value args) {
   CAMLparam2(fun_name, args);
   CAMLlocal2(tmpval,tmpval2);
