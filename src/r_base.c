@@ -114,7 +114,7 @@ CAMLprim value eval_sexp_list (value sexp_list) {
   CAMLparam1(sexp_list);
   CAMLlocal1(result);
 
-  SEXP sexp2eval = (SEXP) Long_val(Field(sexp,0));
+  SEXP sexp2eval = (SEXP) Long_val(Field(sexp_list,0));
   SEXP e;
   int error = 0;
 
