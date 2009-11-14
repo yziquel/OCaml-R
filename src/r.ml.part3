@@ -43,6 +43,7 @@ let init ?(name = try Sys.argv.(0) with _ -> "OCaml-R")
 ;;
 
 type sexp
+type langsxp (* We should perhaps make sexp a polymorphic type? *)
 type symbol = string
 type arg = [
     `Named of symbol * sexp
@@ -53,7 +54,10 @@ external sexp : string -> sexp = "r_sexp_of_string"
 external sexp_of_symbol : symbol -> sexp = "r_sexp_of_symbol"
 external set_var : symbol -> sexp -> unit = "r_set_var"
 external r_print_value : sexp -> unit = "r_print_value"
-external eval_sexp_list : sexp -> sexp = "r_eval_sexp_list"
+
+external langsxp_of_list : sexp list -> langsxp = "langsxp_of_list"
+external eval_langsxp : langsxp -> sexp = "r_eval_langsxp"
+let eval = function l -> eval_langsxp (langsxp_of_list l)
 external exec : string -> arg array -> unit = "r_exec"
 
 external to_bool : sexp -> bool = "bool_of_sexp"

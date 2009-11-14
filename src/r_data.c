@@ -217,19 +217,29 @@ CAMLprim value to_matrix (value f, value sexp) {
 }
 */
 
-/* listsxp_of_list creates a lisp-like list out of an
-   OCaml list. listsxps, called pairlists, are not much
+/* langsxp_of_list creates a lisp-like list out of an
+   OCaml list. langsxps, called pairlists, are not much
    used in R these days, except for internal matters,
    such as being an argument to R_tryEval.
    - Argument l is the OCaml list.
    - Argument n is the length of the OCaml list. */
-CAMLprim value listsxp_of_list (value l, value ml_n) {
-  CAMLparam2(l, ml_n);
-  int n = Int_val(ml_n);
+CAMLprim value langsxp_of_list (value l, value n) {
+  CAMLparam2(l, n);
+  CAMLlocal(l_cursor);
   SEXP s, t;
-  PROTECT(t = s = allocList(n));
+
+  PROTECT(t = s = allocList(Int_val(n)));
   SET_TYPEOF(s, LANGSXP);
   /* Fill in list s, with t moving over the pairlist,
      with values from l */
+  int first_time = 1;
+  while (l_cursor && Is_block(l_cursor)) {
+    if (first_time) {first_time = 0;} else {t = CDR(t);}
+    SEXP sexp_item = (SEXP) Long_val(Field(Field(l_cursor, 0), 0));
+    SETCAR(t, sexp_item);
+    l_cursor = Field(l_cursor, 1);
+  }
   UNPROTECT(1);
+
+  CAMLreturn(Val_sexp(s));
 }

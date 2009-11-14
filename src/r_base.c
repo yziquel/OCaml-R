@@ -108,7 +108,7 @@ CAMLprim void r_print_value (value sexp) {
   CAMLreturn0;
 }
 
-CAMLprim value r_eval_sexp_list (value sexp_list) {
+CAMLprim value r_eval_langsxp (value sexp_list) {
   CAMLparam1(sexp_list);
 
   SEXP sexp2eval = (SEXP) Long_val(Field(sexp_list,0));
@@ -116,8 +116,9 @@ CAMLprim value r_eval_sexp_list (value sexp_list) {
   int error = 0;
 
   /* Should this be wrapped with a PROTECT() and
-     an UNPROTECT(1)? */
-  e = R_tryEval(sexp2eval, R_GlobalEnv, &error);
+     an UNPROTECT(1), or not? */
+  PROTECT(e = R_tryEval(sexp2eval, R_GlobalEnv, &error));
+  UNPROTECT(1);
 
   if (error) {caml_failwith(
     "OCaml-R error in eval_sexp_list C stub."

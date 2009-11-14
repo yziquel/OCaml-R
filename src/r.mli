@@ -56,6 +56,7 @@ val sexp : string -> sexp
 val sexp_of_symbol : symbol -> sexp
 val set_var : symbol -> sexp -> unit
 val r_print_value : sexp -> unit
+val eval : sexp list -> sexp
 val exec : string -> arg array -> unit
 val to_bool : sexp -> bool
 val to_int : sexp -> int
