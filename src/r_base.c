@@ -122,7 +122,9 @@ CAMLprim value eval_sexp_list (value sexp_list) {
      an UNPROTECT(1)? */
   e = R_tryEval(sexp2eval, R_GlobalEnv, &error);
 
-  if (error) {caml_failwith("OCaml-R error in eval_sexp_list C stub.")};
+  if (error) {caml_failwith(
+    "OCaml-R error in eval_sexp_list C stub."
+  );};
 
   result = alloc(1,Abstract_tag);
   Field(result,0) = Val_long(e);
