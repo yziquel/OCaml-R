@@ -199,7 +199,6 @@ CAMLprim value float_array_of_sexp (value sexp) {
 
 CAMLprim value r_get_attrib (value sexp, value attrib) {
   CAMLparam2(sexp,attrib);
-  CAMLlocal1(result);
   SEXP e = (SEXP)Long_val(Field(sexp,0));
   SEXP res;
   PROTECT(res = Rf_getAttrib(e, mkString(String_val(attrib))));
@@ -217,3 +216,20 @@ CAMLprim value to_matrix (value f, value sexp) {
 
 }
 */
+
+/* listsxp_of_list creates a lisp-like list out of an
+   OCaml list. listsxps, called pairlists, are not much
+   used in R these days, except for internal matters,
+   such as being an argument to R_tryEval.
+   - Argument l is the OCaml list.
+   - Argument n is the length of the OCaml list. */
+CAMLprim value listsxp_of_list (value l, value ml_n) {
+  CAMLparam2(l, ml_n);
+  int n = Int_val(ml_n);
+  SEXP s, t;
+  PROTECT(t = s = allocList(n));
+  SET_TYPEOF(s, LANGSXP);
+  /* Fill in list s, with t moving over the pairlist,
+     with values from l */
+  UNPROTECT(1);
+}

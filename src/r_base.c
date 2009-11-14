@@ -61,7 +61,6 @@ void prerr_endline (char* s) {
 
 CAMLprim value r_sexp_of_symbol (value symbol) {
   CAMLparam1(symbol);
-  CAMLlocal1(result);
   char* c_symbol = String_val(symbol);
   SEXP e;
 
@@ -69,9 +68,8 @@ CAMLprim value r_sexp_of_symbol (value symbol) {
   PROTECT(e = duplicate(findVar(install(c_symbol), R_GlobalEnv)));
   /*PrintValue(e);*/
   UNPROTECT(1);
-  result = alloc(1,Abstract_tag) ;
-  Field(result,0) = Val_long(e) ;
-  CAMLreturn(result);
+
+  CAMLreturn(Val_sexp(e));
 }
 
 CAMLprim value r_sexp_of_string (value expression) {
@@ -110,9 +108,8 @@ CAMLprim void r_print_value (value sexp) {
   CAMLreturn0;
 }
 
-CAMLprim value eval_sexp_list (value sexp_list) {
+CAMLprim value r_eval_sexp_list (value sexp_list) {
   CAMLparam1(sexp_list);
-  CAMLlocal1(result);
 
   SEXP sexp2eval = (SEXP) Long_val(Field(sexp_list,0));
   SEXP e;
@@ -126,9 +123,7 @@ CAMLprim value eval_sexp_list (value sexp_list) {
     "OCaml-R error in eval_sexp_list C stub."
   );};
 
-  result = alloc(1,Abstract_tag);
-  Field(result,0) = Val_long(e);
-  CAMLreturn(result);
+  CAMLreturn(Val_sexp(e));
 }
 
 CAMLprim void r_exec (value fun_name, value args) {

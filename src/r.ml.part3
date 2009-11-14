@@ -53,6 +53,7 @@ external sexp : string -> sexp = "r_sexp_of_string"
 external sexp_of_symbol : symbol -> sexp = "r_sexp_of_symbol"
 external set_var : symbol -> sexp -> unit = "r_set_var"
 external r_print_value : sexp -> unit = "r_print_value"
+external eval_sexp_list : sexp -> sexp = "r_eval_sexp_list"
 external exec : string -> arg array -> unit = "r_exec"
 
 external to_bool : sexp -> bool = "bool_of_sexp"
