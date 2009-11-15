@@ -84,7 +84,7 @@ CAMLprim value r_sexp_of_string (value expression) {
   asprintf(&s_exp, "%s = %s", c_name, String_val(expression));
   PROTECT(tmp = mkString(s_exp));
   PROTECT(e = R_ParseVector(tmp, 1, &status, R_NilValue));
-  /*PrintValue(e);*/
+  PrintValue(e); /* DEBUG */
   R_tryEval(VECTOR_ELT(e,0), R_GlobalEnv, &hadError);
   UNPROTECT(2);
   free(s_exp);
