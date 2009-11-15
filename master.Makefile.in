@@ -106,7 +106,7 @@ ROOT=@ROOT@
 	$(OCAMLOPT) $(OCAMLPP) $(COMPFLAGS) -c $<
 
 %.o: %.c
-	$(OCAMLOPT) $(COMPFLAGS) -ccopt -fPIC -c $<
+	$(OCAMLOPT) -Wall $(COMPFLAGS) -ccopt -fPIC -c $<
 
 %.ml:%.mll
 	$(OCAMLLEX) $<
