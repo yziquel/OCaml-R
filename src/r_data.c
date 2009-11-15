@@ -44,7 +44,7 @@ CAMLprim value Val_voidptr (void *pointer)
 {
   CAMLparam0();
   CAMLlocal1(result);
-  rv = caml_alloc (1, Abstract_tag);
+  result = caml_alloc (1, Abstract_tag);
   Field(result, 0) = (value) pointer;
   CAMLreturn (result);
 }
