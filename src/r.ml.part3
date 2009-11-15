@@ -55,9 +55,9 @@ external sexp_of_symbol : symbol -> sexp = "r_sexp_of_symbol"
 external set_var : symbol -> sexp -> unit = "r_set_var"
 external r_print_value : sexp -> unit = "r_print_value"
 
-external langsxp_of_list : sexp list -> langsxp = "langsxp_of_list"
+external langsxp_of_list : sexp list -> int -> langsxp = "langsxp_of_list"
 external eval_langsxp : langsxp -> sexp = "r_eval_langsxp"
-let eval = function l -> eval_langsxp (langsxp_of_list l)
+let eval = function l -> eval_langsxp (langsxp_of_list l (List.length l))
 external exec : string -> arg array -> unit = "r_exec"
 
 external to_bool : sexp -> bool = "bool_of_sexp"
