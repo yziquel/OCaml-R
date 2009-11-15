@@ -34,6 +34,8 @@
 #include <R_ext/Parse.h>
 #include <stdio.h>
 
+#include "r_data.h"
+
 /* Base functions. */
 
 CAMLprim value init_r (value argv) {

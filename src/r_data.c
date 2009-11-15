@@ -173,11 +173,16 @@ CAMLprim value name##_array_of_sexp (value sexp) { \
   UNPROTECT(1); \
   CAMLreturn(result);}
 
-ARRAY_VALUE(bool, int, LOGICAL, AS_LOGICAL, Val_bool)
-ARRAY_VALUE(int, int, INTEGER, AS_INTEGER, Val_int)
+/* ARRAY_VALUE(bool, int, LOGICAL, AS_LOGICAL, Val_bool) */
+    /* Commented because 'cast to pointer from integer of different size' */
+
+/* ARRAY_VALUE(int, int, INTEGER, AS_INTEGER, Val_int) */
+    /* Commented because 'cast to pointer from integer of different size' */
+
 //ARRAY_VALUE(string, char*, CHARACTER_VALUE, caml_copy_string)
 
-CAMLprim value string_array_of_sexp (value sexp) {
+/* Commented because 'passing argument 1 of ‘Rf_asChar’ from incompatible pointer type' */
+/*CAMLprim value string_array_of_sexp (value sexp) {
   CAMLparam1(sexp);
   CAMLlocal1(result);
   SEXP e = (SEXP)Long_val(Field(sexp,0));
@@ -192,7 +197,7 @@ CAMLprim value string_array_of_sexp (value sexp) {
   }
   UNPROTECT(1);
   CAMLreturn(result);
-}
+}*/
 
 CAMLprim value float_array_of_sexp (value sexp) {
   CAMLparam1(sexp);
