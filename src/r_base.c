@@ -98,7 +98,7 @@ CAMLprim void r_set_var (value name, value sexp) {
 
 CAMLprim void r_print_value (value sexp) {
   CAMLparam1(sexp);
-  SEXP e = (SEXP) Long_val(Field(sexp,0));
+  SEXP e = Sexp_val(sexp);
   PrintValue(e);
   CAMLreturn0;
 }
