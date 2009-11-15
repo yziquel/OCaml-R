@@ -43,7 +43,7 @@ CAMLprim value Val_sexp (SEXP sexp) {
   CAMLreturn(result);
 }
 
-SEXP Sep_val (value sexp) {
+SEXP Sexp_val (value sexp) {
   SEXP s = (SEXP) Long_val(Field(sexp, 0));
   return s;
 }
