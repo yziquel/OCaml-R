@@ -40,14 +40,20 @@ void prerr_endline (char* s) {
   fflush(stderr);
 }
 
-CAMLprim value Val_voidptr (void *pointer)
-{
-  CAMLparam0();
-  CAMLlocal1(result);
-  result = caml_alloc (1, Abstract_tag);
-  Field(result, 0) = (value) pointer;
-  CAMLreturn (result);
-}
+/* Concerning wrapping OCaml values. Would it not be
+   better to use the following Val_voidptr function
+   from perl4caml? Val_sexp could be just a macro...
+   The main question is: (value) pointer, or
+   Val_long(sexp) to wrap up the R sexp? And 'alloc',
+   or 'caml_alloc'? */
+//CAMLprim value Val_voidptr (void *pointer)
+//{
+//  CAMLparam0();
+//  CAMLlocal1(result);
+//  result = caml_alloc (1, Abstract_tag);
+//  Field(result, 0) = (value) pointer;
+//  CAMLreturn (result);
+//}
 
 CAMLprim value Val_sexp (SEXP sexp) {
   CAMLparam0();
@@ -58,8 +64,7 @@ CAMLprim value Val_sexp (SEXP sexp) {
 }
 
 SEXP Sexp_val (value sexp) {
-  SEXP s = (SEXP) Long_val(Field(sexp, 0));
-  return s;
+  return (SEXP) Long_val(Field(sexp, 0));
 }
 
 CAMLprim value sexptype_of_sexp (value sexp) {

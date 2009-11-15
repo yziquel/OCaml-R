@@ -43,8 +43,8 @@
 
 /* Base functions. */
 
-CAMLprim value init_r (value argv) {
-  CAMLparam1(argv);
+CAMLprim value init_r (value argv, value sigs) {
+  CAMLparam2(argv, sigs);
   int length = Wosize_val(argv);
   char* argv2[length];
   int i;
@@ -52,8 +52,9 @@ CAMLprim value init_r (value argv) {
     argv2[i]=String_val(Field(argv,i));
   }
 
-  /* Don't let R set up its own signal handlers. Needs R >= 2.3.1. */
-  R_SignalHandlers = 0;
+  /* Don't let R set up its own signal handlers when sigs = 1.
+     This requires R >= 2.3.1. */
+  if (Int_val(sigs)) {R_SignalHandlers = 0;}
 
   i = Rf_initEmbeddedR(length, argv2);
   CAMLreturn(Val_int(i));
@@ -70,9 +71,9 @@ CAMLprim value r_sexp_of_symbol (value symbol) {
   char* c_symbol = String_val(symbol);
   SEXP e;
 
-  prerr_endline (c_symbol); /* DEBUG */
+  /* prerr_endline (c_symbol); DEBUG */
   PROTECT(e = duplicate(findVar(install(c_symbol), R_GlobalEnv)));
-  PrintValue(e); /* DEBUG */
+  /* PrintValue(e); DEBUG */
   UNPROTECT(1);
 
   CAMLreturn(Val_sexp(e));
@@ -90,14 +91,13 @@ CAMLprim value r_sexp_of_string (value expression) {
   asprintf(&s_exp, "%s = %s", c_name, String_val(expression));
   PROTECT(tmp = mkString(s_exp));
   PROTECT(e = R_ParseVector(tmp, 1, &status, R_NilValue));
-  PrintValue(e); /* DEBUG */
+  /* PrintValue(e); DEBUG */
   R_tryEval(VECTOR_ELT(e,0), R_GlobalEnv, &hadError);
   UNPROTECT(2);
   free(s_exp);
   result = r_sexp_of_symbol(caml_copy_string(c_name));
   CAMLreturn(result);
 }
-
 
 CAMLprim void r_set_var (value name, value sexp) {
   CAMLparam2(name,sexp);

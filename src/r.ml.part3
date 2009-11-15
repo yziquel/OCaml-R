@@ -28,19 +28,19 @@ end
 
 (** *)
 
-external init_r : string array -> int = "init_r";;
-external terminate : unit -> unit = "end_r";;
+external init_r : string array -> int -> int = "init_r"
+external terminate : unit -> unit = "end_r"
 
 exception Initialisation_failed
 
-let init ?(name = try Sys.argv.(0) with _ -> "OCaml-R")
-         ?(argv = try List.tl (Array.to_list Sys.argv) with _ -> [])
-         ?(env  = Standard.env) () =
+let init ?(name    = try Sys.argv.(0) with _ -> "OCaml-R")
+         ?(argv    = try List.tl (Array.to_list Sys.argv) with _ -> [])
+         ?(env     = Standard.env)
+         ?(sigs    = Standard.signal_handlers) () =
   List.iter (function name, value -> Unix.putenv name value) env;
-  match init_r (Array.of_list (name::argv)) with
-  | 1 -> ()
-  | _ -> raise Initialisation_failed
-;;
+  let r_sigs = match sigs with true -> 0 | false -> 1 in
+  match init_r (Array.of_list (name::argv)) r_sigs with
+  | 1 -> () | _ -> raise Initialisation_failed
 
 type sexp
 type langsxp (* We should perhaps make sexp a polymorphic type? *)
@@ -113,7 +113,7 @@ let sexptype s = match (r_sexptype_of_sexp s) with
 external sexp : string -> sexp = "r_sexp_of_string"
 external sexp_of_symbol : symbol -> sexp = "r_sexp_of_symbol"
 external set_var : symbol -> sexp -> unit = "r_set_var"
-external r_print_value : sexp -> unit = "r_print_value"
+external print : sexp -> unit = "r_print_value"
 
 external langsxp_of_list : sexp list -> int -> langsxp = "langsxp_of_list"
 external eval_langsxp : langsxp -> sexp = "r_eval_langsxp"
@@ -170,5 +170,9 @@ let of_string_matrix = of_matrix of_string;;
 module type Interpreter = sig end
 
 module Interpreter (Env : Environment) : Interpreter = struct
-  let () = init ~name: Env.name ~argv: Env.options ~env: Env.env ()
+  let () = init ~name: Env.name
+                ~argv: Env.options
+                ~env:  Env.env
+                ~sigs: Env.signal_handlers
+                ()
 end

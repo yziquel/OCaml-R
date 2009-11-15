@@ -26,6 +26,7 @@
 module type Environment = sig
   val name : string
   val options : string list
+  val signal_handlers : bool
   val env : (string * string) list
 end
 
@@ -85,7 +86,7 @@ val sexptype : sexp -> sexptype
 val sexp : string -> sexp
 val sexp_of_symbol : symbol -> sexp
 val set_var : symbol -> sexp -> unit
-val r_print_value : sexp -> unit
+val print : sexp -> unit
 val eval : sexp list -> sexp
 (*val exec : string -> arg array -> unit
   Commented out while working on compilation of 64 bits. *)
