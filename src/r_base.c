@@ -31,10 +31,11 @@
 #include <alloc.h>
 #include <memory.h>
 #include <fail.h>
-#include <Rinternals.h>
 #include <R.h>
-#include <Rembedded.h>
 #include <Rdefines.h>
+#include <Rinternals.h>
+#include <Rinterface.h>
+#include <Rembedded.h>
 #include <R_ext/Parse.h>
 #include <stdio.h>
 
