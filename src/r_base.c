@@ -50,6 +50,10 @@ CAMLprim value init_r (value argv) {
   for (i=0 ; i<length ; i++) {
     argv2[i]=String_val(Field(argv,i));
   }
+
+  /* Don't let R set up its own signal handlers. Needs R >= 2.3.1. */
+  R_SignalHandlers = 0;
+
   i = Rf_initEmbeddedR(length, argv2);
   CAMLreturn(Val_int(i));
 }
