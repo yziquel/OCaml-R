@@ -64,9 +64,9 @@ CAMLprim value r_sexp_of_symbol (value symbol) {
   char* c_symbol = String_val(symbol);
   SEXP e;
 
-  /*prerr_endline (c_symbol);*/
+  prerr_endline (c_symbol); /* DEBUG */
   PROTECT(e = duplicate(findVar(install(c_symbol), R_GlobalEnv)));
-  /*PrintValue(e);*/
+  PrintValue(e); /* DEBUG */
   UNPROTECT(1);
 
   CAMLreturn(Val_sexp(e));
