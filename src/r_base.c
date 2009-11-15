@@ -128,67 +128,68 @@ CAMLprim value r_eval_langsxp (value sexp_list) {
   CAMLreturn(Val_sexp(e));
 }
 
-CAMLprim void r_exec (value fun_name, value args) {
-  CAMLparam2(fun_name, args);
-  CAMLlocal2(tmpval,tmpval2);
-  int nb_args = Wosize_val(args);
-  int i;
-  SEXP s, t, u;
-  int error = 0;
-  char* error_msg;
-/*  prerr_endline (asprintf("%d args", nb_args));*/
-
-  PROTECT(t = s = allocList(nb_args + 1));
-  SET_TYPEOF(s, LANGSXP);
-  SETCAR(t, install(String_val(fun_name)));
-  for (i = 0; i < nb_args; i++) {
-    t = CDR(t);
-    tmpval = Field(args,i);
-    if (Is_block(tmpval)) {
-      tmpval2 = Field(tmpval,1);
-      if (Field(tmpval,0) == hash_variant("Named")) {
-/*
-        prerr_endline("Named");
-        prerr_endline(String_val(Field(tmpval2,0)));
-*/
-        SET_TAG(t, install(String_val(Field(tmpval2,0))));
-        u = Long_val(Field(Field(tmpval2,1),0));
-/*
-        PrintValue(u);
-*/
-        SETCAR(t, duplicate(u));
-/*
-        prerr_endline("Named ok");
-*/
-      } else if (Field(tmpval,0) == hash_variant("Anon")) {
-/*
-        prerr_endline ("Anon");
-*/
-        u = Long_val(Field(tmpval2,0));
-/*
-        PrintValue(u);
-*/
-        SETCAR(t, duplicate(u));
-/*
-        prerr_endline ("Anon ok");
-*/
-      } else {
-        prerr_endline("bad constructor");
-        /* bad constructor */
-      }
-
-    }  else
-    {
-      /* no argument, bad value for us */
-      prerr_endline("no block, bad value");
-    }
-  }
-  R_tryEval(s, R_GlobalEnv, &error);
-  UNPROTECT(1);
-  if (error) {
-    asprintf(&error_msg, "R failure while calling function '%s'.", String_val(fun_name));
-    caml_failwith(error_msg);
-  }
-  CAMLreturn0;
-}
+/* Commented out because of 'warning: assignment makes pointer from integer without a cast' */
+//CAMLprim void r_exec (value fun_name, value args) {
+//  CAMLparam2(fun_name, args);
+//  CAMLlocal2(tmpval,tmpval2);
+//  int nb_args = Wosize_val(args);
+//  int i;
+//  SEXP s, t, u;
+//  int error = 0;
+//  char* error_msg;
+///*  prerr_endline (asprintf("%d args", nb_args));*/
+//
+//  PROTECT(t = s = allocList(nb_args + 1));
+//  SET_TYPEOF(s, LANGSXP);
+//  SETCAR(t, install(String_val(fun_name)));
+//  for (i = 0; i < nb_args; i++) {
+//    t = CDR(t);
+//    tmpval = Field(args,i);
+//    if (Is_block(tmpval)) {
+//      tmpval2 = Field(tmpval,1);
+//      if (Field(tmpval,0) == hash_variant("Named")) {
+///*
+//        prerr_endline("Named");
+//        prerr_endline(String_val(Field(tmpval2,0)));
+//*/
+//        SET_TAG(t, install(String_val(Field(tmpval2,0))));
+//        u = Long_val(Field(Field(tmpval2,1),0));
+///*
+//        PrintValue(u);
+//*/
+//        SETCAR(t, duplicate(u));
+///*
+//        prerr_endline("Named ok");
+//*/
+//      } else if (Field(tmpval,0) == hash_variant("Anon")) {
+///*
+//        prerr_endline ("Anon");
+//*/
+//        u = Long_val(Field(tmpval2,0));
+///*
+//        PrintValue(u);
+//*/
+//        SETCAR(t, duplicate(u));
+///*
+//        prerr_endline ("Anon ok");
+//*/
+//      } else {
+//        prerr_endline("bad constructor");
+//        /* bad constructor */
+//      }
+//
+//    }  else
+//    {
+//      /* no argument, bad value for us */
+//      prerr_endline("no block, bad value");
+//    }
+//  }
+//  R_tryEval(s, R_GlobalEnv, &error);
+//  UNPROTECT(1);
+//  if (error) {
+//    asprintf(&error_msg, "R failure while calling function '%s'.", String_val(fun_name));
+//    caml_failwith(error_msg);
+//  }
+//  CAMLreturn0;
+//}
 

@@ -150,7 +150,7 @@ dep.ps:dep.dot
 # backup, clean and depend :
 ############################
 
-GENERATED_FILES=rstdenv.ml
+GENERATED_FILES=r.ml.part2 r.ml
 
 cleanocamldoc:
 	$(RM) -r ocamldoc
