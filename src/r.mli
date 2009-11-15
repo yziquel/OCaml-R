@@ -50,8 +50,38 @@ val init : ?name:string -> ?argv:string list -> ?env:(string * string) list -> u
 val terminate : unit -> unit
 
 type sexp
+type sexptype =
+  | NilSxp
+  | SymSxp
+  | ListSxp
+  | ClosSxp
+  | EnvSxp
+  | PromSxp
+  | LangSxp
+  | SpecialSxp
+  | BuiltinSxp
+  | CharSxp
+  | LglSxp
+  | IntSxp
+  | RealSxp
+  | CplxSxp
+  | StrSxp
+  | DotSxp
+  | AnySxp
+  | VecSxp
+  | ExprSxp
+  | BcodeSxp
+  | ExtptrSxp
+  | WeakrefSxp
+  | RawSxp
+  | S4Sxp
+  | FunSxp
+
 type symbol = string
 type arg = [ `Anon of sexp | `Named of symbol * sexp ]
+
+val sexptype : sexp -> sexptype
+
 val sexp : string -> sexp
 val sexp_of_symbol : symbol -> sexp
 val set_var : symbol -> sexp -> unit

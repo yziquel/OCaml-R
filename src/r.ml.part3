@@ -44,11 +44,71 @@ let init ?(name = try Sys.argv.(0) with _ -> "OCaml-R")
 
 type sexp
 type langsxp (* We should perhaps make sexp a polymorphic type? *)
+
+type sexptype =
+  | NilSxp
+  | SymSxp
+  | ListSxp
+  | ClosSxp
+  | EnvSxp
+  | PromSxp
+  | LangSxp
+  | SpecialSxp
+  | BuiltinSxp
+  | CharSxp
+  | LglSxp
+  | IntSxp
+  | RealSxp
+  | CplxSxp
+  | StrSxp
+  | DotSxp
+  | AnySxp
+  | VecSxp
+  | ExprSxp
+  | BcodeSxp
+  | ExtptrSxp
+  | WeakrefSxp
+  | RawSxp
+  | S4Sxp
+  | FunSxp
+
 type symbol = string
 type arg = [
     `Named of symbol * sexp
   | `Anon of sexp
   ]
+
+external r_sexptype_of_sexp : sexp -> int = "sexptype_of_sexp"
+let sexptype s = match (r_sexptype_of_sexp s) with
+  | 0  -> NilSxp
+  | 1  -> SymSxp
+  | 2  -> ListSxp
+  | 3  -> ClosSxp
+  | 4  -> EnvSxp
+  | 5  -> PromSxp
+  | 6  -> LangSxp
+  | 7  -> SpecialSxp
+  | 8  -> BuiltinSxp
+  | 9  -> CharSxp
+  | 10 -> LglSxp
+  (* Integer range is not defined here. *)
+  | 13 -> IntSxp
+  | 14 -> RealSxp
+  | 15 -> CplxSxp
+  | 16 -> StrSxp
+  | 17 -> DotSxp
+  | 18 -> AnySxp
+  | 19 -> VecSxp
+  | 20 -> ExprSxp
+  | 21 -> BcodeSxp
+  | 22 -> ExtptrSxp
+  | 23 -> WeakrefSxp
+  | 24 -> RawSxp
+  | 25 -> S4Sxp
+  (* 99 represents a 'dummy' type for functions, with is an
+     umbrella for Closure, Builtin or Special types. *)
+  | 99 -> FunSxp
+  | _ -> failwith "R value with type not specified in Rinternals.h"
 
 external sexp : string -> sexp = "r_sexp_of_string"
 external sexp_of_symbol : symbol -> sexp = "r_sexp_of_symbol"

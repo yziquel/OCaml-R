@@ -43,6 +43,16 @@ CAMLprim value Val_sexp (SEXP sexp) {
   CAMLreturn(result);
 }
 
+SEXP Sep_val (value sexp) {
+  SEXP s = (SEXP) Long_val(Field(sexp, 0));
+  return s;
+}
+
+CAMLprim value sexptype_of_sexp (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_int(TYPEOF(Sexp_val(sexp))));
+}
+
 #define SIMPLE_SEXP(name,type,setter,conv) \
 CAMLprim value sexp_of_##name (value v) { \
   CAMLparam1(v); SEXP sexp ; \
