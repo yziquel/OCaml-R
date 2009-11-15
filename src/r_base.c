@@ -23,6 +23,10 @@
 /*                                                                               */
 /*********************************************************************************/
 
+#define _GNU_SOURCE   /* Required by asprinft (see 'man asprintf'), as it is a
+                         GNU extension. Seems a bit overkill. Should try to
+                         remove this dependency on asprintf. */
+
 #include <mlvalues.h>
 #include <alloc.h>
 #include <memory.h>
