@@ -87,7 +87,8 @@ val sexp_of_symbol : symbol -> sexp
 val set_var : symbol -> sexp -> unit
 val r_print_value : sexp -> unit
 val eval : sexp list -> sexp
-val exec : string -> arg array -> unit
+(*val exec : string -> arg array -> unit
+  Commented out while working on compilation of 64 bits. *)
 val to_bool : sexp -> bool
 val to_int : sexp -> int
 val to_float : sexp -> float
@@ -96,17 +97,22 @@ val of_bool : bool -> sexp
 val of_int : int -> sexp
 val of_float : float -> sexp
 val of_string : string -> sexp
-val to_bool_array : sexp -> bool array
-val to_int_array : sexp -> int array
+(*val to_bool_array : sexp -> bool array
+  Commented out while working on 64 bits compilation. *)
+(*val to_int_array : sexp -> int array
+  Commented out while working on 64 bits compilation. *)
 val to_float_array : sexp -> float array
-val to_string_array : sexp -> string array
+(*val to_string_array : sexp -> string array
+  Commented out while working on 64 bits compilation. *)
 val of_bool_array : bool array -> sexp
 val of_int_array : int array -> sexp
 val of_float_array : float array -> sexp
 val of_string_array : string array -> sexp
 val get_attrib : sexp -> string -> sexp
-val dim : sexp -> int array
-val dimnames : sexp -> string array
+(*val dim : sexp -> int array
+  Commented out while working on 64 bits compilation. *)
+(*val dimnames : sexp -> string array
+  Commented out while working on 64 bits compilation. *)
 
 (** {2 Functor interface}
 

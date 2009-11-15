@@ -118,7 +118,8 @@ external r_print_value : sexp -> unit = "r_print_value"
 external langsxp_of_list : sexp list -> int -> langsxp = "langsxp_of_list"
 external eval_langsxp : langsxp -> sexp = "r_eval_langsxp"
 let eval = function l -> eval_langsxp (langsxp_of_list l (List.length l))
-external exec : string -> arg array -> unit = "r_exec"
+(*external exec : string -> arg array -> unit = "r_exec"
+  Commented out because of C warning. Will uncoment when OCaml-R compiles on 64 bits. *)
 
 external to_bool : sexp -> bool = "bool_of_sexp"
 external to_int : sexp -> int = "int_of_sexp"
@@ -130,10 +131,13 @@ external of_int : int -> sexp = "sexp_of_int"
 external of_float : float -> sexp = "sexp_of_float"
 external of_string : string -> sexp = "sexp_of_string"
 
-external to_bool_array : sexp -> bool array = "bool_array_of_sexp"
-external to_int_array : sexp -> int array = "int_array_of_sexp"
+(*external to_bool_array : sexp -> bool array = "bool_array_of_sexp"
+  Commented out while working on 64 bits compilation. *)
+(*external to_int_array : sexp -> int array = "int_array_of_sexp"
+  Commented out while working on 64 bits compilation. *)
 external to_float_array : sexp -> float array = "float_array_of_sexp"
-external to_string_array : sexp -> string array = "string_array_of_sexp"
+(*external to_string_array : sexp -> string array = "string_array_of_sexp"
+  Commented out while working on 64 bits compilation. *)
 
 external of_bool_array : bool array -> sexp = "sexp_of_bool_array"
 external of_int_array : int array -> sexp = "sexp_of_int_array"
@@ -142,8 +146,10 @@ external of_string_array : string array -> sexp = "sexp_of_string_array"
 
 external get_attrib : sexp -> string -> sexp = "r_get_attrib"
 
-let dim sexp = to_int_array (get_attrib sexp "dim");;
-let dimnames sexp = to_string_array (get_attrib sexp "dimnames");;
+(*let dim sexp = to_int_array (get_attrib sexp "dim");;
+  Commented out while working on 64 bits compilation. *)
+(*let dimnames sexp = to_string_array (get_attrib sexp "dimnames");;
+  Commented out while working on 64 bits compilation. *)
 
 (*
 external to_matrix : (sexp -> 'a) -> sexp -> 'a array array = "to_matrix"
