@@ -54,11 +54,6 @@ CAMLprim void end_r () {
   CAMLreturn0;
 }
 
-void prerr_endline (char* s) {
-  fprintf (stderr, "%s\n", s);
-  fflush(stderr);
-}
-
 CAMLprim value r_sexp_of_symbol (value symbol) {
   CAMLparam1(symbol);
   char* c_symbol = String_val(symbol);

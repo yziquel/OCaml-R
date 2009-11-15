@@ -35,6 +35,11 @@
 #include <R_ext/Parse.h>
 #include <stdio.h>
 
+void prerr_endline (char* s) {
+  fprintf (stderr, "%s\n", s);
+  fflush(stderr);
+}
+
 CAMLprim value Val_sexp (SEXP sexp) {
   CAMLparam0();
   CAMLlocal1(result);
