@@ -225,7 +225,7 @@ CAMLprim value to_matrix (value f, value sexp) {
    - Argument n is the length of the OCaml list. */
 CAMLprim value langsxp_of_list (value l, value n) {
   CAMLparam2(l, n);
-  CAMLlocal(l_cursor);
+  CAMLlocal1(l_cursor);
   SEXP s, t;
 
   PROTECT(t = s = allocList(Int_val(n)));
