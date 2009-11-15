@@ -173,7 +173,7 @@ end
 
 module Interpreter (Env : Environment) : Interpreter = struct
 
-  let require library = ignore (R.sexp ("require("^library^")"))
+  let require library = ignore (sexp ("require("^library^")"))
 
   let () = init ~name: Env.name
                 ~argv: Env.options
