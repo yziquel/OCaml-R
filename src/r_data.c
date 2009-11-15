@@ -233,6 +233,7 @@ CAMLprim value langsxp_of_list (value l, value n) {
   /* Fill in list s, with t moving over the pairlist,
      with values from l */
   int first_time = 1;
+  l_cursor = l;
   while (l_cursor && Is_block(l_cursor)) {
     if (first_time) {first_time = 0;} else {t = CDR(t);}
     SEXP sexp_item = (SEXP) Long_val(Field(Field(l_cursor, 0), 0));
