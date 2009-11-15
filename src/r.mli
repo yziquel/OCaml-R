@@ -126,6 +126,8 @@ A functor interface is provided so it is possible to ensure that the interpreter
    {!init}. As environement, you can specify your own or use the {!Standard} module.
 *)
 
-module type Interpreter = sig end
+module type Interpreter = sig
+  val require : string -> unit
+end
 
 module Interpreter : functor (Env : Environment) -> Interpreter
