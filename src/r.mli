@@ -45,7 +45,10 @@ exception Initialisation_failed;;
     initialization function in C.
    @raise Initialisation_failed if an error occurs.
  *)
-val init : ?name:string -> ?argv:string list -> ?env:(string * string) list -> unit -> unit
+val init : ?name:string ->
+           ?argv:string list ->
+           ?env:(string * string) list ->
+           ?sigs:bool -> unit -> unit
 
 (** Call this function to terminate properly the interpreter. *)
 val terminate : unit -> unit
