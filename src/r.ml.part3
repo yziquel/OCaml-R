@@ -190,7 +190,7 @@ module Interpreter (Env : Environment) : Interpreter = struct
 
   module Require (Lib : LibraryDescription) : Library = struct
     let () = ignore (sexp ("require("^Lib.name^")"))
-    let root = List.map sexp_of_symbol L.symbols
+    let root = List.map sexp_of_symbol Lib.symbols
   end
 
 end
