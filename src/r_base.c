@@ -60,10 +60,10 @@ CAMLprim value init_r (value argv, value sigs) {
   CAMLreturn(Val_int(i));
 }
 
-CAMLprim void end_r () {
+CAMLprim value end_r () {
   CAMLparam0();
   Rf_endEmbeddedR(0);
-  CAMLreturn0;
+  CAMLreturn(Val_unit);
 }
 
 CAMLprim value r_sexp_of_symbol (value symbol) {
@@ -99,19 +99,19 @@ CAMLprim value r_sexp_of_string (value expression) {
   CAMLreturn(result);
 }
 
-CAMLprim void r_set_var (value name, value sexp) {
+CAMLprim value r_set_var (value name, value sexp) {
   CAMLparam2(name,sexp);
   char* c_name = String_val(name);
   SEXP e = (SEXP) Long_val(Field(sexp,0));
   setVar(install(c_name), e, R_GlobalEnv);
-  CAMLreturn0;
+  CAMLreturn(Val_unit);
 }
 
-CAMLprim void r_print_value (value sexp) {
+CAMLprim value r_print_value (value sexp) {
   CAMLparam1(sexp);
   SEXP e = Sexp_val(sexp);
   PrintValue(e);
-  CAMLreturn0;
+  CAMLreturn(Val_unit);
 }
 
 CAMLprim value r_eval_langsxp (value sexp_list) {
@@ -134,7 +134,7 @@ CAMLprim value r_eval_langsxp (value sexp_list) {
 }
 
 /* Commented out because of 'warning: assignment makes pointer from integer without a cast' */
-//CAMLprim void r_exec (value fun_name, value args) {
+//CAMLprim value r_exec (value fun_name, value args) {
 //  CAMLparam2(fun_name, args);
 //  CAMLlocal2(tmpval,tmpval2);
 //  int nb_args = Wosize_val(args);
@@ -195,6 +195,6 @@ CAMLprim value r_eval_langsxp (value sexp_list) {
 //    asprintf(&error_msg, "R failure while calling function '%s'.", String_val(fun_name));
 //    caml_failwith(error_msg);
 //  }
-//  CAMLreturn0;
+//  CAMLreturn(Val_unit);
 //}
 
