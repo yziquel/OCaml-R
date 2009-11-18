@@ -84,6 +84,8 @@ type sexptype =
 type symbol = string
 type arg = [ `Anon of sexp | `Named of symbol * sexp ]
 
+val null : sexp
+
 val sexptype : sexp -> sexptype
 
 val sexp : string -> sexp

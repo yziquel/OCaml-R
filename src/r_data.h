@@ -25,12 +25,21 @@
 
 /* Converting data structures from/to R to/from OCaml. */
 
-void prerr_endline (char* s);
+/* Debugging function. Prints on stderr. */
+//void prerr_endline (char* s);
 
+/* Wrapping and unwrapping of R values. */
 CAMLprim value Val_sexp (SEXP sexp);
 SEXP Sexp_val (value sexp);
 
+/* Extracting runtime R low-level type information. */
 CAMLprim value sexptype_of_sexp (value sexp);
+
+/* The NULL constant in R... */
+CAMLprim value r_null (value unit);
+
+
+/* Conversion functions. */
 
 #define SIMPLE_SEXP(name,type,setter,conv) \
 CAMLprim value sexp_of_##name (value v);

@@ -110,6 +110,9 @@ let sexptype s = match (r_sexptype_of_sexp s) with
   | 99 -> FunSxp
   | _ -> failwith "R value with type not specified in Rinternals.h"
 
+external null_creator : unit -> sexp = "r_null"
+let null = null_creator ()
+
 external sexp : string -> sexp = "r_sexp_of_string"
 external sexp_of_symbol : symbol -> sexp = "r_sexp_of_symbol"
 external set_var : symbol -> sexp -> unit = "r_set_var"

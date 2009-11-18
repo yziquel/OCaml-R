@@ -35,42 +35,52 @@
 #include <R_ext/Parse.h>
 #include <stdio.h>
 
-void prerr_endline (char* s) {
-  fprintf (stderr, "%s\n", s);
-  fflush(stderr);
-}
 
-/* Concerning wrapping OCaml values. Would it not be
-   better to use the following Val_voidptr function
-   from perl4caml? Val_sexp could be just a macro...
-   The main question is: (value) pointer, or
-   Val_long(sexp) to wrap up the R sexp? And 'alloc',
-   or 'caml_alloc'? */
-//CAMLprim value Val_voidptr (void *pointer)
-//{
-//  CAMLparam0();
-//  CAMLlocal1(result);
-//  result = caml_alloc (1, Abstract_tag);
-//  Field(result, 0) = (value) pointer;
-//  CAMLreturn (result);
+/* Debugging function. Prints on stderr. */
+
+//void prerr_endline (char* s) {
+//  fprintf (stderr, "%s\n", s);
+//  fflush(stderr);
 //}
 
-CAMLprim value Val_sexp (SEXP sexp) {
+
+/* Wrapping and unwrapping of R values. */
+
+CAMLprim value Val_voidptr (void *pointer)
+{
   CAMLparam0();
   CAMLlocal1(result);
-  result=alloc(1,Abstract_tag) ;
-  Field(result,0) = Val_long(sexp);
+  result = caml_alloc(1, Abstract_tag);
+  Field(result, 0) = (value) pointer;
+    /* Do not use Val_long in the above statement,
+       as it will drop the top bit. See mlvalues.h. */
   CAMLreturn(result);
 }
 
+#define Val_sexp(x) Val_voidptr((void *) x)
+
 SEXP Sexp_val (value sexp) {
-  return (SEXP) Long_val(Field(sexp, 0));
+  return (SEXP) Field(sexp, 0);
 }
+
+
+/* Extracting runtime R low-level type information. */
 
 CAMLprim value sexptype_of_sexp (value sexp) {
   CAMLparam1(sexp);
   CAMLreturn(Val_int(TYPEOF(Sexp_val(sexp))));
 }
+
+
+/* The NULL constant in R... */
+
+CAMLprim value r_null (value unit) {
+  CAMLparam1(unit);
+  CAMLreturn(Val_sexp(R_NilValue));
+}
+
+
+/* Conversion functions. */
 
 #define SIMPLE_SEXP(name,type,setter,conv) \
 CAMLprim value sexp_of_##name (value v) { \
