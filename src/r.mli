@@ -54,7 +54,71 @@ val init : ?name:string ->
 val terminate : unit -> unit
 
 
-(* The Raw module is here to help people deal with internals of the R
+(** Static types for R values. *)
+type t
+
+(*type symbol = string*)
+(*type arg = [ `Anon of Raw.sexp | `Named of symbol * Raw.sexp ]*)
+
+(*val sexptype : Raw.sexp -> Raw.sexptype*)
+
+(*val sexp : string -> Raw.sexp*)
+(*val sexp_of_symbol : symbol -> Raw.sexp*)
+(*val set_var : symbol -> Raw.sexp -> unit*)
+(*val print : Raw.sexp -> unit*)
+(*val eval : Raw.sexp list -> Raw.sexp*)
+(*val exec : string -> arg array -> unit
+  Commented out while working on compilation of 64 bits. *)
+(*val to_bool : Raw.sexp -> bool*)
+(*val to_int : Raw.sexp -> int*)
+(*val to_float : Raw.sexp -> float*)
+(*val to_string : Raw.sexp -> string*)
+(*val of_bool : bool -> Raw.sexp*)
+(*val of_int : int -> Raw.sexp*)
+(*val of_float : float -> Raw.sexp*)
+(*val of_string : string -> Raw.sexp*)
+(*val to_bool_array : Raw.sexp -> bool array
+  Commented out while working on 64 bits compilation. *)
+(*val to_int_array : Raw.sexp -> int array
+  Commented out while working on 64 bits compilation. *)
+(*val to_float_array : Raw.sexp -> float array*)
+(*val to_string_array : Raw.sexp -> string array
+  Commented out while working on 64 bits compilation. *)
+(*val of_bool_array : bool array -> Raw.sexp*)
+(*val of_int_array : int array -> Raw.sexp*)
+(*val of_float_array : float array -> Raw.sexp*)
+(*val of_string_array : string array -> Raw.sexp*)
+(*val get_attrib : Raw.sexp -> string -> Raw.sexp*)
+(*val dim : Raw.sexp -> int array
+  Commented out while working on 64 bits compilation. *)
+(*val dimnames : Raw.sexp -> string array
+  Commented out while working on 64 bits compilation. *)
+
+(** {2 Functor interface}
+
+A functor interface is provided so it is possible to ensure that the interpreter
+   is initialized before using the interface. The creation of the interface
+   module using the {!Interpreter} functor performs the initialization using
+   {!init}. As environement, you can specify your own or use the {!Standard} module.
+*)
+
+module type LibraryDescription = sig
+  val name : string
+  val symbols : string list
+end
+
+module type Library = sig
+  val root : Raw.sexp list
+end
+
+module type Interpreter = sig
+  module Require : functor (L : LibraryDescription) -> Library
+end
+
+module Interpreter : functor (Env : Environment) -> Interpreter
+
+
+* The Raw module is here to help people deal with internals of the R
    module. It will eventually be hidden. *)
 
 module Raw : sig
@@ -88,69 +152,5 @@ module Raw : sig
     | S4Sxp
     | FunSxp
 
-
 end
 
-
-(** Static types for R values. *)
-type t
-
-type symbol = string
-type arg = [ `Anon of Raw.sexp | `Named of symbol * Raw.sexp ]
-
-val sexptype : Raw.sexp -> Raw.sexptype
-
-val sexp : string -> Raw.sexp
-val sexp_of_symbol : symbol -> Raw.sexp
-val set_var : symbol -> Raw.sexp -> unit
-val print : Raw.sexp -> unit
-val eval : Raw.sexp list -> Raw.sexp
-(*val exec : string -> arg array -> unit
-  Commented out while working on compilation of 64 bits. *)
-val to_bool : Raw.sexp -> bool
-val to_int : Raw.sexp -> int
-val to_float : Raw.sexp -> float
-val to_string : Raw.sexp -> string
-val of_bool : bool -> Raw.sexp
-val of_int : int -> Raw.sexp
-val of_float : float -> Raw.sexp
-val of_string : string -> Raw.sexp
-(*val to_bool_array : Raw.sexp -> bool array
-  Commented out while working on 64 bits compilation. *)
-(*val to_int_array : Raw.sexp -> int array
-  Commented out while working on 64 bits compilation. *)
-val to_float_array : Raw.sexp -> float array
-(*val to_string_array : Raw.sexp -> string array
-  Commented out while working on 64 bits compilation. *)
-val of_bool_array : bool array -> Raw.sexp
-val of_int_array : int array -> Raw.sexp
-val of_float_array : float array -> Raw.sexp
-val of_string_array : string array -> Raw.sexp
-val get_attrib : Raw.sexp -> string -> Raw.sexp
-(*val dim : Raw.sexp -> int array
-  Commented out while working on 64 bits compilation. *)
-(*val dimnames : Raw.sexp -> string array
-  Commented out while working on 64 bits compilation. *)
-
-(** {2 Functor interface}
-
-A functor interface is provided so it is possible to ensure that the interpreter
-   is initialized before using the interface. The creation of the interface
-   module using the {!Interpreter} functor performs the initialization using
-   {!init}. As environement, you can specify your own or use the {!Standard} module.
-*)
-
-module type LibraryDescription = sig
-  val name : string
-  val symbols : string list
-end
-
-module type Library = sig
-  val root : Raw.sexp list
-end
-
-module type Interpreter = sig
-  module Require : functor (L : LibraryDescription) -> Library
-end
-
-module Interpreter : functor (Env : Environment) -> Interpreter
