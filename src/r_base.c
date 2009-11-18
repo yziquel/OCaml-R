@@ -95,7 +95,9 @@ CAMLprim value Val_sexp (SEXP sexp) {
   CAMLreturn(result);
 }
 
-SEXP Sexp_val (value sexp) return (SEXP) Field(sexp, 0);
+SEXP Sexp_val (value sexp) {
+  return (SEXP) Field(sexp, 0);
+}
 
 
 /* Beta-reduction in R. */
@@ -112,7 +114,7 @@ CAMLprim value r_eval_langsxp (value sexp_list) {
 
   /* Should this be wrapped with a PROTECT() and
      an UNPROTECT(1), or not? */
-  PROTECT(e = R_tryEval(Sexp_val(sexp_list, 0), R_GlobalEnv, &error));
+  PROTECT(e = R_tryEval(Sexp_val(sexp_list), R_GlobalEnv, &error));
   UNPROTECT(1);
 
   if (error) caml_failwith("OCaml-R error in eval_sexp_list C stub.");

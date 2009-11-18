@@ -142,7 +142,7 @@ dep.ps:dep.dot
 # backup, clean and depend :
 ############################
 
-GENERATED_FILES=r.ml.part2 r.ml
+GENERATED_FILES=r.part2.ml r.ml
 
 cleanocamldoc:
 	$(RM) -r ocamldoc
