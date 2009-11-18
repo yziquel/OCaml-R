@@ -46,12 +46,12 @@
 
 /* Wrapping and unwrapping of R values. */
 
-CAMLprim value Val_voidptr (void *pointer)
+CAMLprim value Val_sexp (SEXP sexp)
 {
   CAMLparam0();
   CAMLlocal1(result);
   result = caml_alloc(1, Abstract_tag);
-  Field(result, 0) = (value) pointer;
+  Field(result, 0) = (value) sexp;
     /* Do not use Val_long in the above statement,
        as it will drop the top bit. See mlvalues.h. */
   CAMLreturn(result);
