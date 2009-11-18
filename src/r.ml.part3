@@ -26,7 +26,8 @@
 (* This is the end of the Standard module, constructed via r.ml.part1 and .part2. *)
 end
 
-(** *)
+
+(* Functions to initialise and terminate the R interpreter. *)
 
 external init_r : string array -> int -> int = "init_r"
 external terminate : unit -> unit = "end_r"
@@ -42,10 +43,27 @@ let init ?(name    = try Sys.argv.(0) with _ -> "OCaml-R")
   match init_r (Array.of_list (name::argv)) r_sigs with
   | 1 -> () | _ -> raise Initialisation_failed
 
+
+(* Static types for R values. *)
+
 type sexp
 type langsxp (* We should perhaps make sexp a polymorphic type? *)
 
-type sexptype =
+type t = Sexp of sexp | NULL
+
+
+(* Conversion of R types from OCaml side to R side. *)
+
+external null_creator : unit -> sexp = "r_null"
+
+let sexp_of_t = function
+  | Sexp s -> s
+  | NULL -> null_creator ()
+
+
+(* Runtime types internal to R. *)
+
+type internally =
   | NilSxp
   | SymSxp
   | ListSxp
@@ -71,12 +89,6 @@ type sexptype =
   | RawSxp
   | S4Sxp
   | FunSxp
-
-type symbol = string
-type arg = [
-    `Named of symbol * sexp
-  | `Anon of sexp
-  ]
 
 external r_sexptype_of_sexp : sexp -> int = "sexptype_of_sexp"
 let sexptype s = match (r_sexptype_of_sexp s) with
@@ -110,8 +122,20 @@ let sexptype s = match (r_sexptype_of_sexp s) with
   | 99 -> FunSxp
   | _ -> failwith "R value with type not specified in Rinternals.h"
 
-external null_creator : unit -> sexp = "r_null"
-let null = null_creator ()
+
+(* Conversion of R types from R side to OCaml side. *)
+
+let t_of_sexp s = match sexptype s with
+  | NilSxp -> NULL
+  | _ -> Sexp s
+
+
+
+type symbol = string
+type arg = [
+    `Named of symbol * sexp
+  | `Anon of sexp
+  ]
 
 external sexp : string -> sexp = "r_sexp_of_string"
 external sexp_of_symbol : symbol -> sexp = "r_sexp_of_symbol"
