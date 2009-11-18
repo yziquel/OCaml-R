@@ -102,6 +102,34 @@ SEXP Sexp_val (value sexp) {
 
 /* Beta-reduction in R. */
 
+/* langsxp_of_list creates a lisp-like list out of an
+   OCaml list. langsxps, called pairlists, are not much
+   used in R these days, except for internal matters,
+   such as being an argument to R_tryEval.
+   - Argument l is the OCaml list.
+   - Argument n is the length of the OCaml list. */
+CAMLprim value langsxp_of_list (value l, value n) {
+  CAMLparam2(l, n);
+  CAMLlocal1(l_cursor);
+  SEXP s, t;
+
+  PROTECT(t = s = allocList(Int_val(n)));
+  SET_TYPEOF(s, LANGSXP);
+
+  /* Fill in list s, with t moving over the pairlist,
+     with values from l */
+  int first_time = 1;
+  l_cursor = l;
+  while (l_cursor && Is_block(l_cursor)) {
+    if (first_time) {first_time = 0;} else {t = CDR(t);}
+    SETCAR(t, Sexp_val(Field(l_cursor, 0)));
+    l_cursor = Field(l_cursor, 1);
+  }
+  UNPROTECT(1);
+
+  CAMLreturn(Val_sexp(s));
+}
+
 CAMLprim value r_eval_langsxp (value sexp_list) {
   /* sexp_list is an OCaml value containing a SEXP of sexptype LANGSXP.
      This is a LISP-style pairlist of SEXP values. r_eval_langsxp
