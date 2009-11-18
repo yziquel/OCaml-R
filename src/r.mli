@@ -23,6 +23,8 @@
 (*                                                                               *)
 (*********************************************************************************)
 
+
+
 module type Environment = sig
   val name : string
   val options : string list
@@ -33,6 +35,8 @@ end
 (** Module containing standard environment variables for R. *)
 
 module Standard : Environment
+
+
 
 (** Interface to R. *)
 
@@ -54,8 +58,17 @@ val init : ?name:string ->
 val terminate : unit -> unit
 
 
+
 (** Static types for R values. *)
 type t
+
+
+
+(** Dealing with the R symbol table. *)
+type symbol = string
+val symbol : symbol -> t
+
+
 
 (*type symbol = string*)
 (*type arg = [ `Anon of Raw.sexp | `Named of symbol * Raw.sexp ]*)
@@ -108,7 +121,7 @@ module type LibraryDescription = sig
 end
 
 module type Library = sig
-  val root : Raw.sexp list
+  val root : t list
 end
 
 module type Interpreter = sig
@@ -125,7 +138,7 @@ module Raw : sig
 
   type sexp
 
-  type sexptype =
+  type internally =
     | NilSxp
     | SymSxp
     | ListSxp

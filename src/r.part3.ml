@@ -130,15 +130,23 @@ let t_of_sexp s = match sexptype s with
   | _ -> Sexp s
 
 
+(* Dealing with the R symbol table. *)
 
 type symbol = string
+
+external sexp_of_symbol : symbol -> sexp = "r_sexp_of_symbol"
+
+let symbol (sym : symbol) = t_of_sexp (sexp_of_symbol sym)
+
+
+
+
 type arg = [
     `Named of symbol * sexp
   | `Anon of sexp
   ]
 
 external sexp : string -> sexp = "r_sexp_of_string"
-external sexp_of_symbol : symbol -> sexp = "r_sexp_of_symbol"
 external set_var : symbol -> sexp -> unit = "r_set_var"
 external print : sexp -> unit = "r_print_value"
 
@@ -217,7 +225,7 @@ module Interpreter (Env : Environment) : Interpreter = struct
 
   module Require (Lib : LibraryDescription) : Library = struct
     let () = ignore (sexp ("require("^Lib.name^")"))
-    let root = List.map sexp_of_symbol Lib.symbols
+    let root = List.map symbol Lib.symbols
   end
 
 end
@@ -230,5 +238,7 @@ end
 module Raw = struct
 
   type sexp = sexp
+
+  type internally = internally
 
 end
