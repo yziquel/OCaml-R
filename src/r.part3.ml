@@ -27,6 +27,11 @@
 end
 
 
+
+module Raw = struct end
+
+
+
 (* Functions to initialise and terminate the R interpreter. *)
 
 external init_r : string array -> int -> int = "init_r"
@@ -46,10 +51,14 @@ let init ?(name    = try Sys.argv.(0) with _ -> "OCaml-R")
 
 (* Static types for R values. *)
 
-type sexp
+module Raw = struct include Raw
+  type sexp
+end include Raw
+
 type langsxp (* We should perhaps make sexp a polymorphic type? *)
 
 type t = Sexp of sexp | NULL
+
 
 
 (* Conversion of R types from OCaml side to R side. *)
@@ -63,32 +72,34 @@ let sexp_of_t = function
 
 (* Runtime types internal to R. *)
 
-type internally =
-  | NilSxp
-  | SymSxp
-  | ListSxp
-  | ClosSxp
-  | EnvSxp
-  | PromSxp
-  | LangSxp
-  | SpecialSxp
-  | BuiltinSxp
-  | CharSxp
-  | LglSxp
-  | IntSxp
-  | RealSxp
-  | CplxSxp
-  | StrSxp
-  | DotSxp
-  | AnySxp
-  | VecSxp
-  | ExprSxp
-  | BcodeSxp
-  | ExtptrSxp
-  | WeakrefSxp
-  | RawSxp
-  | S4Sxp
-  | FunSxp
+module Raw = struct include Raw
+  type internally =
+    | NilSxp
+    | SymSxp
+    | ListSxp
+    | ClosSxp
+    | EnvSxp
+    | PromSxp
+    | LangSxp
+    | SpecialSxp
+    | BuiltinSxp
+    | CharSxp
+    | LglSxp
+    | IntSxp
+    | RealSxp
+    | CplxSxp
+    | StrSxp
+    | DotSxp
+    | AnySxp
+    | VecSxp
+    | ExprSxp
+    | BcodeSxp
+    | ExtptrSxp
+    | WeakrefSxp
+    | RawSxp
+    | S4Sxp
+    | FunSxp
+end include Raw
 
 external r_sexptype_of_sexp : sexp -> int = "sexptype_of_sexp"
 let sexptype s = match (r_sexptype_of_sexp s) with
@@ -235,12 +246,4 @@ end
    people dealing with the internals of the R module. It should
    not be used in the scope of vanilla R / OCaml code. *)
 
-module Raw = struct
-
-  type raw_sexp = sexp
-  type sexp = raw_sexp
-
-  type raw_internally = internally
-  type internally = raw_internally
-
-end
+module Raw = struct include Raw end
