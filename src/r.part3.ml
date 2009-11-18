@@ -208,7 +208,7 @@ module type LibraryDescription = sig
 end
 
 module type Library = sig
-  val root : sexp list 
+  val root : t list 
 end
 
 module type Interpreter = sig
