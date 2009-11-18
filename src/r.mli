@@ -54,71 +54,82 @@ val init : ?name:string ->
 val terminate : unit -> unit
 
 
+(* The Raw module is here to help people deal with internals of the R
+   module. It will eventually be hidden. *)
+
+module Raw : sig
+
+  type sexp
+
+  type sexptype =
+    | NilSxp
+    | SymSxp
+    | ListSxp
+    | ClosSxp
+    | EnvSxp
+    | PromSxp
+    | LangSxp
+    | SpecialSxp
+    | BuiltinSxp
+    | CharSxp
+    | LglSxp
+    | IntSxp
+    | RealSxp
+    | CplxSxp
+    | StrSxp
+    | DotSxp
+    | AnySxp
+    | VecSxp
+    | ExprSxp
+    | BcodeSxp
+    | ExtptrSxp
+    | WeakrefSxp
+    | RawSxp
+    | S4Sxp
+    | FunSxp
+
+
+end
+
+
 (** Static types for R values. *)
 type t
 
-type sexptype =
-  | NilSxp
-  | SymSxp
-  | ListSxp
-  | ClosSxp
-  | EnvSxp
-  | PromSxp
-  | LangSxp
-  | SpecialSxp
-  | BuiltinSxp
-  | CharSxp
-  | LglSxp
-  | IntSxp
-  | RealSxp
-  | CplxSxp
-  | StrSxp
-  | DotSxp
-  | AnySxp
-  | VecSxp
-  | ExprSxp
-  | BcodeSxp
-  | ExtptrSxp
-  | WeakrefSxp
-  | RawSxp
-  | S4Sxp
-  | FunSxp
-
 type symbol = string
-type arg = [ `Anon of sexp | `Named of symbol * sexp ]
+type arg = [ `Anon of Raw.sexp | `Named of symbol * Raw.sexp ]
 
-val sexptype : sexp -> sexptype
+val sexptype : Raw.sexp -> Raw.sexptype
 
-val sexp : string -> sexp
-val sexp_of_symbol : symbol -> sexp
-val set_var : symbol -> sexp -> unit
-val print : sexp -> unit
-val eval : sexp list -> sexp
+val sexp : string -> Raw.sexp
+val sexp_of_symbol : symbol -> Raw.sexp
+val set_var : symbol -> Raw.sexp -> unit
+val print : Raw.sexp -> unit
+val eval : Raw.sexp list -> Raw.sexp
 (*val exec : string -> arg array -> unit
   Commented out while working on compilation of 64 bits. *)
-val to_bool : sexp -> bool
-val to_int : sexp -> int
-val to_float : sexp -> float
-val to_string : sexp -> string
-val of_bool : bool -> sexp
-val of_int : int -> sexp
-val of_float : float -> sexp
-val of_string : string -> sexp
-(*val to_bool_array : sexp -> bool array
+val to_bool : Raw.sexp -> bool
+val to_int : Raw.sexp -> int
+val to_float : Raw.sexp -> float
+val to_string : Raw.sexp -> string
+val of_bool : bool -> Raw.sexp
+val of_int : int -> Raw.sexp
+val of_float : float -> Raw.sexp
+val of_string : string -> Raw.sexp
+(*val to_bool_array : Raw.sexp -> bool array
   Commented out while working on 64 bits compilation. *)
-(*val to_int_array : sexp -> int array
+(*val to_int_array : Raw.sexp -> int array
   Commented out while working on 64 bits compilation. *)
-val to_float_array : sexp -> float array
-(*val to_string_array : sexp -> string array
+val to_float_array : Raw.sexp -> float array
+(*val to_string_array : Raw.sexp -> string array
   Commented out while working on 64 bits compilation. *)
-val of_bool_array : bool array -> sexp
-val of_int_array : int array -> sexp
-val of_float_array : float array -> sexp
-val of_string_array : string array -> sexp
-val get_attrib : sexp -> string -> sexp
-(*val dim : sexp -> int array
+val of_bool_array : bool array -> Raw.sexp
+val of_int_array : int array -> Raw.sexp
+val of_float_array : float array -> Raw.sexp
+val of_string_array : string array -> Raw.sexp
+val get_attrib : Raw.sexp -> string -> Raw.sexp
+(*val dim : Raw.sexp -> int array
   Commented out while working on 64 bits compilation. *)
-(*val dimnames : sexp -> string array
+(*val dimnames : Raw.sexp -> string array
   Commented out while working on 64 bits compilation. *)
 
 (** {2 Functor interface}
@@ -135,7 +146,7 @@ module type LibraryDescription = sig
 end
 
 module type Library = sig
-  val root : sexp list
+  val root : Raw.sexp list
 end
 
 module type Interpreter = sig

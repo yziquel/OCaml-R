@@ -221,3 +221,14 @@ module Interpreter (Env : Environment) : Interpreter = struct
   end
 
 end
+
+
+(* Raw functions module. The purpose of this module is the help
+   people dealing with the internals of the R module. It should
+   not be used in the scope of vanilla R / OCaml code. *)
+
+module Raw = struct
+
+  type sexp = sexp
+
+end
