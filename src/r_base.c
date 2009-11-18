@@ -100,6 +100,14 @@ SEXP Sexp_val (value sexp) {
 }
 
 
+/* Extracting runtime R low-level type information. */
+
+CAMLprim value sexptype_of_sexp (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_int(TYPEOF(Sexp_val(sexp))));
+}
+
+
 /* Beta-reduction in R. */
 
 /* langsxp_of_list creates a lisp-like list out of an

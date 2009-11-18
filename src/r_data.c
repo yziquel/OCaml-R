@@ -44,14 +44,6 @@
 //}
 
 
-/* Extracting runtime R low-level type information. */
-
-CAMLprim value sexptype_of_sexp (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_int(TYPEOF(Sexp_val(sexp))));
-}
-
-
 /* The NULL constant in R... */
 
 CAMLprim value r_null (value unit) {
