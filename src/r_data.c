@@ -44,14 +44,6 @@
 //}
 
 
-/* The NULL constant in R... */
-
-CAMLprim value r_null (value unit) {
-  CAMLparam1(unit);
-  CAMLreturn(Val_sexp(R_NilValue));
-}
-
-
 /* Conversion functions. */
 
 //#define SIMPLE_SEXP(name,type,setter,conv) \

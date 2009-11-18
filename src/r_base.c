@@ -100,6 +100,14 @@ SEXP Sexp_val (value sexp) {
 }
 
 
+/* The NULL constant in R... */
+
+CAMLprim value r_null (value unit) {
+  CAMLparam1(unit);
+  CAMLreturn(Val_sexp(R_NilValue));
+}
+
+
 /* Extracting runtime R low-level type information. */
 
 CAMLprim value sexptype_of_sexp (value sexp) {
