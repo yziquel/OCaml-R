@@ -237,8 +237,10 @@ end
 
 module Raw = struct
 
-  type sexp = sexp
+  type raw_sexp = sexp
+  type sexp = raw_sexp
 
-  type internally = internally
+  type raw_internally = internally
+  type internally = raw_internally
 
 end
