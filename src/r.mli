@@ -118,7 +118,7 @@ end
 module Interpreter : functor (Env : Environment) -> Interpreter
 
 
-* The Raw module is here to help people deal with internals of the R
+(* The Raw module is here to help people deal with internals of the R
    module. It will eventually be hidden. *)
 
 module Raw : sig
