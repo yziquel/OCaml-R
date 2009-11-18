@@ -57,8 +57,6 @@ CAMLprim value Val_sexp (SEXP sexp)
   CAMLreturn(result);
 }
 
-#define Val_sexp(x) Val_voidptr((void *) x)
-
 SEXP Sexp_val (value sexp) {
   return (SEXP) Field(sexp, 0);
 }
