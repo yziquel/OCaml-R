@@ -28,7 +28,7 @@ end
 
 
 
-module Raw = struct end
+module Raw0 = struct end
 
 
 
@@ -51,9 +51,9 @@ let init ?(name    = try Sys.argv.(0) with _ -> "OCaml-R")
 
 (* Static types for R values. *)
 
-module Raw = struct include Raw
+module Raw1 = struct include Raw0
   type sexp
-end include Raw
+end include Raw1
 
 type langsxp (* We should perhaps make sexp a polymorphic type? *)
 
@@ -72,7 +72,7 @@ let sexp_of_t = function
 
 (* Runtime types internal to R. *)
 
-module Raw = struct include Raw
+module Raw2 = struct include Raw1
   type internally =
     | NilSxp
     | SymSxp
@@ -99,7 +99,7 @@ module Raw = struct include Raw
     | RawSxp
     | S4Sxp
     | FunSxp
-end include Raw
+end include Raw2
 
 external r_sexptype_of_sexp : sexp -> int = "sexptype_of_sexp"
 let sexptype s = match (r_sexptype_of_sexp s) with
@@ -246,4 +246,4 @@ end
    people dealing with the internals of the R module. It should
    not be used in the scope of vanilla R / OCaml code. *)
 
-module Raw = struct include Raw end
+module Raw = struct include Raw2 end
