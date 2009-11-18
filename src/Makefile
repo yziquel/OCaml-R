@@ -48,7 +48,6 @@ LIB_CMXFILES=$(LIB_CMOFILES:.cmo=.cmx)
 LIB_CMIFILES= $(LIB_CMOFILES:.cmo=.cmi)
 
 LIB_COBJ_FILES=r_base.o\
-	r_data.o \
 #	r_devices.o
 
 LIBMATH_CMOFILES=\
@@ -69,16 +68,15 @@ lib_byte: $(LIB_BYTE) $(LIB_CMI) $(LIBINTERP_BYTE) $(LIBINTERP_CMI) $(LIBMATH_BY
 
 all: byte opt
 
-$(LIB_BYTE): dllr_base_stubs.so dllr_data_stubs.so $(LIB_CMIFILES) $(LIB_CMOFILES)
+$(LIB_BYTE): dllr_base_stubs.so $(LIB_CMIFILES) $(LIB_CMOFILES)
 	$(OCAMLC) -a -dllpath /usr/lib/R/lib \
 	-dllib dllr_base_stubs.so \
-	-dllib dllr_data_stubs.so \
 	-dllib libR.so -o $@ \
 	$(LIB_CMOFILES)
 
-$(LIB): dllr_base_stubs.so dllr_data_stubs.so $(LIB_CMIFILES) $(LIB_CMXFILES)
+$(LIB): dllr_base_stubs.so $(LIB_CMIFILES) $(LIB_CMXFILES)
 	$(OCAMLOPT) -a -ccopt -L/usr/lib/R/lib \
-	-cclib -lr_base_stubs -cclib -lr_data_stubs \
+	-cclib -lr_base_stubs \
 	-cclib -lR \
 	-o $@ $(LIB_CMXFILES)
 
@@ -99,17 +97,11 @@ $(LIBMATH): dllr_math_stubs.so $(LIBMATH_CMIFILES) $(LIBMATH_CMXFILES)
 dllr_base_stubs.so: libr_base_stubs.a r_base.o
 	$(OCAMLMKLIB) -o r_base_stubs r_base.o
 
-dllr_data_stubs.so: libr_data_stubs.a r_data.o
-	$(OCAMLMKLIB) -o r_data_stubs r_data.o
-
 dllr_math_stubs.so: libr_math_stubs.a r_math.o
 	$(OCAMLMKLIB) -o r_math_stubs r_math.o
 
 libr_base_stubs.a: r_base.o
 	ar rcs libr_base_stubs.a r_base.o
-
-libr_data_stubs.a: r_data.o
-	ar rcs libr_data_stubs.a r_data.o
 
 libr_math_stubs.a: r_math.o
 	ar rcs libr_math_stubs.a r_math.o
@@ -117,11 +109,11 @@ libr_math_stubs.a: r_math.o
 $(PA_R): pa_ocamlr.ml
 	$(OCAMLC) -I +camlp4 -I +camlp4/Camlp4Parsers -c -pp camlp4of.opt $<
 
-r.ml.part2: rstdenv.R
-	$(R) --silent --vanilla --slave < rstdenv.R > r.ml.part2
+r.part2.ml: r.part2.R
+	$(R) --silent --vanilla --slave < r.part2.R > r.part2.ml
 
-r.ml: r.ml.part1 r.ml.part2 r.ml.part3
-	cat r.ml.part1 r.ml.part2 r.ml.part3 > r.ml
+r.ml: r.part1.ml r.part2.ml r.part3.ml
+	cat r.part1.ml r.part2.ml r.part3.ml > r.ml
 
 test.x: $(LIB) $(LIBMATH) test.cmx
 	$(OCAMLOPT) -verbose -o $@ unix.cmxa $(LIBMATH) $(LIB) test.cmx
@@ -168,7 +160,7 @@ clean:: dummy
 
 .depend depend:
 	$(RM) .depend
-	$(OCAMLDEP) $(OCAMLPP) `ls *.ml *.mli | grep -v test_pa | grep -v pa_ocaml` > .depend
+	$(OCAMLDEP) $(OCAMLPP) `ls *.ml *.mli | grep -v test_pa | grep -v pa_ocaml | grep -v r.part` > .depend
 
 alldepend: $(GENERATED_FILES)
 	$(MAKE) depend

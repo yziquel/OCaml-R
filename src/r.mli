@@ -53,7 +53,10 @@ val init : ?name:string ->
 (** Call this function to terminate properly the interpreter. *)
 val terminate : unit -> unit
 
-type sexp
+
+(** Static types for R values. *)
+type t
+
 type sexptype =
   | NilSxp
   | SymSxp
@@ -83,8 +86,6 @@ type sexptype =
 
 type symbol = string
 type arg = [ `Anon of sexp | `Named of symbol * sexp ]
-
-val null : sexp
 
 val sexptype : sexp -> sexptype
 

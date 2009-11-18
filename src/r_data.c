@@ -44,24 +44,6 @@
 //}
 
 
-/* Wrapping and unwrapping of R values. */
-
-CAMLprim value Val_sexp (SEXP sexp)
-{
-  CAMLparam0();
-  CAMLlocal1(result);
-  result = caml_alloc(1, Abstract_tag);
-  Field(result, 0) = (value) sexp;
-    /* Do not use Val_long in the above statement,
-       as it will drop the top bit. See mlvalues.h. */
-  CAMLreturn(result);
-}
-
-SEXP Sexp_val (value sexp) {
-  return (SEXP) Field(sexp, 0);
-}
-
-
 /* Extracting runtime R low-level type information. */
 
 CAMLprim value sexptype_of_sexp (value sexp) {
@@ -80,120 +62,120 @@ CAMLprim value r_null (value unit) {
 
 /* Conversion functions. */
 
-#define SIMPLE_SEXP(name,type,setter,conv) \
-CAMLprim value sexp_of_##name (value v) { \
-  CAMLparam1(v); SEXP sexp ; \
-  PROTECT(sexp = allocVector(type, 1)); \
-  setter(sexp)[0] = conv(v) ; \
-  UNPROTECT(1) ; CAMLreturn(Val_sexp(duplicate(sexp))); }
+//#define SIMPLE_SEXP(name,type,setter,conv) \
+//CAMLprim value sexp_of_##name (value v) { \
+//  CAMLparam1(v); SEXP sexp ; \
+//  PROTECT(sexp = allocVector(type, 1)); \
+//  setter(sexp)[0] = conv(v) ; \
+//  UNPROTECT(1) ; CAMLreturn(Val_sexp(duplicate(sexp))); }
 
-SIMPLE_SEXP(bool, LGLSXP, LOGICAL, Bool_val)
-SIMPLE_SEXP(int, INTSXP, INTEGER, Int_val)
-SIMPLE_SEXP(float, REALSXP, REAL, Double_val)
+//SIMPLE_SEXP(bool, LGLSXP, LOGICAL, Bool_val)
+//SIMPLE_SEXP(int, INTSXP, INTEGER, Int_val)
+//SIMPLE_SEXP(float, REALSXP, REAL, Double_val)
 
-CAMLprim value sexp_of_string (value v) {
-  CAMLparam1(v); SEXP sexp ;
-  /* don't ask me why it is mkString and not mkChar... */
-  PROTECT (sexp=mkString(String_val(v)));
-  UNPROTECT(1);
-  CAMLreturn(Val_sexp(duplicate(sexp)));
-}
+//CAMLprim value sexp_of_string (value v) {
+//  CAMLparam1(v); SEXP sexp ;
+//  /* don't ask me why it is mkString and not mkChar... */
+//  PROTECT (sexp=mkString(String_val(v)));
+//  UNPROTECT(1);
+//  CAMLreturn(Val_sexp(duplicate(sexp)));
+//}
 
-#define SIMPLE_VALUE(name, conv_r, conv_ml) \
-CAMLprim value name##_of_sexp (value sexp) { \
-  CAMLparam1(sexp); \
-  CAMLlocal1(result); \
-  SEXP e = (SEXP)Long_val(Field(sexp,0)); \
-  PROTECT(e = Rf_eval(e,R_GlobalEnv)); \
-  result=conv_ml(conv_r(e)); \
-  UNPROTECT(1); \
-  CAMLreturn(result);}
+//#define SIMPLE_VALUE(name, conv_r, conv_ml) \
+//CAMLprim value name##_of_sexp (value sexp) { \
+//  CAMLparam1(sexp); \
+//  CAMLlocal1(result); \
+//  SEXP e = (SEXP)Long_val(Field(sexp,0)); \
+//  PROTECT(e = Rf_eval(e,R_GlobalEnv)); \
+//  result=conv_ml(conv_r(e)); \
+//  UNPROTECT(1); \
+//  CAMLreturn(result);}
 
-SIMPLE_VALUE(bool, Rf_asLogical, Val_bool)
-SIMPLE_VALUE(int, Rf_asInteger, Val_int)
-SIMPLE_VALUE(float, Rf_asReal, caml_copy_double)
+//SIMPLE_VALUE(bool, Rf_asLogical, Val_bool)
+//SIMPLE_VALUE(int, Rf_asInteger, Val_int)
+//SIMPLE_VALUE(float, Rf_asReal, caml_copy_double)
 
-CAMLprim value string_of_sexp (value sexp) {
-  CAMLparam1(sexp);
-  CAMLlocal1(result);
-  SEXP e = (SEXP)Long_val(Field(sexp,0));
-  PROTECT(e = Rf_eval(AS_CHARACTER(e),R_GlobalEnv));
-  result=caml_copy_string(CHARACTER_VALUE(e));
-  UNPROTECT(1);
-  CAMLreturn(result);
-}
+//CAMLprim value string_of_sexp (value sexp) {
+//  CAMLparam1(sexp);
+//  CAMLlocal1(result);
+//  SEXP e = (SEXP)Long_val(Field(sexp,0));
+//  PROTECT(e = Rf_eval(AS_CHARACTER(e),R_GlobalEnv));
+//  result=caml_copy_string(CHARACTER_VALUE(e));
+//  UNPROTECT(1);
+//  CAMLreturn(result);
+//}
 
 
-#define ARRAY_SEXP(name,type,setter,conv) \
-CAMLprim value sexp_of_##name##_array (value v) { \
-  CAMLparam1(v); SEXP sexp ; \
-  if (Is_block(v) && Tag_val(v) == 0) { \
-    int len = Wosize_val(v); int i ; \
-    PROTECT(sexp = allocVector(type, len)); \
-    for (i=0;i<len;i++) { \
-      setter(sexp)[i] = conv(Field(v,i)); \
-    } \
-    UNPROTECT(1); \
-  } else { \
-    PROTECT(sexp = allocVector(type, 0)); \
-    UNPROTECT(1); \
-  } \
-  CAMLreturn(Val_sexp(sexp)); \
-}
+//#define ARRAY_SEXP(name,type,setter,conv) \
+//CAMLprim value sexp_of_##name##_array (value v) { \
+//  CAMLparam1(v); SEXP sexp ; \
+//  if (Is_block(v) && Tag_val(v) == 0) { \
+//    int len = Wosize_val(v); int i ; \
+//    PROTECT(sexp = allocVector(type, len)); \
+//    for (i=0;i<len;i++) { \
+//      setter(sexp)[i] = conv(Field(v,i)); \
+//    } \
+//    UNPROTECT(1); \
+//  } else { \
+//    PROTECT(sexp = allocVector(type, 0)); \
+//    UNPROTECT(1); \
+//  } \
+//  CAMLreturn(Val_sexp(sexp)); \
+//}
 
-ARRAY_SEXP(bool, LGLSXP, LOGICAL, Bool_val)
-ARRAY_SEXP(int, INTSXP, INTEGER, Int_val)
+//ARRAY_SEXP(bool, LGLSXP, LOGICAL, Bool_val)
+//ARRAY_SEXP(int, INTSXP, INTEGER, Int_val)
 
-CAMLprim value sexp_of_float_array (value v) {
-  CAMLparam1(v);
-  SEXP sexp ;
-  if (Is_block(v) && Tag_val(v) == Double_array_tag) {
-    int len = Wosize_val(v) / 2; int i ;
-    PROTECT(sexp = allocVector(REALSXP, len));
-    for (i=0;i<len;i++) {
-      REAL(sexp)[i] = Double_field(v,i);
-    }
-    UNPROTECT(1);
-  } else {
-    PROTECT(sexp = allocVector(REALSXP, 0));
-    UNPROTECT(1);
-  }
-  CAMLreturn(Val_sexp(sexp));
-}
+//CAMLprim value sexp_of_float_array (value v) {
+//  CAMLparam1(v);
+//  SEXP sexp ;
+//  if (Is_block(v) && Tag_val(v) == Double_array_tag) {
+//    int len = Wosize_val(v) / 2; int i ;
+//    PROTECT(sexp = allocVector(REALSXP, len));
+//    for (i=0;i<len;i++) {
+//      REAL(sexp)[i] = Double_field(v,i);
+//    }
+//    UNPROTECT(1);
+//  } else {
+//    PROTECT(sexp = allocVector(REALSXP, 0));
+//    UNPROTECT(1);
+//  }
+//  CAMLreturn(Val_sexp(sexp));
+//}
 
-CAMLprim value sexp_of_string_array (value v) {
-  CAMLparam1(v);
-  SEXP sexp ;
-  if (Is_block(v) && Tag_val(v) == 0) {
-    int len = Wosize_val(v); int i ;
-    PROTECT(sexp = allocVector(STRSXP, len));
-    for (i=0;i<len;i++) {
-      STRING_PTR(sexp)[i] = duplicate(mkChar(String_val(Field(v,i))));
-    }
-    UNPROTECT(1);
-  } else {
-    PROTECT(sexp = allocVector(STRSXP, 0));
-    UNPROTECT(1);
-  }
-  CAMLreturn(Val_sexp(sexp));
-}
+//CAMLprim value sexp_of_string_array (value v) {
+//  CAMLparam1(v);
+//  SEXP sexp ;
+//  if (Is_block(v) && Tag_val(v) == 0) {
+//    int len = Wosize_val(v); int i ;
+//    PROTECT(sexp = allocVector(STRSXP, len));
+//    for (i=0;i<len;i++) {
+//      STRING_PTR(sexp)[i] = duplicate(mkChar(String_val(Field(v,i))));
+//    }
+//    UNPROTECT(1);
+//  } else {
+//    PROTECT(sexp = allocVector(STRSXP, 0));
+//    UNPROTECT(1);
+//  }
+//  CAMLreturn(Val_sexp(sexp));
+//}
 
-#define ARRAY_VALUE(name, type, accessor, conv_r, conv_ml) \
-CAMLprim value name##_array_of_sexp (value sexp) { \
-  CAMLparam1(sexp); \
-  CAMLlocal1(result); \
-  SEXP e = (SEXP)Long_val(Field(sexp,0)); \
-  type* e2 ; \
-  PROTECT(e = Rf_eval(e,R_GlobalEnv)); \
-  int length = LENGTH(e); \
-  int i; \
-  result = caml_alloc (length, 0); \
-  for (i=0; i<length; i++) { \
-    e2 = (type*)accessor(conv_r(e))[i]; \
-    Store_field(result, i, conv_ml(e2)); \
-  } \
-  UNPROTECT(1); \
-  CAMLreturn(result);}
+//#define ARRAY_VALUE(name, type, accessor, conv_r, conv_ml) \
+//CAMLprim value name##_array_of_sexp (value sexp) { \
+//  CAMLparam1(sexp); \
+//  CAMLlocal1(result); \
+//  SEXP e = (SEXP)Long_val(Field(sexp,0)); \
+//  type* e2 ; \
+//  PROTECT(e = Rf_eval(e,R_GlobalEnv)); \
+//  int length = LENGTH(e); \
+//  int i; \
+//  result = caml_alloc (length, 0); \
+//  for (i=0; i<length; i++) { \
+//    e2 = (type*)accessor(conv_r(e))[i]; \
+//    Store_field(result, i, conv_ml(e2)); \
+//  } \
+//  UNPROTECT(1); \
+//  CAMLreturn(result);}
 
 /* ARRAY_VALUE(bool, int, LOGICAL, AS_LOGICAL, Val_bool) */
     /* Commented because 'cast to pointer from integer of different size' */
@@ -221,7 +203,7 @@ CAMLprim value name##_array_of_sexp (value sexp) { \
   CAMLreturn(result);
 }*/
 
-CAMLprim value float_array_of_sexp (value sexp) {
+/*CAMLprim value float_array_of_sexp (value sexp) {
   CAMLparam1(sexp);
   CAMLlocal1(result);
   SEXP e = (SEXP)Long_val(Field(sexp,0));
@@ -236,19 +218,19 @@ CAMLprim value float_array_of_sexp (value sexp) {
   }
   UNPROTECT(1);
   CAMLreturn(result);
-}
+}*/
 
 
-CAMLprim value r_get_attrib (value sexp, value attrib) {
+/*CAMLprim value r_get_attrib (value sexp, value attrib) {
   CAMLparam2(sexp,attrib);
   SEXP e = (SEXP)Long_val(Field(sexp,0));
   SEXP res;
   PROTECT(res = Rf_getAttrib(e, mkString(String_val(attrib))));
   UNPROTECT(1);
   CAMLreturn(Val_sexp(res));
-}
-/*
-CAMLprim value to_matrix (value f, value sexp) {
+}*/
+
+/*CAMLprim value to_matrix (value f, value sexp) {
   CAMLparam2(f, sexp);
   CAMLlocal1(result);
   SEXP e = (SEXP)Long_val(Field(sexp,0));
@@ -256,8 +238,7 @@ CAMLprim value to_matrix (value f, value sexp) {
 
   result = caml_alloc(length,0);
 
-}
-*/
+}*/
 
 /* langsxp_of_list creates a lisp-like list out of an
    OCaml list. langsxps, called pairlists, are not much
@@ -278,8 +259,7 @@ CAMLprim value langsxp_of_list (value l, value n) {
   l_cursor = l;
   while (l_cursor && Is_block(l_cursor)) {
     if (first_time) {first_time = 0;} else {t = CDR(t);}
-    SEXP sexp_item = (SEXP) Long_val(Field(Field(l_cursor, 0), 0));
-    SETCAR(t, sexp_item);
+    SETCAR(t, Sexp_val(Field(l_cursor, 0)));
     l_cursor = Field(l_cursor, 1);
   }
   UNPROTECT(1);

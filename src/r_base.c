@@ -39,34 +39,92 @@
 #include <R_ext/Parse.h>
 #include <stdio.h>
 
-#include "r_data.h"
 
-/* Base functions. */
+/* Stub code initialising and terminating the R interpreter. */
 
 CAMLprim value init_r (value argv, value sigs) {
+
+  /* -1- argv is an OCaml array of strings, which gives the command line
+     arguments used to invoke the R interpreter. Code segfaults if
+     the array does not contain a first element, which is the name of
+     the program, typically "R", or "OCaml-R". Other arguments typically
+     are "--vanilla", "--slave"...
+
+     -2- sigs is an OCaml int. When set to 0, R signal handlers are not
+     removed. When set to, say, 1, R signal handlers are removed. It is
+     very useful to remove signal handlers when embedding R. */
+
   CAMLparam2(argv, sigs);
   int length = Wosize_val(argv);
   char* argv2[length];
   int i;
-  for (i=0 ; i<length ; i++) {
-    argv2[i]=String_val(Field(argv,i));
-  }
+
+  // We duplicate the OCaml array into a C array.
+  for (i=0; i<length; i++) argv2[i]=String_val(Field(argv, i));
 
   /* Don't let R set up its own signal handlers when sigs = 1.
      This requires R >= 2.3.1. */
-  if (Int_val(sigs)) {R_SignalHandlers = 0;}
+  if (Int_val(sigs)) R_SignalHandlers = 0;
 
+  // This is the libR.so function.
   i = Rf_initEmbeddedR(length, argv2);
+
+  // Returns 1 if R is correctly initialised.
   CAMLreturn(Val_int(i));
 }
 
-CAMLprim value end_r () {
-  CAMLparam0();
+CAMLprim value end_r (value unit) {
+  /* This function terminates the R interpreter. It is not clear whether
+     or not this function is garbage-collector-friendly. For details, see
+     http://old.nabble.com/Reset-an-embedded-R.dll-td17236931.html */
+  CAMLparam1(unit);
   Rf_endEmbeddedR(0);
   CAMLreturn(Val_unit);
 }
 
+
+/* Wrapping and unwrapping of R values. */
+
+CAMLprim value Val_sexp (SEXP sexp) {
+  CAMLparam0();
+  CAMLlocal1(result);
+  result = caml_alloc(1, Abstract_tag);
+  Field(result, 0) = (value) sexp;
+    /* Do not use Val_long in the above statement,
+       as it will drop the top bit. See mlvalues.h. */
+  CAMLreturn(result);
+}
+
+SEXP Sexp_val (value sexp) return (SEXP) Field(sexp, 0);
+
+
+/* Beta-reduction in R. */
+
+CAMLprim value r_eval_langsxp (value sexp_list) {
+  /* sexp_list is an OCaml value containing a SEXP of sexptype LANGSXP.
+     This is a LISP-style pairlist of SEXP values. r_eval_langsxp
+     executes the whole string, and sends back the resulting SEXP wrapped
+     up in an OCaml value. There's also an error handling mechanism. */
+  CAMLparam1(sexp_list);
+
+  SEXP e;        // Placeholder for the result of beta-reduction.
+  int error = 0; // Error catcher boolean.
+
+  /* Should this be wrapped with a PROTECT() and
+     an UNPROTECT(1), or not? */
+  PROTECT(e = R_tryEval(Sexp_val(sexp_list, 0), R_GlobalEnv, &error));
+  UNPROTECT(1);
+
+  if (error) caml_failwith("OCaml-R error in eval_sexp_list C stub.");
+
+  CAMLreturn(Val_sexp(e));
+}
+
+
+
 CAMLprim value r_sexp_of_symbol (value symbol) {
+  /* Remark: explanation of the install function at
+     https://stat.ethz.ch/pipermail/r-devel/2009-August/054494.html */
   CAMLparam1(symbol);
   char* c_symbol = String_val(symbol);
   SEXP e;
@@ -112,25 +170,6 @@ CAMLprim value r_print_value (value sexp) {
   SEXP e = Sexp_val(sexp);
   PrintValue(e);
   CAMLreturn(Val_unit);
-}
-
-CAMLprim value r_eval_langsxp (value sexp_list) {
-  CAMLparam1(sexp_list);
-
-  SEXP sexp2eval = (SEXP) Long_val(Field(sexp_list,0));
-  SEXP e;
-  int error = 0;
-
-  /* Should this be wrapped with a PROTECT() and
-     an UNPROTECT(1), or not? */
-  PROTECT(e = R_tryEval(sexp2eval, R_GlobalEnv, &error));
-  UNPROTECT(1);
-
-  if (error) {caml_failwith(
-    "OCaml-R error in eval_sexp_list C stub."
-  );};
-
-  CAMLreturn(Val_sexp(e));
 }
 
 /* Commented out because of 'warning: assignment makes pointer from integer without a cast' */
