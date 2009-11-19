@@ -178,7 +178,7 @@ install: installlibs
 installlibs: dummy
 	$(MKDIR) $(LIBDIR)
 	@for i in $(LIB) $(LIB_BYTE) $(LIB_CMI) $(LIBMATH) $(LIBMATH_BYTE) $(LIBMATH_CMI) \
-	$(LIB:.cmxa=.a) $(LIBMATH:.cmxa=.a) libr*.a dllr*.so ; do \
+	$(LIB:.cmxa=.a) $(LIBMATH:.cmxa=.a) libr*.a dllr*.so META; do \
 	if test -f $$i; then \
 		$(CP) $$i $(LIBDIR)/; echo $(LIBDIR)/`basename $$i` installed; \
 	else \

@@ -175,7 +175,9 @@ end
 
 module Internal : sig
 
-  type t = {
+  type t = eager_t Lazy.t
+
+  and eager_t = {
     (* sxpinfo : sxpinfo; *)
     (* attrib  : t; *)
     (* gengc_nextnode : t; *)
@@ -214,5 +216,6 @@ module Internal : sig
   and sxp_prom = { prom_value: t; expr: t; env: t }
 
   val t_of_sexp : Raw.sexp -> t
+  val unfold : int -> t -> unit
 
 end

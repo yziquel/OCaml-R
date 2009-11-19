@@ -48,6 +48,7 @@ let init ?(name    = try Sys.argv.(0) with _ -> "OCaml-R")
 
 module Raw0 = struct
   type sexp
+  external sexp_equality : sexp -> sexp -> bool = "r_sexp_equality"
 end include Raw0
 
 type langsxp (* We should perhaps make sexp a polymorphic type? *)
@@ -275,7 +276,9 @@ module Internal = struct
 
   (* Type definitions. *)
 
-  type t = {
+  type t = eager_t Lazy.t
+
+  and eager_t = {
     (* sxpinfo : sxpinfo;   *)
     (* attrib  : t;         *)
     (* gengc_nextnode : t; *)
@@ -324,38 +327,74 @@ module Internal = struct
   external inspect_promsxp_env     : sexp -> sexp = "inspect_promsxp_env"
 
   let rec t_of_sexp s =
-  { content = match sexptype s with
-    | NilSxp     -> NILSXP
-    | SymSxp     -> SYMSXP {
-        pname      = t_of_sexp (inspect_symsxp_pname    s);
-        sym_value  = t_of_sexp (inspect_symsxp_value    s);
-        internal   = t_of_sexp (inspect_symsxp_internal s)}
-    | ListSxp    -> LISTSXP
-    | ClosSxp    -> CLOSSXP
-    | EnvSxp     -> ENVSXP
-    | PromSxp    -> PROMSXP {
-        prom_value = t_of_sexp (inspect_promsxp_value s);
-        expr       = t_of_sexp (inspect_promsxp_expr  s);
-        env        = t_of_sexp (inspect_promsxp_env   s)}
-    | LangSxp    -> LANGSXP
-    | SpecialSxp -> SPECIALSXP
-    | BuiltinSxp -> BUILTINSXP
-    | CharSxp    -> CHARSXP
-    | LglSxp     -> LGLSXP
-    | IntSxp     -> INTSXP
-    | RealSxp    -> REALSXP
-    | CplxSxp    -> CPLXSXP
-    | StrSxp     -> STRSXP
-    | DotSxp     -> DOTSXP
-    | AnySxp     -> ANYSXP
-    | VecSxp     -> VECSXP
-    | ExprSxp    -> EXPRSXP
-    | BcodeSxp   -> BCODESXP
-    | ExtptrSxp  -> EXTPTRSXP
-    | WeakrefSxp -> WEAKREFSXP
-    | RawSxp     -> RAWSXP
-    | S4Sxp      -> S4SXP
-    | FunSxp     -> FUNSXP
-  }
+    let sexps_seen = ref [] in
+    let rec aux s =
+      let is_found (ss, _) = sexp_equality s ss in
+      match (try Some (List.find is_found !sexps_seen) with _ -> None) with
+      | Some (_, t) -> t | None -> let t = lazy
+          { content = match sexptype s with
+            | NilSxp     -> NILSXP
+            | SymSxp     -> SYMSXP {
+                pname      = aux (inspect_symsxp_pname    s);
+                sym_value  = aux (inspect_symsxp_value    s);
+                internal   = aux (inspect_symsxp_internal s)}
+            | ListSxp    -> LISTSXP
+            | ClosSxp    -> CLOSSXP
+            | EnvSxp     -> ENVSXP
+            | PromSxp    -> PROMSXP {
+                prom_value = aux (inspect_promsxp_value s);
+                expr       = aux (inspect_promsxp_expr  s);
+                env        = aux (inspect_promsxp_env   s)}
+            | LangSxp    -> LANGSXP
+            | SpecialSxp -> SPECIALSXP
+            | BuiltinSxp -> BUILTINSXP
+            | CharSxp    -> CHARSXP
+            | LglSxp     -> LGLSXP
+            | IntSxp     -> INTSXP
+            | RealSxp    -> REALSXP
+            | CplxSxp    -> CPLXSXP
+            | StrSxp     -> STRSXP
+            | DotSxp     -> DOTSXP
+            | AnySxp     -> ANYSXP
+            | VecSxp     -> VECSXP
+            | ExprSxp    -> EXPRSXP
+            | BcodeSxp   -> BCODESXP
+            | ExtptrSxp  -> EXTPTRSXP
+            | WeakrefSxp -> WEAKREFSXP
+            | RawSxp     -> RAWSXP
+            | S4Sxp      -> S4SXP
+            | FunSxp     -> FUNSXP
+          } in sexps_seen := (s, t)::!sexps_seen; t
+    in aux s
+
+    let rec unfold level t =
+      match level with | 0 -> () | _ -> List.iter (unfold (level - 1))
+      begin match (Lazy.force t).content with
+      | NILSXP     -> []
+      | SYMSXP x   -> [x.pname; x.sym_value; x.internal]
+      | LISTSXP    -> []
+      | CLOSSXP    -> []
+      | ENVSXP     -> []
+      | PROMSXP x  -> [x.prom_value; x.expr; x.env]
+      | LANGSXP    -> []
+      | SPECIALSXP -> []
+      | BUILTINSXP -> []
+      | CHARSXP    -> []
+      | LGLSXP     -> []
+      | INTSXP     -> []
+      | REALSXP    -> []
+      | CPLXSXP    -> []
+      | STRSXP     -> []
+      | DOTSXP     -> []
+      | ANYSXP     -> []
+      | VECSXP     -> []
+      | EXPRSXP    -> []
+      | BCODESXP   -> []
+      | EXTPTRSXP  -> []
+      | WEAKREFSXP -> []
+      | RAWSXP     -> []
+      | S4SXP      -> []
+      | FUNSXP     -> []
+      end
 
 end
