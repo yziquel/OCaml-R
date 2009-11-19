@@ -23,9 +23,13 @@
 /*                                                                               */
 /*********************************************************************************/
 
-#define _GNU_SOURCE   /* Required by asprinft (see 'man asprintf'), as it is a
-                         GNU extension. Seems a bit overkill. Should try to
-                         remove this dependency on asprintf. */
+#define _GNU_SOURCE    /* Required by asprinft (see 'man asprintf'), as it is a
+                          GNU extension. Seems a bit overkill. Should try to
+                          remove this dependency on asprintf. */
+
+#define USE_RINTERNALS /* This compilation directive allows us to have access to
+                          the definition of R internal types. Compilation of the
+                          inspect* functions is otherwise prohibited. */
 
 #include <mlvalues.h>
 #include <alloc.h>
@@ -289,18 +293,15 @@ CAMLprim value r_print_value (value sexp) {
 
 CAMLprim value inspect_promsxp_value (value sexp) {
   CAMLparam1(sexp);
-  struct promsxp_struct * s = (Sexp_val(sexp)).u;
-  CAMLreturn(Val_sexp((*s).promsxp.value));
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.value));
 }
 
 CAMLprim value inspect_promsxp_expr (value sexp) {
   CAMLparam1(sexp);
-  struct promsxp_struct * s = (Sexp_val(sexp)).u;
-  CAMLreturn(Val_sexp((*s).promsxp.expr));
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.expr));
 }
 
 CAMLprim value inspect_promsxp_env (value sexp) {
   CAMLparam1(sexp);
-  struct promsxp_struct * s = (Sexp_val(sexp)).u;
-  CAMLreturn(Val_sexp((*s).promsxp.env));
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.env));
 }
