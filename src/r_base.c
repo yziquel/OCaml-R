@@ -289,18 +289,18 @@ CAMLprim value r_print_value (value sexp) {
 
 CAMLprim value inspect_promsxp_value (value sexp) {
   CAMLparam1(sexp);
-  struct promsxp_struct s = (Sexp_val(sexp))->u;
-  CAMLreturn(Val_sexp(s.promsxp.value));
+  struct promsxp_struct * s = (Sexp_val(sexp)).u;
+  CAMLreturn(Val_sexp((*s).promsxp.value));
 }
 
 CAMLprim value inspect_promsxp_expr (value sexp) {
   CAMLparam1(sexp);
-  struct promsxp_struct s = (Sexp_val(sexp))->u;
-  CAMLreturn(Val_sexp(s.promsxp.expr));
+  struct promsxp_struct * s = (Sexp_val(sexp)).u;
+  CAMLreturn(Val_sexp((*s).promsxp.expr));
 }
 
 CAMLprim value inspect_promsxp_env (value sexp) {
   CAMLparam1(sexp);
-  struct promsxp_struct s = (Sexp_val(sexp))->u;
-  CAMLreturn(Val_sexp(s.promsxp.env));
+  struct promsxp_struct * s = (Sexp_val(sexp)).u;
+  CAMLreturn(Val_sexp((*s).promsxp.env));
 }
