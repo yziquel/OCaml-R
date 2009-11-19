@@ -193,6 +193,6 @@ module Internal : sig
     content : t_content
   }
 
-  val t_of_sexp : sexp -> t
+  val t_of_sexp : Raw.sexp -> t
 
 end
