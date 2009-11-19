@@ -175,16 +175,6 @@ end
 
 module Internal : sig
 
-  module Sxp : sig 
-
-    type prom = {value: t; expr: t; env: t}
-
-  end
-
-  type t_content =
-    | PromSxp of Sxp.prom
-    | Unknown
-
   type t = {
     (* sxpinfo : sxpinfo; *)
     (* attrib  : t; *)
@@ -192,6 +182,12 @@ module Internal : sig
     (* gengc_prevnode : t; *)
     content : t_content
   }
+
+  and t_content =
+    | Prom of sxp_prom
+    | Unknown
+
+  and sxp_prom = {value: t; expr: t; env: t}
 
   val t_of_sexp : Raw.sexp -> t
 
