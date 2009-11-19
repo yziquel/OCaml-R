@@ -77,6 +77,10 @@ LIBMATH=rmath.cmxa
 LIBMATH_BYTE=rmath.cma
 LIBMATH_CMI=rmath.cmi
 
+LIBINTERP=oCamlR.cmxa
+LIBINTERP_BYTE=oCamlR.cma
+LIBINTERP_CMI=oCamlR.cmi
+
 LIBDIR=${OCAMLLIB}/R
 
 #############################
