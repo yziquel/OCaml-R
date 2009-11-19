@@ -56,6 +56,13 @@ type t = Sexp of sexp | NULL
 
 
 
+(* R constants - global symbols in libR.so. *)
+
+external null_creator : unit -> sexp = "r_null"
+let null = NULL
+
+
+
 (* Conversion of R types from OCaml side to R side. *)
 
 external null_creator : unit -> sexp = "r_null"

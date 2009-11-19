@@ -57,17 +57,14 @@ val init : ?name:string ->
 (** Call this function to terminate properly the interpreter. *)
 val terminate : unit -> unit
 
-
-
 (** Static types for R values. *)
 type t
 
-
+(* R constants - global symbols in libR.so. *)
+val null : t
 
 (** Beta-reduction in R. *)
 val eval : t list -> t
-
-
 
 (** Dealing with the R symbol table. *)
 type symbol = string
