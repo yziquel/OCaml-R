@@ -85,6 +85,16 @@ CAMLprim value end_r (value unit) {
 
 /* Wrapping and unwrapping of R values. */
 
+CAMLprim value Val_ptr ((void *) p) {
+  CAMLparam0();
+  CAMLlocal1(result);
+  result = caml_alloc(1, Abstract_tag);
+  Field(result, 0) = (value) p;
+    /* Do not use Val_long in the above statement,
+       as it will drop the top bit. See mlvalues.h. */
+  CAMLreturn(result);
+}
+
 CAMLprim value Val_sexp (SEXP sexp) {
   CAMLparam0();
   CAMLlocal1(result);
@@ -289,15 +299,18 @@ CAMLprim value r_print_value (value sexp) {
 
 CAMLprim value inspect_promsxp_value (value sexp) {
   CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.value));
+  (struct promsxp) s = (Sexp_val(sexp))->u;
+  CAMLreturn(Val_ptr((void *) s.promsxp.value));
 }
 
 CAMLprim value inspect_promsxp_expr (value sexp) {
   CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.expr));
+  (struct promsxp) s = (Sexp_val(sexp))->u;
+  CAMLreturn(Val_ptr((void *) s.promsxp.expr));
 }
 
 CAMLprim value inspect_promsxp_env (value sexp) {
   CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.env));
+  (struct promsxp) s = (Sexp_val(sexp))->u;
+  CAMLreturn(Val_ptr((void *) s.promsxp.env));
 }
