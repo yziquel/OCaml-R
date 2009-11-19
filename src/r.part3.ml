@@ -284,8 +284,32 @@ module Internal = struct
   }
 
   and t_content =
-    | Prom of sxp_prom
-    | Unknown
+    | NILSXP
+    | SYMSXP
+    | LISTSXP
+    | CLOSSXP
+    | ENVSXP
+    | PROMSXP of sxp_prom
+    | LANGSXP
+    | SPECIALSXP
+    | BUILTINSXP
+    | CHARSXP
+    | LGLSXP
+    | INTSXP
+    | REALSXP
+    | CPLXSXP
+    | STRSXP
+    | DOTSXP
+    | ANYSXP
+    | VECSXP
+    | EXPRSXP
+    | BCODESXP
+    | EXTPTRSXP
+    | WEAKREFSXP
+    | RAWSXP
+    | S4SXP
+    | FUNSXP
+
 
   and sxp_prom = {
     value : t;
@@ -301,11 +325,34 @@ module Internal = struct
 
   let rec t_of_sexp s =
   { content = match sexptype s with
-    | PromSxp -> Prom {
+    | NilSxp     -> NILSXP
+    | SymSxp     -> SYMSXP
+    | ListSxp    -> LISTSXP
+    | ClosSxp    -> CLOSSXP
+    | EnvSxp     -> ENVSXP
+    | PromSxp    -> PROMSXP {
         value = t_of_sexp (inspect_promsxp_value s);
         expr  = t_of_sexp (inspect_promsxp_expr  s);
         env   = t_of_sexp (inspect_promsxp_env   s)}
-    | _ -> Unknown
+    | LangSxp    -> LANGSXP
+    | SpecialSxp -> SPECIALSXP
+    | BuiltinSxp -> BUILTINSXP
+    | CharSxp    -> CHARSXP
+    | LglSxp     -> LGLSXP
+    | IntSxp     -> INTSXP
+    | RealSxp    -> REALSXP
+    | CplxSxp    -> CPLXSXP
+    | StrSxp     -> STRSXP
+    | DotSxp     -> DOTSXP
+    | AnySxp     -> ANYSXP
+    | VecSxp     -> VECSXP
+    | ExprSxp    -> EXPRSXP
+    | BcodeSxp   -> BCODESXP
+    | ExtptrSxp  -> EXTPTRSXP
+    | WeakrefSxp -> WEAKREFSXP
+    | RawSxp     -> RAWSXP
+    | S4Sxp      -> S4SXP
+    | FunSxp     -> FUNSXP
   }
 
 end

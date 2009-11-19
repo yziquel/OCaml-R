@@ -184,8 +184,31 @@ module Internal : sig
   }
 
   and t_content =
-    | Prom of sxp_prom
-    | Unknown
+    | NILSXP
+    | SYMSXP
+    | LISTSXP
+    | CLOSSXP
+    | ENVSXP
+    | PROMSXP of sxp_prom
+    | LANGSXP
+    | SPECIALSXP
+    | BUILTINSXP
+    | CHARSXP
+    | LGLSXP
+    | INTSXP
+    | REALSXP
+    | CPLXSXP
+    | STRSXP
+    | DOTSXP
+    | ANYSXP
+    | VECSXP
+    | EXPRSXP
+    | BCODESXP
+    | EXTPTRSXP
+    | WEAKREFSXP
+    | RAWSXP
+    | S4SXP
+    | FUNSXP
 
   and sxp_prom = {value: t; expr: t; env: t}
 
