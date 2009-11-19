@@ -110,7 +110,7 @@ CAMLprim value r_null (value unit) {
 
 /* Extracting runtime R low-level type information. */
 
-CAMLprim value sexptype_of_sexp (value sexp) {
+CAMLprim value r_sexptype_of_sexp (value sexp) {
   CAMLparam1(sexp);
   CAMLreturn(Val_int(TYPEOF(Sexp_val(sexp))));
 }
@@ -118,13 +118,13 @@ CAMLprim value sexptype_of_sexp (value sexp) {
 
 /* Beta-reduction in R. */
 
-/* langsxp_of_list creates a lisp-like list out of an
+/* r_langsxp_of_list creates a lisp-like list out of an
    OCaml list. langsxps, called pairlists, are not much
    used in R these days, except for internal matters,
    such as being an argument to R_tryEval.
    - Argument l is the OCaml list.
    - Argument n is the length of the OCaml list. */
-CAMLprim value langsxp_of_list (value l, value n) {
+CAMLprim value r_langsxp_of_list (value l, value n) {
   CAMLparam2(l, n);
   CAMLlocal1(l_cursor);
   SEXP s, t;

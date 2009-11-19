@@ -60,14 +60,17 @@ type t = Sexp of sexp | NULL
 
 external null_creator : unit -> sexp = "r_null"
 
-let sexp_of_t = function
-  | Sexp s -> s
-  | NULL -> null_creator ()
+module Raw1 = struct
+  let sexp_of_t = function
+    | Sexp s -> s
+    | NULL -> null_creator ()
+end include Raw1
+
 
 
 (* Runtime types internal to R. *)
 
-module Raw1 = struct
+module Raw2 = struct
   type internally =
     | NilSxp
     | SymSxp
@@ -94,39 +97,42 @@ module Raw1 = struct
     | RawSxp
     | S4Sxp
     | FunSxp
-end include Raw1
+end include Raw2
 
-external r_sexptype_of_sexp : sexp -> int = "sexptype_of_sexp"
-let sexptype s = match (r_sexptype_of_sexp s) with
-  | 0  -> NilSxp
-  | 1  -> SymSxp
-  | 2  -> ListSxp
-  | 3  -> ClosSxp
-  | 4  -> EnvSxp
-  | 5  -> PromSxp
-  | 6  -> LangSxp
-  | 7  -> SpecialSxp
-  | 8  -> BuiltinSxp
-  | 9  -> CharSxp
-  | 10 -> LglSxp
-  (* Integer range is not defined here. *)
-  | 13 -> IntSxp
-  | 14 -> RealSxp
-  | 15 -> CplxSxp
-  | 16 -> StrSxp
-  | 17 -> DotSxp
-  | 18 -> AnySxp
-  | 19 -> VecSxp
-  | 20 -> ExprSxp
-  | 21 -> BcodeSxp
-  | 22 -> ExtptrSxp
-  | 23 -> WeakrefSxp
-  | 24 -> RawSxp
-  | 25 -> S4Sxp
-  (* 99 represents a 'dummy' type for functions, with is an
-     umbrella for Closure, Builtin or Special types. *)
-  | 99 -> FunSxp
-  | _ -> failwith "R value with type not specified in Rinternals.h"
+external sexptype_of_sexp : sexp -> int = "r_sexptype_of_sexp"
+modele Raw3 = struct
+  let sexptype s = match (sexptype_of_sexp s) with
+    | 0  -> NilSxp
+    | 1  -> SymSxp
+    | 2  -> ListSxp
+    | 3  -> ClosSxp
+    | 4  -> EnvSxp
+    | 5  -> PromSxp
+    | 6  -> LangSxp
+    | 7  -> SpecialSxp
+    | 8  -> BuiltinSxp
+    | 9  -> CharSxp
+    | 10 -> LglSxp
+    (* Integer range is not defined here. *)
+    | 13 -> IntSxp
+    | 14 -> RealSxp
+    | 15 -> CplxSxp
+    | 16 -> StrSxp
+    | 17 -> DotSxp
+    | 18 -> AnySxp
+    | 19 -> VecSxp
+    | 20 -> ExprSxp
+    | 21 -> BcodeSxp
+    | 22 -> ExtptrSxp
+    | 23 -> WeakrefSxp
+    | 24 -> RawSxp
+    | 25 -> S4Sxp
+    (* 99 represents a 'dummy' type for functions, with is an
+       umbrella for Closure, Builtin or Special types. *)
+    | 99 -> FunSxp
+    | _ -> failwith "R value with type not specified in Rinternals.h"
+end include Raw3
+
 
 
 (* Conversion of R types from R side to OCaml side. *)
@@ -134,6 +140,19 @@ let sexptype s = match (r_sexptype_of_sexp s) with
 let t_of_sexp s = match sexptype s with
   | NilSxp -> NULL
   | _ -> Sexp s
+
+
+
+(* Beta-reduction in R. *)
+
+external langsxp_of_list : sexp list -> int -> langsxp = "r_langsxp_of_list"
+external eval_langsxp : langsxp -> sexp = "r_eval_langsxp"
+
+let eval l =
+  let sexps, n = (List.map sexp_of_t l), (List.length l) in
+  let langsxp = langsxp_of_list sexps n in
+  t_of_sexp (eval_langsxp langsxp)
+
 
 
 (* Dealing with the R symbol table. *)
@@ -156,9 +175,6 @@ external sexp : string -> sexp = "r_sexp_of_string"
 external set_var : symbol -> sexp -> unit = "r_set_var"
 external print : sexp -> unit = "r_print_value"
 
-external langsxp_of_list : sexp list -> int -> langsxp = "langsxp_of_list"
-external eval_langsxp : langsxp -> sexp = "r_eval_langsxp"
-let eval = function l -> eval_langsxp (langsxp_of_list l (List.length l))
 (*external exec : string -> arg array -> unit = "r_exec"
   Commented out because of C warning. Will uncoment when OCaml-R compiles on 64 bits. *)
 
@@ -244,4 +260,6 @@ end
 module Raw = struct
   include Raw0
   include Raw1
+  include Raw2
+  include Raw3
 end

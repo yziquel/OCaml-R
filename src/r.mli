@@ -64,6 +64,11 @@ type t
 
 
 
+(** Beta-reduction in R. *)
+val eval : t list -> t
+
+
+
 (** Dealing with the R symbol table. *)
 type symbol = string
 val symbol : symbol -> t
@@ -138,6 +143,8 @@ module Raw : sig
 
   type sexp
 
+  val sexp_of_t : t -> sexp
+
   type internally =
     | NilSxp
     | SymSxp
@@ -164,6 +171,8 @@ module Raw : sig
     | RawSxp
     | S4Sxp
     | FunSxp
+
+  val sexptype : sexp -> internally
 
 end
 
