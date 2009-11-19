@@ -100,7 +100,7 @@ module Raw2 = struct
 end include Raw2
 
 external sexptype_of_sexp : sexp -> int = "r_sexptype_of_sexp"
-modele Raw3 = struct
+module Raw3 = struct
   let sexptype s = match (sexptype_of_sexp s) with
     | 0  -> NilSxp
     | 1  -> SymSxp
