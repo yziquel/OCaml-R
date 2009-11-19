@@ -185,7 +185,7 @@ module Internal : sig
 
   and t_content =
     | NILSXP
-    | SYMSXP
+    | SYMSXP of sxp_sym
     | LISTSXP
     | CLOSSXP
     | ENVSXP
@@ -210,7 +210,8 @@ module Internal : sig
     | S4SXP
     | FUNSXP
 
-  and sxp_prom = {value: t; expr: t; env: t}
+  and sxp_sym  = { pname: t; sym_value: t; internal: t }
+  and sxp_prom = { prom_value: t; expr: t; env: t }
 
   val t_of_sexp : Raw.sexp -> t
 

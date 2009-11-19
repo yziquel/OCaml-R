@@ -285,7 +285,7 @@ module Internal = struct
 
   and t_content =
     | NILSXP
-    | SYMSXP
+    | SYMSXP of sxp_sym
     | LISTSXP
     | CLOSSXP
     | ENVSXP
@@ -310,30 +310,33 @@ module Internal = struct
     | S4SXP
     | FUNSXP
 
-
-  and sxp_prom = {
-    value : t;
-    expr  : t;
-    env   : t
-  }
+  and sxp_sym  = { pname: t; sym_value: t; internal: t }
+  and sxp_prom = { prom_value: t; expr: t; env: t }
 
   (* Conversion functions. *)
 
-  external inspect_promsxp_value : sexp -> sexp = "inspect_promsxp_value"
-  external inspect_promsxp_expr  : sexp -> sexp = "inspect_promsxp_expr"
-  external inspect_promsxp_env   : sexp -> sexp = "inspect_promsxp_env"
+  external inspect_symsxp_pname    : sexp -> sexp = "inspect_symsxp_pname"
+  external inspect_symsxp_value    : sexp -> sexp = "inspect_symsxp_value"
+  external inspect_symsxp_internal : sexp -> sexp = "inspect_symsxp_internal"
+
+  external inspect_promsxp_value   : sexp -> sexp = "inspect_promsxp_value"
+  external inspect_promsxp_expr    : sexp -> sexp = "inspect_promsxp_expr"
+  external inspect_promsxp_env     : sexp -> sexp = "inspect_promsxp_env"
 
   let rec t_of_sexp s =
   { content = match sexptype s with
     | NilSxp     -> NILSXP
-    | SymSxp     -> SYMSXP
+    | SymSxp     -> SYMSXP {
+        pname      = t_of_sexp (inspect_symsxp_pname    s);
+        sym_value  = t_of_sexp (inspect_symsxp_value    s);
+        internal   = t_of_sexp (inspect_symsxp_internal s)}
     | ListSxp    -> LISTSXP
     | ClosSxp    -> CLOSSXP
     | EnvSxp     -> ENVSXP
     | PromSxp    -> PROMSXP {
-        value = t_of_sexp (inspect_promsxp_value s);
-        expr  = t_of_sexp (inspect_promsxp_expr  s);
-        env   = t_of_sexp (inspect_promsxp_env   s)}
+        prom_value = t_of_sexp (inspect_promsxp_value s);
+        expr       = t_of_sexp (inspect_promsxp_expr  s);
+        env        = t_of_sexp (inspect_promsxp_env   s)}
     | LangSxp    -> LANGSXP
     | SpecialSxp -> SPECIALSXP
     | BuiltinSxp -> BUILTINSXP
