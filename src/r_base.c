@@ -283,3 +283,21 @@ CAMLprim value r_print_value (value sexp) {
 //  CAMLreturn(Val_unit);
 //}
 
+
+/* What follows is low-level accessor functions, in order to inspect
+   in details the contents of SEXPs. */
+
+CAMLprim value inspect_promsxp_value (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.value));
+}
+
+CAMLprim value inspect_promsxp_expr (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.expr));
+}
+
+CAMLprim value inspect_promsxp_env (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.env));
+}

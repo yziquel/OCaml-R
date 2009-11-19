@@ -270,3 +270,68 @@ module Raw = struct
   include Raw2
   include Raw3
 end
+
+module rec Internal : sig
+
+  module Sxp : sig
+
+    type prom = {value: t; expr: t; env: t}
+
+  end
+
+  type t_content =
+    | PromSxp of Sxp.prom
+    | Unknown
+
+  type t = {
+    (* sxpinfo : sxpinfo; *)
+    (* attrib  : t; *)
+    (* gengc_nextnode : t; *)
+    (* gengc_prevnode : t; *)
+    content : t_content
+  }
+
+  val t_of_sexp : sexp -> t
+
+end = struct
+
+  (* Type definitions. *)
+
+  module Sxp = struct
+
+    type prom = {
+      value : Internal.t;
+      expr  : Internal.t;
+      env   : Internal.t
+    }
+
+  end
+
+  type t_content =
+    | PromSxp of Sxp.prom
+    | Unknown
+  
+  type t = {
+    (* sxpinfo : sxpinfo; *)
+    (* attrib  : Internal.t; *)
+    (* gengc_nextnode : Internal.t; *)
+    (* gengc_prevnode : Internal.t; *)
+    content : t_content
+  }
+
+  (* Conversion functions. *)
+
+  external inspect_promsxp_value : sexp -> sexp = "inspect_promsxp_value"
+  external inspect_promsxp_expr  : sexp -> sexp = "inspect_promsxp_expr"
+  external inspect_promsxp_env   : sexp -> sexp = "inspect_promsxp_env"
+
+  let rec t_of_sexp s =
+  { content = match sexptype s with
+    | Raw.PromSxp -> PromSxp {
+        value = t_of_sexp (inspect_promsxp_value s);
+        expr  = t_of_sexp (inspect_promsxp_expr  s);
+        env   = t_of_sexp (inspect_promsxp_env   s)}
+    | _ -> Unknown
+  }
+
+end
