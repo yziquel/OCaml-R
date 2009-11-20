@@ -355,7 +355,6 @@ module Internal = struct
 
   let rec t_of_sexp ?unfold:(unfold=true) s =
     let rec aux sexps_seen s =
-      print_endline (string_of_int (List.length sexps_seen));
       let is_found (ss, _) = sexp_equality s ss in
       match (try Some (List.find is_found sexps_seen) with _ -> None) with
       | Some (_, t) -> lazy (Lazy.force t)
