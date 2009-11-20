@@ -23,6 +23,8 @@
 /*                                                                               */
 /*********************************************************************************/
 
+//#define OCAMLR_DEBUG   /* Toggle this on or off to enable debugging. */
+
 #define _GNU_SOURCE    /* Required by asprinft (see 'man asprintf'), as it is a
                           GNU extension. Seems a bit overkill. Should try to
                           remove this dependency on asprintf. */
@@ -42,6 +44,18 @@
 #include <Rembedded.h>
 #include <R_ext/Parse.h>
 #include <stdio.h>
+
+
+#ifdef OCAMLR_DEBUG
+
+/* Debugging function. Prints on stderr. */
+
+void prerr_endline (char* s) {
+  fprintf (stderr, "%s\n", s);
+  fflush(stderr);
+}
+
+#endif
 
 
 /* Stub code initialising and terminating the R interpreter. */
@@ -185,9 +199,13 @@ CAMLprim value r_sexp_of_symbol (value symbol) {
   char* c_symbol = String_val(symbol);
   SEXP e;
 
-  /* prerr_endline (c_symbol); DEBUG */
+#ifdef OCAMLR_DEBUG
+  prerr_endline (c_symbol);
   PROTECT(e = duplicate(findVar(install(c_symbol), R_GlobalEnv)));
-  /* PrintValue(e); DEBUG */
+  PrintValue(e);
+#else
+  PROTECT(e = duplicate(findVar(install(c_symbol), R_GlobalEnv)));
+#endif
   UNPROTECT(1);
 
   CAMLreturn(Val_sexp(e));
@@ -310,6 +328,21 @@ CAMLprim value inspect_symsxp_value (value sexp) {
 CAMLprim value inspect_symsxp_internal (value sexp) {
   CAMLparam1(sexp);
   CAMLreturn(Val_sexp(Sexp_val(sexp)->u.symsxp.internal));
+}
+
+CAMLprim value inspect_listsxp_carval (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.listsxp.carval));
+}
+
+CAMLprim value inspect_listsxp_cdrval (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.listsxp.cdrval));
+}
+
+CAMLprim value inspect_listsxp_tagval (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.listsxp.tagval));
 }
 
 CAMLprim value inspect_promsxp_value (value sexp) {

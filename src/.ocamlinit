@@ -1,0 +1,9 @@
+#use "topfind";;
+#require "unix";;
+#load "r.cma";;
+R.init ();;
+
+let symbol_structure x = R.Internal.t_of_sexp (R.Raw.sexp_of_t (R.symbol x));;
+
+let t = symbol_structure "str";;
+open R.Internal;;

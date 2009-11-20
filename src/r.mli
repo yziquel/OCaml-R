@@ -138,11 +138,12 @@ module Interpreter : functor (Env : Environment) -> Interpreter
 
 module Raw : sig
 
-  type sexp
+  type 'a sexp
 
-  val sexp_of_t : t -> sexp
+  val sexp_of_t : t -> 'a sexp
+  val sexp_equality : 'b sexp -> 'b sexp -> bool
 
-  type internally =
+  type sexptype =
     | NilSxp
     | SymSxp
     | ListSxp
@@ -169,7 +170,9 @@ module Raw : sig
     | S4Sxp
     | FunSxp
 
-  val sexptype : sexp -> internally
+  val sexptype : 'a sexp -> sexptype
+
+  val sexp_of_symbol : symbol -> 'a sexp
 
 end
 
@@ -188,11 +191,11 @@ module Internal : sig
   and t_content =
     | NILSXP
     | SYMSXP of sxp_sym
-    | LISTSXP
+    | LISTSXP of sxp_list
     | CLOSSXP
     | ENVSXP
     | PROMSXP of sxp_prom
-    | LANGSXP
+    | LANGSXP of sxp_list
     | SPECIALSXP
     | BUILTINSXP
     | CHARSXP
@@ -213,9 +216,10 @@ module Internal : sig
     | FUNSXP
 
   and sxp_sym  = { pname: t; sym_value: t; internal: t }
+  and sxp_list = { carval: t; cdrval: t; tagval: t}
   and sxp_prom = { prom_value: t; expr: t; env: t }
 
-  val t_of_sexp : Raw.sexp -> t
+  val t_of_sexp : 'a Raw.sexp -> t
   val unfold : int -> t -> unit
 
 end
