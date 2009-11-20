@@ -120,7 +120,7 @@ SEXP Sexp_val (value sexp) {
 /* Comparison operator. */
 CAMLprim value r_sexp_equality (value s1, value s2) {
   CAMLparam2(s1, s2);
-  CAMLreturn(Val_bool(s1 == s2));
+  CAMLreturn(Val_bool(Sexp_val(s1) == Sexp_val(s2)));
 }
 
 

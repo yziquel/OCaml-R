@@ -353,32 +353,33 @@ module Internal = struct
   external inspect_promsxp_expr    : 'a sexp -> 'b sexp = "inspect_promsxp_expr"
   external inspect_promsxp_env     : 'a sexp -> 'b sexp = "inspect_promsxp_env"
 
-  let rec t_of_sexp s =
-    let sexps_seen = ref [] in
-    let rec aux s =
+  let rec t_of_sexp ?unfold:(unfold=true) s =
+    let rec aux sexps_seen s =
+      print_endline (string_of_int (List.length sexps_seen));
       let is_found (ss, _) = sexp_equality s ss in
-      match (try Some (List.find is_found !sexps_seen) with _ -> None) with
-      | Some (_, t) -> t | None -> let t = lazy
+      match (try Some (List.find is_found sexps_seen) with _ -> None) with
+      | Some (_, t) -> lazy (Lazy.force t)
+      | None -> let veil x = aux ((s, x)::sexps_seen) in let rec t = lazy
           { content = match sexptype s with
             | NilSxp     -> NILSXP
             | SymSxp     -> SYMSXP {
-                pname      = aux (inspect_symsxp_pname    s);
-                sym_value  = aux (inspect_symsxp_value    s);
-                internal   = aux (inspect_symsxp_internal s)}
+                pname      = veil t (inspect_symsxp_pname    s);
+                sym_value  = veil t (inspect_symsxp_value    s);
+                internal   = veil t (inspect_symsxp_internal s)}
             | ListSxp    -> LISTSXP {
-                carval     = aux (inspect_listsxp_carval s);
-                cdrval     = aux (inspect_listsxp_cdrval s);
-                tagval     = aux (inspect_listsxp_tagval s)}
+                carval     = veil t (inspect_listsxp_carval s);
+                cdrval     = veil t (inspect_listsxp_cdrval s);
+                tagval     = veil t (inspect_listsxp_tagval s)}
             | ClosSxp    -> CLOSSXP
             | EnvSxp     -> ENVSXP
             | PromSxp    -> PROMSXP {
-                prom_value = aux (inspect_promsxp_value s);
-                expr       = aux (inspect_promsxp_expr  s);
-                env        = aux (inspect_promsxp_env   s)}
+                prom_value = veil t (inspect_promsxp_value s);
+                expr       = veil t (inspect_promsxp_expr  s);
+                env        = veil t (inspect_promsxp_env   s)}
             | LangSxp    -> LANGSXP {
-                carval     = aux (inspect_listsxp_carval s);
-                cdrval     = aux (inspect_listsxp_cdrval s);
-                tagval     = aux (inspect_listsxp_tagval s)}
+                carval     = veil t (inspect_listsxp_carval s);
+                cdrval     = veil t (inspect_listsxp_cdrval s);
+                tagval     = veil t (inspect_listsxp_tagval s)}
             | SpecialSxp -> SPECIALSXP
             | BuiltinSxp -> BUILTINSXP
             | CharSxp    -> CHARSXP
@@ -397,8 +398,8 @@ module Internal = struct
             | RawSxp     -> RAWSXP
             | S4Sxp      -> S4SXP
             | FunSxp     -> FUNSXP
-          } in sexps_seen := (s, t)::!sexps_seen; t
-    in aux s
+          } in if unfold then ignore (Lazy.force t); t
+    in aux [] s
 
     let rec unfold level t =
       match level with | 0 -> () | _ -> List.iter (unfold (level - 1))

@@ -219,7 +219,7 @@ module Internal : sig
   and sxp_list = { carval: t; cdrval: t; tagval: t}
   and sxp_prom = { prom_value: t; expr: t; env: t }
 
-  val t_of_sexp : 'a Raw.sexp -> t
+  val t_of_sexp : ?unfold:bool -> 'a Raw.sexp -> t
   val unfold : int -> t -> unit
 
 end
