@@ -538,7 +538,7 @@ module Internal = struct
 
   module CParser = Parser (CTypes)
 
-  module PrettyParser = Parser (CParser)
+  module PrettyParser = Parser (PrettyTypes)
 
   module C = struct
     include CTypes
