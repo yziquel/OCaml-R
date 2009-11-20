@@ -183,48 +183,62 @@ end
 
 module Internal : sig
 
-  type t = eager_t Lazy.t
+  module C : sig
 
-  and eager_t = {
-    (* sxpinfo : sxpinfo; *)
-    (* attrib  : t; *)
-    (* gengc_nextnode : t; *)
-    (* gengc_prevnode : t; *)
-    content : t_content
-  }
+    type t = {
+      (* sxpinfo : sxpinfo; *)
+      (* attrib  : t; *)
+      (* gengc_nextnode : t; *)
+      (* gengc_prevnode : t; *)
+      content : t_content
+    }
 
-  and t_content =
-    | NILSXP
-    | SYMSXP of sxp_sym
-    | LISTSXP of sxp_list
-    | CLOSSXP
-    | ENVSXP
-    | PROMSXP of sxp_prom
-    | LANGSXP of sxp_list
-    | SPECIALSXP
-    | BUILTINSXP
-    | CHARSXP of string
-    | LGLSXP
-    | INTSXP
-    | REALSXP
-    | CPLXSXP
-    | STRSXP
-    | DOTSXP
-    | ANYSXP
-    | VECSXP
-    | EXPRSXP
-    | BCODESXP
-    | EXTPTRSXP
-    | WEAKREFSXP
-    | RAWSXP
-    | S4SXP
-    | FUNSXP
+    and t_content =
+      | NILSXP
+      | SYMSXP of sxp_sym
+      | LISTSXP of sxp_list
+      | CLOSSXP
+      | ENVSXP
+      | PROMSXP of sxp_prom
+      | LANGSXP of sxp_list
+      | SPECIALSXP
+      | BUILTINSXP
+      | CHARSXP of string
+      | LGLSXP
+      | INTSXP
+      | REALSXP
+      | CPLXSXP
+      | STRSXP
+      | DOTSXP
+      | ANYSXP
+      | VECSXP
+      | EXPRSXP
+      | BCODESXP
+      | EXTPTRSXP
+      | WEAKREFSXP
+      | RAWSXP
+      | S4SXP
+      | FUNSXP
 
-  and sxp_sym  = { pname: t; sym_value: t; internal: t }
-  and sxp_list = { carval: t; cdrval: t; tagval: t}
-  and sxp_prom = { prom_value: t; expr: t; env: t }
+    and sxp_sym  = { pname: t Lazy.t; sym_value: t Lazy.t; internal: t Lazy.t }
+    and sxp_list = { carval: t Lazy.t; cdrval: t Lazy.t; tagval: t Lazy.t}
+    and sxp_prom = { prom_value: t Lazy.t; expr: t Lazy.t; env: t Lazy.t }
 
-  val t_of_sexp : ?unfold:bool -> 'a Raw.sexp -> t
-  val unfold : int -> t -> unit
+    val t_of_sexp : ?unfold:bool -> Raw.raw Raw.sexp -> t Lazy.t
+    val unfold : int -> t Lazy.t -> unit
+
+  end
+
+  module Pretty : sig
+
+    type t =
+      | NULL
+      | SYMBOL of string option
+      | Unknown
+
+    val t_of_sexp : ?unfold:bool -> Raw.raw Raw.sexp -> t Lazy.t
+    val unfold : int -> t Lazy.t -> unit
+
+  end
 
 end

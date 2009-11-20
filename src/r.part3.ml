@@ -324,61 +324,38 @@ end
 
 module Internal = struct
 
-  (* Type definitions. *)
+  (* General parsing function for internal R structures, i.e. SEXPs. *)
 
-  type t = eager_t Lazy.t
+  type 'a dummy = Dummy of 'a
 
-  and eager_t = {
-    (* sxpinfo : sxpinfo;   *)
-    (* attrib  : t;         *)
-    (* gengc_nextnode : t; *)
-    (* gengc_prevnode : t; *)
-    content : t_content
-  }
+  let rec parse_sexp build ?unfold:(unfold=true) s =
+    let rec aux sexps_seen s =
+      let is_found (ss, _) = sexp_equality s ss in
+      match (try Some (List.find is_found sexps_seen) with _ -> None) with
+      | Some (_, t) -> lazy (Lazy.force t)
+      | None -> let rec veil = Dummy begin function inside_sexp ->
+                  aux ((s, t)::sexps_seen) inside_sexp end
+                and t = lazy (build (let Dummy f = veil in f) s) in
+                if unfold then ignore (Lazy.force t); t
+    in aux [] s
 
-  (* and sxpinfo = {
-    type  : Raw.sexptype;
-    obj   : int;
-    named : int;
-    gp    : int;
-    mark  : int;
-    debug : int;
-    trace : int;
-    spare : int;
-    gcgen : int;
-    gccls : int;
-  }*)
+  module type Types = sig
 
-  and t_content =
-    | NILSXP
-    | SYMSXP of sxp_sym
-    | LISTSXP of sxp_list
-    | CLOSSXP
-    | ENVSXP
-    | PROMSXP of sxp_prom
-    | LANGSXP of sxp_list
-    | SPECIALSXP
-    | BUILTINSXP
-    | CHARSXP of string
-    | LGLSXP
-    | INTSXP
-    | REALSXP
-    | CPLXSXP
-    | STRSXP
-    | DOTSXP
-    | ANYSXP
-    | VECSXP
-    | EXPRSXP
-    | BCODESXP
-    | EXTPTRSXP
-    | WEAKREFSXP
-    | RAWSXP
-    | S4SXP
-    | FUNSXP
+    type t
+    val access : t -> t Lazy.t list
+    val build : (raw sexp -> t Lazy.t) -> raw sexp -> t
 
-  and sxp_sym  = { pname: t; sym_value: t; internal: t }
-  and sxp_list = { carval: t; cdrval: t; tagval: t}
-  and sxp_prom = { prom_value: t; expr: t; env: t }
+  end
+
+  module Parser (M : Types) = struct
+
+    let t_of_sexp = parse_sexp M.build
+
+    let rec unfold level t =
+      match level with | 0 -> () | _ ->
+      List.iter (unfold (level - 1)) (M.access (Lazy.force t))
+
+  end
 
   (* Conversion functions. *)
 
@@ -394,60 +371,63 @@ module Internal = struct
   external inspect_promsxp_expr    : 'a sexp -> 'b sexp = "inspect_promsxp_expr"
   external inspect_promsxp_env     : 'a sexp -> 'b sexp = "inspect_promsxp_env"
 
-  let rec t_of_sexp ?unfold:(unfold=true) s =
-    let rec aux sexps_seen s =
-<<<<<<< HEAD
-=======
-      print_endline (string_of_int (List.length sexps_seen));
->>>>>>> R.Internal.t_of_sexp now works.
-      let is_found (ss, _) = sexp_equality s ss in
-      match (try Some (List.find is_found sexps_seen) with _ -> None) with
-      | Some (_, t) -> lazy (Lazy.force t)
-      | None -> let veil x = aux ((s, x)::sexps_seen) in let rec t = lazy
-          { content = match sexptype s with
-            | NilSxp     -> NILSXP
-            | SymSxp     -> SYMSXP {
-                pname      = veil t (inspect_symsxp_pname    s);
-                sym_value  = veil t (inspect_symsxp_value    s);
-                internal   = veil t (inspect_symsxp_internal s)}
-            | ListSxp    -> LISTSXP {
-                carval     = veil t (inspect_listsxp_carval s);
-                cdrval     = veil t (inspect_listsxp_cdrval s);
-                tagval     = veil t (inspect_listsxp_tagval s)}
-            | ClosSxp    -> CLOSSXP
-            | EnvSxp     -> ENVSXP
-            | PromSxp    -> PROMSXP {
-                prom_value = veil t (inspect_promsxp_value s);
-                expr       = veil t (inspect_promsxp_expr  s);
-                env        = veil t (inspect_promsxp_env   s)}
-            | LangSxp    -> LANGSXP {
-                carval     = veil t (inspect_listsxp_carval s);
-                cdrval     = veil t (inspect_listsxp_cdrval s);
-                tagval     = veil t (inspect_listsxp_tagval s)}
-            | SpecialSxp -> SPECIALSXP
-            | BuiltinSxp -> BUILTINSXP
-            | CharSxp    -> CHARSXP (string_of_charsexp ((Obj.magic s) : char sexp))
-            | LglSxp     -> LGLSXP
-            | IntSxp     -> INTSXP
-            | RealSxp    -> REALSXP
-            | CplxSxp    -> CPLXSXP
-            | StrSxp     -> STRSXP
-            | DotSxp     -> DOTSXP
-            | AnySxp     -> ANYSXP
-            | VecSxp     -> VECSXP
-            | ExprSxp    -> EXPRSXP
-            | BcodeSxp   -> BCODESXP
-            | ExtptrSxp  -> EXTPTRSXP
-            | WeakrefSxp -> WEAKREFSXP
-            | RawSxp     -> RAWSXP
-            | S4Sxp      -> S4SXP
-            | FunSxp     -> FUNSXP
-          } in if unfold then ignore (Lazy.force t); t
-    in aux [] s
+  module CTypes = struct
 
-    let rec unfold level t =
-      match level with | 0 -> () | _ -> List.iter (unfold (level - 1))
-      begin match (Lazy.force t).content with
+    (* Type definitions. *)
+
+    type t = {
+      (* sxpinfo : sxpinfo;   *)
+      (* attrib  : t Lazy.t;         *)
+      (* gengc_nextnode : t Lazy.t; *)
+      (* gengc_prevnode : t Lazy.t; *)
+      content : t_content
+    }
+
+    (* and sxpinfo = {
+      type  : sexptype;
+      obj   : int;
+      named : int;
+      gp    : int;
+      mark  : int;
+      debug : int;
+      trace : int;
+      spare : int;
+      gcgen : int;
+      gccls : int;
+    }*)
+
+    and t_content =
+      | NILSXP
+      | SYMSXP of sxp_sym
+      | LISTSXP of sxp_list
+      | CLOSSXP
+      | ENVSXP
+      | PROMSXP of sxp_prom
+      | LANGSXP of sxp_list
+      | SPECIALSXP
+      | BUILTINSXP
+      | CHARSXP of string
+      | LGLSXP
+      | INTSXP
+      | REALSXP
+      | CPLXSXP
+      | STRSXP
+      | DOTSXP
+      | ANYSXP
+      | VECSXP
+      | EXPRSXP
+      | BCODESXP
+      | EXTPTRSXP
+      | WEAKREFSXP
+      | RAWSXP
+      | S4SXP
+      | FUNSXP
+
+    and sxp_sym  = { pname: t Lazy.t; sym_value: t Lazy.t; internal: t Lazy.t }
+    and sxp_list = { carval: t Lazy.t; cdrval: t Lazy.t; tagval: t Lazy.t }
+    and sxp_prom = { prom_value: t Lazy.t; expr: t Lazy.t; env: t Lazy.t }
+
+    let access t = match t.content with
       | NILSXP     -> []
       | SYMSXP x   -> [x.pname; x.sym_value; x.internal]
       | LISTSXP x  -> [x.carval; x.cdrval; x.tagval]
@@ -473,6 +453,101 @@ module Internal = struct
       | RAWSXP     -> []
       | S4SXP      -> []
       | FUNSXP     -> []
-      end
+
+    let build rec_build s = { content = match sexptype s with
+      | NilSxp     -> NILSXP
+      | SymSxp     -> SYMSXP {
+          pname      = rec_build (inspect_symsxp_pname    s);
+          sym_value  = rec_build (inspect_symsxp_value    s);
+          internal   = rec_build (inspect_symsxp_internal s)}
+      | ListSxp    -> LISTSXP {
+          carval     = rec_build (inspect_listsxp_carval s);
+          cdrval     = rec_build (inspect_listsxp_cdrval s);
+          tagval     = rec_build (inspect_listsxp_tagval s)}
+      | ClosSxp    -> CLOSSXP
+      | EnvSxp     -> ENVSXP
+      | PromSxp    -> PROMSXP {
+          prom_value = rec_build (inspect_promsxp_value s);
+          expr       = rec_build (inspect_promsxp_expr  s);
+          env        = rec_build (inspect_promsxp_env   s)}
+      | LangSxp    -> LANGSXP {
+          carval     = rec_build (inspect_listsxp_carval s);
+          cdrval     = rec_build (inspect_listsxp_cdrval s);
+          tagval     = rec_build (inspect_listsxp_tagval s)}
+      | SpecialSxp -> SPECIALSXP
+      | BuiltinSxp -> BUILTINSXP
+      | CharSxp    -> CHARSXP (string_of_charsexp ((Obj.magic s) : char sexp))
+      | LglSxp     -> LGLSXP
+      | IntSxp     -> INTSXP
+      | RealSxp    -> REALSXP
+      | CplxSxp    -> CPLXSXP
+      | StrSxp     -> STRSXP
+      | DotSxp     -> DOTSXP
+      | AnySxp     -> ANYSXP
+      | VecSxp     -> VECSXP
+      | ExprSxp    -> EXPRSXP
+      | BcodeSxp   -> BCODESXP
+      | ExtptrSxp  -> EXTPTRSXP
+      | WeakrefSxp -> WEAKREFSXP
+      | RawSxp     -> RAWSXP
+      | S4Sxp      -> S4SXP
+      | FunSxp     -> FUNSXP
+    }
+
+  end
+
+  module PrettyTypes = struct
+
+    (* Type definitions. *)
+
+    type t =
+      | NULL
+      | SYMBOL of string option
+      | Unknown
+
+    let access t = []
+
+    let build rec_build s = match sexptype s with
+      | NilSxp     -> NULL
+      | SymSxp     -> SYMBOL None
+      | ListSxp    -> Unknown
+      | ClosSxp    -> Unknown
+      | EnvSxp     -> Unknown
+      | PromSxp    -> Unknown
+      | LangSxp    -> Unknown
+      | SpecialSxp -> Unknown
+      | BuiltinSxp -> Unknown
+      | CharSxp    -> Unknown
+      | LglSxp     -> Unknown
+      | IntSxp     -> Unknown
+      | RealSxp    -> Unknown
+      | CplxSxp    -> Unknown
+      | StrSxp     -> Unknown
+      | DotSxp     -> Unknown
+      | AnySxp     -> Unknown
+      | VecSxp     -> Unknown
+      | ExprSxp    -> Unknown
+      | BcodeSxp   -> Unknown
+      | ExtptrSxp  -> Unknown
+      | WeakrefSxp -> Unknown
+      | RawSxp     -> Unknown
+      | S4Sxp      -> Unknown
+      | FunSxp     -> Unknown
+
+  end
+
+  module CParser = Parser (CTypes)
+
+  module PrettyParser = Parser (CParser)
+
+  module C = struct
+    include CTypes
+    include CParser
+  end
+
+  module Pretty = struct
+    include PrettyTypes
+    include PrettyParser
+  end
 
 end
