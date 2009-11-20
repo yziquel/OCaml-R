@@ -138,9 +138,14 @@ module Interpreter : functor (Env : Environment) -> Interpreter
 
 module Raw : sig
 
+  type nil
+  type lang
+  type char
+  type raw
+
   type 'a sexp
 
-  val sexp_of_t : t -> 'a sexp
+  val sexp_of_t : t -> raw sexp
   val sexp_equality : 'b sexp -> 'b sexp -> bool
 
   type sexptype =
@@ -172,7 +177,7 @@ module Raw : sig
 
   val sexptype : 'a sexp -> sexptype
 
-  val sexp_of_symbol : symbol -> 'a sexp
+  val sexp_of_symbol : symbol -> raw sexp
 
 end
 
@@ -198,7 +203,7 @@ module Internal : sig
     | LANGSXP of sxp_list
     | SPECIALSXP
     | BUILTINSXP
-    | CHARSXP
+    | CHARSXP of string
     | LGLSXP
     | INTSXP
     | REALSXP

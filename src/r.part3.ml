@@ -27,7 +27,36 @@
 end
 
 
-(* Functions to initialise and terminate the R interpreter. *)
+(* Summary:
+
+     -1- Functions to initialise and terminate the R interpreter.
+           [init_r and terminate functions.]
+
+     -2- Static types for R values.
+           [types R.t and 'a R.Raw.sexp, and phantom sexptypes.]
+
+     -3- R constants - global symbols in libR.so.
+           [null/null_creator.]
+
+     -4- Conversion of R types from OCaml side to R side.
+           [sexp_of_t : R.t -> raw sexp.]
+
+     -5- Runtime types internal to R.
+           [runtime algebraic types, *NOT* static phantom types.]
+           [sexptype : 'a sexp -> sexptype.]
+
+     -6- Conversion of R types from R side to OCaml side.
+           [t_of_sexp : 'a sexp -> R.t.]
+
+     -7- Beta-reduction in R.
+           [R.eval : R.t list -> R.t.]
+
+     -8- Dealing with the R symbol table.
+           [R.symbol : symbol -> R.t]
+
+================================================================================ *)
+
+(* -1- Functions to initialise and terminate the R interpreter. *)
 
 external init_r : string array -> int -> int = "init_r"
 external terminate : unit -> unit = "end_r"
@@ -44,44 +73,48 @@ let init ?(name    = try Sys.argv.(0) with _ -> "OCaml-R")
   | 1 -> () | _ -> raise Initialisation_failed
 
 
-(* Static types for R values. *)
+(* -2- Static types for R values. *)
 
 module Raw0 = struct
 
   (* Argument types for the polymorphic 'a sexp type. *)
   type nil          (* For NILSXP *)
   type lang         (* For LANGSXP *)
-  type any          (* To construct the type 'any sexp' *)
+  type char         (* For CHARSEXP *)
+  type raw          (* universal type 'raw sexp' *)
 
   (* Types of wrapped R SEXP values. sexp is a polymorphic type. *)
   type 'a sexp
+
+  (* Forgetful 'functor'. *)
+  let forget_sexptype : 'a sexp -> raw sexp = Obj.magic
 
   external sexp_equality : 'a sexp -> 'b sexp -> bool = "r_sexp_equality"
 
 end include Raw0
 
-type t = Sexp of any sexp | NULL
+type t = Sexp of raw sexp | NULL
 
 
 
-(* R constants - global symbols in libR.so. *)
+(* -3- R constants - global symbols in libR.so. *)
 
 external null_creator : unit -> nil sexp = "r_null"
 let null = NULL
 
 
 
-(* Conversion of R types from OCaml side to R side. *)
+(* -4- Conversion of R types from OCaml side to R side. *)
 
 module Raw1 = struct
-  let sexp_of_t : t -> 'a sexp = function
-    | Sexp s -> Obj.magic s
-    | NULL -> Obj.magic (null_creator ())
+  let sexp_of_t : t -> raw sexp = function
+    | Sexp s -> s
+    | NULL -> forget_sexptype (null_creator ())
 end include Raw1
 
 
 
-(* Runtime types internal to R. *)
+(* -5- Runtime types internal to R. *)
 
 module Raw2 = struct
   type sexptype =
@@ -148,7 +181,7 @@ end include Raw3
 
 
 
-(* Conversion of R types from R side to OCaml side. *)
+(* -6- Conversion of R types from R side to OCaml side. *)
 
 let t_of_sexp s = match sexptype s with
   | NilSxp -> NULL
@@ -156,10 +189,10 @@ let t_of_sexp s = match sexptype s with
 
 
 
-(* Beta-reduction in R. *)
+(* -7- Beta-reduction in R. *)
 
 external langsxp_of_list : 'a sexp list -> int -> lang sexp = "r_langsxp_of_list"
-external eval_langsxp : lang sexp -> 'a sexp = "r_eval_langsxp"
+external eval_langsxp : lang sexp -> raw sexp = "r_eval_langsxp"
 
 let eval l =
   let sexps, n = (List.map sexp_of_t l), (List.length l) in
@@ -168,26 +201,34 @@ let eval l =
 
 
 
-(* Dealing with the R symbol table. *)
+(* -8- Dealing with the R symbol table. *)
 
 type symbol = string
 
 module Raw4 = struct
   (* Currently, sexp_of_symbol segfaults. This has to be corrected. *)
-  external sexp_of_symbol : symbol -> 'a sexp = "r_sexp_of_symbol"
+  external sexp_of_symbol : symbol -> raw sexp = "r_sexp_of_symbol"
 end include Raw4
 
 let symbol (sym : symbol) = t_of_sexp (sexp_of_symbol sym)
 
 
 
+(* -9- Data conversions. *)
+
+exception Incompatible_sexptype
+
+external string_of_charsexp : char sexp -> string = "r_string_of_charsexp"
+(* let string_of_t (t : string R.t) = *)
+
+
 
 type arg = [
-    `Named of symbol * any sexp
-  | `Anon of any sexp
+    `Named of symbol * raw sexp
+  | `Anon of raw sexp
   ]
 
-external sexp : string -> 'a sexp = "r_sexp_of_string"
+external sexp : string -> raw sexp = "r_sexp_of_string"
 external set_var : symbol -> 'a sexp -> unit = "r_set_var"
 external print : 'a sexp -> unit = "r_print_value"
 
@@ -318,7 +359,7 @@ module Internal = struct
     | LANGSXP of sxp_list
     | SPECIALSXP
     | BUILTINSXP
-    | CHARSXP
+    | CHARSXP of string
     | LGLSXP
     | INTSXP
     | REALSXP
@@ -381,7 +422,7 @@ module Internal = struct
                 tagval     = veil t (inspect_listsxp_tagval s)}
             | SpecialSxp -> SPECIALSXP
             | BuiltinSxp -> BUILTINSXP
-            | CharSxp    -> CHARSXP
+            | CharSxp    -> CHARSXP (string_of_charsexp ((Obj.magic s) : char sexp))
             | LglSxp     -> LGLSXP
             | IntSxp     -> INTSXP
             | RealSxp    -> REALSXP
@@ -412,7 +453,7 @@ module Internal = struct
       | LANGSXP x  -> [x.carval; x.cdrval; x.tagval]
       | SPECIALSXP -> []
       | BUILTINSXP -> []
-      | CHARSXP    -> []
+      | CHARSXP _  -> []
       | LGLSXP     -> []
       | INTSXP     -> []
       | REALSXP    -> []
