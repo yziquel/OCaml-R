@@ -185,7 +185,9 @@ module Internal : sig
 
   module C : sig
 
-    type t = {
+    type t = | Recursive of t Lazy.t | Val of t_val
+
+    and t_val = {
       (* sxpinfo : sxpinfo; *)
       (* attrib  : t; *)
       (* gengc_nextnode : t; *)
@@ -220,24 +222,26 @@ module Internal : sig
       | S4SXP
       | FUNSXP
 
-    and sxp_sym  = { pname: t Lazy.t; sym_value: t Lazy.t; internal: t Lazy.t }
-    and sxp_list = { carval: t Lazy.t; cdrval: t Lazy.t; tagval: t Lazy.t}
-    and sxp_prom = { prom_value: t Lazy.t; expr: t Lazy.t; env: t Lazy.t }
+    and sxp_sym  = { pname: t; sym_value: t; internal: t }
+    and sxp_list = { carval: t; cdrval: t; tagval: t}
+    and sxp_prom = { prom_value: t; expr: t; env: t }
 
-    val t_of_sexp : ?unfold:bool -> Raw.raw Raw.sexp -> t Lazy.t
-    val unfold : int -> t Lazy.t -> unit
+    val t_of_sexp : Raw.raw Raw.sexp -> t
 
   end
 
   module Pretty : sig
 
     type t =
+      | Recursive of t Lazy.t
       | NULL
       | SYMBOL of string option
+      | PROMISE of promise
       | Unknown
 
-    val t_of_sexp : ?unfold:bool -> Raw.raw Raw.sexp -> t Lazy.t
-    val unfold : int -> t Lazy.t -> unit
+    and promise = { value: t; expr: t; env: t }
+
+    val t_of_sexp : Raw.raw Raw.sexp -> t
 
   end
 

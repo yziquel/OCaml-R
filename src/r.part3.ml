@@ -324,36 +324,26 @@ end
 
 module Internal = struct
 
-  (* General parsing function for internal R structures, i.e. SEXPs. *)
-
-  type 'a dummy = Dummy of 'a
-
-  let rec parse_sexp build ?unfold:(unfold=true) s =
-    let rec aux sexps_seen s =
-      let is_found (ss, _) = sexp_equality s ss in
-      match (try Some (List.find is_found sexps_seen) with _ -> None) with
-      | Some (_, t) -> lazy (Lazy.force t)
-      | None -> let rec veil = Dummy begin function inside_sexp ->
-                  aux ((s, t)::sexps_seen) inside_sexp end
-                and t = lazy (build (let Dummy f = veil in f) s) in
-                if unfold then ignore (Lazy.force t); t
-    in aux [] s
-
   module type Types = sig
 
     type t
-    val access : t -> t Lazy.t list
-    val build : (raw sexp -> t Lazy.t) -> raw sexp -> t
+    val recursive : t Lazy.t -> t
+    val build : (raw sexp -> t) -> raw sexp -> t
 
   end
 
   module Parser (M : Types) = struct
 
-    let t_of_sexp = parse_sexp M.build
+    (* General parsing function for internal R structures, i.e. SEXPs. *)
 
-    let rec unfold level t =
-      match level with | 0 -> () | _ ->
-      List.iter (unfold (level - 1)) (M.access (Lazy.force t))
+    let t_of_sexp s =
+      let rec aux sexps_seen s =
+        let is_found (ss, _) = sexp_equality s ss in
+        begin match (try Some (List.find is_found sexps_seen) with _ -> None) with
+        | None -> let rec x = lazy (M.build (aux ((s, x)::sexps_seen)) s) in Lazy.force x
+        | Some (_, t_lazy) -> M.recursive t_lazy
+        end
+      in aux [] s
 
   end
 
@@ -375,11 +365,13 @@ module Internal = struct
 
     (* Type definitions. *)
 
-    type t = {
+    type t = | Recursive of t Lazy.t | Val of t_val
+
+    and t_val = {
       (* sxpinfo : sxpinfo;   *)
-      (* attrib  : t Lazy.t;         *)
-      (* gengc_nextnode : t Lazy.t; *)
-      (* gengc_prevnode : t Lazy.t; *)
+      (* attrib  : t;         *)
+      (* gengc_nextnode : t;  *)
+      (* gengc_prevnode : t;  *)
       content : t_content
     }
 
@@ -423,97 +415,83 @@ module Internal = struct
       | S4SXP
       | FUNSXP
 
-    and sxp_sym  = { pname: t Lazy.t; sym_value: t Lazy.t; internal: t Lazy.t }
-    and sxp_list = { carval: t Lazy.t; cdrval: t Lazy.t; tagval: t Lazy.t }
-    and sxp_prom = { prom_value: t Lazy.t; expr: t Lazy.t; env: t Lazy.t }
+    and sxp_sym  = { pname: t; sym_value: t; internal: t }
+    and sxp_list = { carval: t; cdrval: t; tagval: t }
+    and sxp_prom = { prom_value: t; expr: t; env: t }
 
-    let access t = match t.content with
-      | NILSXP     -> []
-      | SYMSXP x   -> [x.pname; x.sym_value; x.internal]
-      | LISTSXP x  -> [x.carval; x.cdrval; x.tagval]
-      | CLOSSXP    -> []
-      | ENVSXP     -> []
-      | PROMSXP x  -> [x.prom_value; x.expr; x.env]
-      | LANGSXP x  -> [x.carval; x.cdrval; x.tagval]
-      | SPECIALSXP -> []
-      | BUILTINSXP -> []
-      | CHARSXP _  -> []
-      | LGLSXP     -> []
-      | INTSXP     -> []
-      | REALSXP    -> []
-      | CPLXSXP    -> []
-      | STRSXP     -> []
-      | DOTSXP     -> []
-      | ANYSXP     -> []
-      | VECSXP     -> []
-      | EXPRSXP    -> []
-      | BCODESXP   -> []
-      | EXTPTRSXP  -> []
-      | WEAKREFSXP -> []
-      | RAWSXP     -> []
-      | S4SXP      -> []
-      | FUNSXP     -> []
+    let recursive x = Recursive (lazy (Lazy.force x))
 
-    let build rec_build s = { content = match sexptype s with
-      | NilSxp     -> NILSXP
-      | SymSxp     -> SYMSXP {
-          pname      = rec_build (inspect_symsxp_pname    s);
-          sym_value  = rec_build (inspect_symsxp_value    s);
-          internal   = rec_build (inspect_symsxp_internal s)}
-      | ListSxp    -> LISTSXP {
-          carval     = rec_build (inspect_listsxp_carval s);
-          cdrval     = rec_build (inspect_listsxp_cdrval s);
-          tagval     = rec_build (inspect_listsxp_tagval s)}
-      | ClosSxp    -> CLOSSXP
-      | EnvSxp     -> ENVSXP
-      | PromSxp    -> PROMSXP {
-          prom_value = rec_build (inspect_promsxp_value s);
-          expr       = rec_build (inspect_promsxp_expr  s);
-          env        = rec_build (inspect_promsxp_env   s)}
-      | LangSxp    -> LANGSXP {
-          carval     = rec_build (inspect_listsxp_carval s);
-          cdrval     = rec_build (inspect_listsxp_cdrval s);
-          tagval     = rec_build (inspect_listsxp_tagval s)}
-      | SpecialSxp -> SPECIALSXP
-      | BuiltinSxp -> BUILTINSXP
-      | CharSxp    -> CHARSXP (string_of_charsexp ((Obj.magic s) : char sexp))
-      | LglSxp     -> LGLSXP
-      | IntSxp     -> INTSXP
-      | RealSxp    -> REALSXP
-      | CplxSxp    -> CPLXSXP
-      | StrSxp     -> STRSXP
-      | DotSxp     -> DOTSXP
-      | AnySxp     -> ANYSXP
-      | VecSxp     -> VECSXP
-      | ExprSxp    -> EXPRSXP
-      | BcodeSxp   -> BCODESXP
-      | ExtptrSxp  -> EXTPTRSXP
-      | WeakrefSxp -> WEAKREFSXP
-      | RawSxp     -> RAWSXP
-      | S4Sxp      -> S4SXP
-      | FunSxp     -> FUNSXP
-    }
+    let build rec_build s =
+      match sexptype s with
+      | NilSxp     -> Val { content = NILSXP }
+      | SymSxp     -> Val { content = SYMSXP {
+            pname      = rec_build (inspect_symsxp_pname    s);
+            sym_value  = rec_build (inspect_symsxp_value    s);
+            internal   = rec_build (inspect_symsxp_internal s)
+          }}
+      | ListSxp    -> Val { content = LISTSXP {
+            carval     = rec_build (inspect_listsxp_carval s);
+            cdrval     = rec_build (inspect_listsxp_cdrval s);
+            tagval     = rec_build (inspect_listsxp_tagval s)
+          }}
+      | ClosSxp    -> Val { content = CLOSSXP }
+      | EnvSxp     -> Val { content = ENVSXP }
+      | PromSxp    -> Val { content = PROMSXP {
+            prom_value = rec_build (inspect_promsxp_value s);
+            expr       = rec_build (inspect_promsxp_expr  s);
+            env        = rec_build (inspect_promsxp_env   s)
+          }}
+      | LangSxp    -> Val { content = LANGSXP {
+            carval     = rec_build (inspect_listsxp_carval s);
+            cdrval     = rec_build (inspect_listsxp_cdrval s);
+            tagval     = rec_build (inspect_listsxp_tagval s)
+          }}
+      | SpecialSxp -> Val { content = SPECIALSXP }
+      | BuiltinSxp -> Val { content = BUILTINSXP }
+      | CharSxp    -> Val { content = CHARSXP (string_of_charsexp ((Obj.magic s) : char sexp)) }
+      | LglSxp     -> Val { content = LGLSXP }
+      | IntSxp     -> Val { content = INTSXP }
+      | RealSxp    -> Val { content = REALSXP }
+      | CplxSxp    -> Val { content = CPLXSXP }
+      | StrSxp     -> Val { content = STRSXP }
+      | DotSxp     -> Val { content = DOTSXP }
+      | AnySxp     -> Val { content = ANYSXP }
+      | VecSxp     -> Val { content = VECSXP }
+      | ExprSxp    -> Val { content = EXPRSXP }
+      | BcodeSxp   -> Val { content = BCODESXP }
+      | ExtptrSxp  -> Val { content = EXTPTRSXP }
+      | WeakrefSxp -> Val { content = WEAKREFSXP }
+      | RawSxp     -> Val { content = RAWSXP }
+      | S4Sxp      -> Val { content = S4SXP }
+      | FunSxp     -> Val { content = FUNSXP }
 
   end
 
   module PrettyTypes = struct
 
-    (* Type definitions. *)
-
     type t =
+      | Recursive of t Lazy.t
       | NULL
       | SYMBOL of string option
+      | PROMISE of promise
       | Unknown
 
-    let access t = []
+    and promise = { value: t; expr: t; env: t }
 
-    let build rec_build s = match sexptype s with
+    let recursive x = Recursive (lazy (Lazy.force x))
+
+    let build rec_build s =
+      match sexptype s with
       | NilSxp     -> NULL
       | SymSxp     -> SYMBOL None
       | ListSxp    -> Unknown
       | ClosSxp    -> Unknown
       | EnvSxp     -> Unknown
-      | PromSxp    -> Unknown
+      | PromSxp    -> PROMISE {
+            value = rec_build (inspect_promsxp_value s);
+            expr  = rec_build (inspect_promsxp_expr  s);
+            env   = rec_build (inspect_promsxp_env   s)
+          }
       | LangSxp    -> Unknown
       | SpecialSxp -> Unknown
       | BuiltinSxp -> Unknown

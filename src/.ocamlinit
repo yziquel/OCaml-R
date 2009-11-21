@@ -4,6 +4,10 @@
 R.init ();;
 
 let symbol_structure x = R.Internal.C.t_of_sexp (R.Raw.sexp_of_t (R.symbol x));;
+let symbol_pretty x = R.Internal.Pretty.t_of_sexp (R.Raw.sexp_of_t (R.symbol x));;
 
 let t = symbol_structure "str";;
 open R.Internal.C;;
+
+let t' = symbol_pretty "str";;
+open R.Internal.Pretty;;
