@@ -151,7 +151,9 @@ CAMLprim value r_sexptype_of_sexp (value sexp) {
    used in R these days, except for internal matters,
    such as being an argument to R_tryEval.
    - Argument l is the OCaml list.
-   - Argument n is the length of the OCaml list. */
+   - Argument n is the length of the OCaml list.
+   Remark: LANGSXPs are essentially LISTSXPs with the
+   type of the head element set to LANGSXP. */
 CAMLprim value r_langsxp_of_list (value l, value n) {
   CAMLparam2(l, n);
   CAMLlocal1(l_cursor);
@@ -165,6 +167,9 @@ CAMLprim value r_langsxp_of_list (value l, value n) {
   int first_time = 1;
   l_cursor = l;
   while (l_cursor && Is_block(l_cursor)) {
+    /* I've seen somewhere macros / functions allowing to dynamically
+       allocate the next memory space of a listsxp. Will have to check
+       that in more details later on. Would make code clearer. */
     if (first_time) {first_time = 0;} else {t = CDR(t);}
     SETCAR(t, Sexp_val(Field(l_cursor, 0)));
     l_cursor = Field(l_cursor, 1);
@@ -174,11 +179,19 @@ CAMLprim value r_langsxp_of_list (value l, value n) {
   CAMLreturn(Val_sexp(s));
 }
 
-CAMLprim value r_eval_langsxp (value sexp_list) {
+CAMLprim value r_eval_sxp (value sexp_list) {
+
   /* sexp_list is an OCaml value containing a SEXP of sexptype LANGSXP.
-     This is a LISP-style pairlist of SEXP values. r_eval_langsxp
-     executes the whole string, and sends back the resulting SEXP wrapped
-     up in an OCaml value. There's also an error handling mechanism. */
+     This is a LISP-style pairlist of SEXP values. r_eval_sxp executes
+     the whole string, and sends back the resulting SEXP wrapped up in
+     an OCaml value. There's also an error handling mechanism.
+     r_eval_sxp handles values of type LANGSXP and PROMSXP. So we have two
+     functions on the OCaml side associated to this stub, the first on
+     with type lang sexp -> raw sexp, the other one with type
+     prom sexp -> raw sexp. This also means that their is a dynamic type
+     checking being done in the scope of the R_tryEval function, and it
+     would be nice to shortcut it with statically typed equivalents. */
+
   CAMLparam1(sexp_list);
 
   SEXP e;        // Placeholder for the result of beta-reduction.
@@ -189,7 +202,8 @@ CAMLprim value r_eval_langsxp (value sexp_list) {
   PROTECT(e = R_tryEval(Sexp_val(sexp_list), R_GlobalEnv, &error));
   UNPROTECT(1);
 
-  if (error) caml_failwith("OCaml-R error in eval_sexp_list C stub.");
+  /* Will have to implement error handling in OCaml. */
+  if (error) caml_failwith("OCaml-R error in r_eval_sxp C stub.");
 
   CAMLreturn(Val_sexp(e));
 }
@@ -404,6 +418,21 @@ CAMLprim value inspect_listsxp_cdrval (value sexp) {
 CAMLprim value inspect_listsxp_tagval (value sexp) {
   CAMLparam1(sexp);
   CAMLreturn(Val_sexp(Sexp_val(sexp)->u.listsxp.tagval));
+}
+
+CAMLprim value inspect_envsxp_frame (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.envsxp.frame));
+}
+
+CAMLprim value inspect_envsxp_enclos (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.envsxp.enclos));
+}
+
+CAMLprim value inspect_envsxp_hashtab (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.envsxp.hashtab));
 }
 
 CAMLprim value inspect_promsxp_value (value sexp) {

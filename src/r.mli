@@ -139,6 +139,7 @@ module Interpreter : functor (Env : Environment) -> Interpreter
 module Raw : sig
 
   type nil
+  type prom
   type lang
   type vec_char
   type vec_int
@@ -147,7 +148,7 @@ module Raw : sig
   type 'a sexp
 
   val sexp_of_t : t -> raw sexp
-  val sexp_equality : 'b sexp -> 'b sexp -> bool
+  val sexp_equality : 'a sexp -> 'b sexp -> bool
 
   type sexptype =
     | NilSxp
@@ -178,6 +179,8 @@ module Raw : sig
 
   val sexptype : 'a sexp -> sexptype
 
+  val force_promsxp : prom sexp -> raw sexp
+
   val sexp_of_symbol : symbol -> raw sexp
 
 end
@@ -201,7 +204,7 @@ module Internal : sig
       | SYMSXP of sxp_sym
       | LISTSXP of sxp_list
       | CLOSSXP
-      | ENVSXP
+      | ENVSXP of sxp_env
       | PROMSXP of sxp_prom
       | LANGSXP of sxp_list
       | SPECIALSXP
@@ -224,10 +227,11 @@ module Internal : sig
       | FUNSXP
 
     and sxp_sym  = { pname: t; sym_value: t; internal: t }
-    and sxp_list = { carval: t; cdrval: t; tagval: t}
+    and sxp_list = { carval: t; cdrval: t; tagval: t }
+    and sxp_env  = { frame: t; enclos: t; hashtab: t }
     and sxp_prom = { prom_value: t; expr: t; env: t }
 
-    val t_of_sexp : Raw.raw Raw.sexp -> t
+    val t_of_sexp : 'a Raw.sexp -> t
 
   end
 
@@ -238,17 +242,21 @@ module Internal : sig
       | NULL
       | SYMBOL of (string * t) option
       | ARG of string
-      | LIST of t list
+      | LIST of pairlist
+      | ENV of environment
       | PROMISE of promise
-      | CALL of t * (t list)
+      | CALL of t * pairlist
       | BUILTIN
       | STRING of string
       | INT of int list
       | Unknown
 
-    and promise = { value: t; expr: t; env: t }
+    and environment = { frame: t; (* enclos: t; *) hashtab: t }
+    and promise     = { value: t; expr: t; env: t }
 
-    val t_of_sexp : Raw.raw Raw.sexp -> t
+    and pairlist = (t * t) list (* For strict list parsing, t list. *)
+
+    val t_of_sexp : 'a Raw.sexp -> t
 
   end
 
