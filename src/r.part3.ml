@@ -79,8 +79,10 @@ module Raw0 = struct
 
   (* Argument types for the polymorphic 'a sexp type. *)
   type nil          (* For NILSXP *)
+  type sym          (* For SYMSXP *)
   type lang         (* For LANGSXP *)
-  type char         (* For CHARSEXP *)
+  type vec_char     (* For CHARSEXP *)
+  type vec_int      (* For INTSEXP *)
   type raw          (* universal type 'raw sexp' *)
 
   (* Types of wrapped R SEXP values. sexp is a polymorphic type. *)
@@ -216,11 +218,15 @@ let symbol (sym : symbol) = t_of_sexp (sexp_of_symbol sym)
 
 (* -9- Data conversions. *)
 
-exception Incompatible_sexptype
-
-external string_of_charsexp : char sexp -> string = "r_string_of_charsexp"
+external string_of_charsexp : vec_char sexp -> string = "r_string_of_charsexp"
 (* let string_of_t (t : string R.t) = *)
 
+external access_int_vecsexp : vec_int sexp -> int -> int = "r_access_int_vecsexp"
+external length_of_vecsexp : 'a sexp -> int = "inspect_vecsxp_length"
+let int_list_of_int_vecsexp s =
+  let rec aux n s = match n with | 0 -> [] | _ ->
+    (access_int_vecsexp s (n - 1))::(aux (n - 1) s)
+  in aux (length_of_vecsexp s) s
 
 
 type arg = [
@@ -347,7 +353,9 @@ module Internal = struct
 
   end
 
-  (* Conversion functions. *)
+  (* Inspection functions. *)
+
+  external inspect_primsxp_offset  : 'a sexp -> int = "inspect_primsxp_offset"
 
   external inspect_symsxp_pname    : 'a sexp -> 'b sexp = "inspect_symsxp_pname"
   external inspect_symsxp_value    : 'a sexp -> 'b sexp = "inspect_symsxp_value"
@@ -397,10 +405,10 @@ module Internal = struct
       | PROMSXP of sxp_prom
       | LANGSXP of sxp_list
       | SPECIALSXP
-      | BUILTINSXP
+      | BUILTINSXP of int
       | CHARSXP of string
       | LGLSXP
-      | INTSXP
+      | INTSXP of int list
       | REALSXP
       | CPLXSXP
       | STRSXP
@@ -425,32 +433,28 @@ module Internal = struct
       match sexptype s with
       | NilSxp     -> Val { content = NILSXP }
       | SymSxp     -> Val { content = SYMSXP {
-            pname      = rec_build (inspect_symsxp_pname    s);
-            sym_value  = rec_build (inspect_symsxp_value    s);
-            internal   = rec_build (inspect_symsxp_internal s)
-          }}
+          pname      = rec_build (inspect_symsxp_pname    s);
+          sym_value  = rec_build (inspect_symsxp_value    s);
+          internal   = rec_build (inspect_symsxp_internal s)}}
       | ListSxp    -> Val { content = LISTSXP {
-            carval     = rec_build (inspect_listsxp_carval s);
-            cdrval     = rec_build (inspect_listsxp_cdrval s);
-            tagval     = rec_build (inspect_listsxp_tagval s)
-          }}
+          carval     = rec_build (inspect_listsxp_carval s);
+          cdrval     = rec_build (inspect_listsxp_cdrval s);
+          tagval     = rec_build (inspect_listsxp_tagval s)}}
       | ClosSxp    -> Val { content = CLOSSXP }
       | EnvSxp     -> Val { content = ENVSXP }
       | PromSxp    -> Val { content = PROMSXP {
-            prom_value = rec_build (inspect_promsxp_value s);
-            expr       = rec_build (inspect_promsxp_expr  s);
-            env        = rec_build (inspect_promsxp_env   s)
-          }}
+          prom_value = rec_build (inspect_promsxp_value s);
+          expr       = rec_build (inspect_promsxp_expr  s);
+          env        = rec_build (inspect_promsxp_env   s)}}
       | LangSxp    -> Val { content = LANGSXP {
-            carval     = rec_build (inspect_listsxp_carval s);
-            cdrval     = rec_build (inspect_listsxp_cdrval s);
-            tagval     = rec_build (inspect_listsxp_tagval s)
-          }}
+          carval     = rec_build (inspect_listsxp_carval s);
+          cdrval     = rec_build (inspect_listsxp_cdrval s);
+          tagval     = rec_build (inspect_listsxp_tagval s)}}
       | SpecialSxp -> Val { content = SPECIALSXP }
-      | BuiltinSxp -> Val { content = BUILTINSXP }
-      | CharSxp    -> Val { content = CHARSXP (string_of_charsexp ((Obj.magic s) : char sexp)) }
+      | BuiltinSxp -> Val { content = BUILTINSXP (inspect_primsxp_offset s)}
+      | CharSxp    -> Val { content = CHARSXP (string_of_charsexp ((Obj.magic s) : vec_char sexp)) }
       | LglSxp     -> Val { content = LGLSXP }
-      | IntSxp     -> Val { content = INTSXP }
+      | IntSxp     -> Val { content = INTSXP (int_list_of_int_vecsexp ((Obj.magic s) : vec_int sexp))}
       | RealSxp    -> Val { content = REALSXP }
       | CplxSxp    -> Val { content = CPLXSXP }
       | StrSxp     -> Val { content = STRSXP }
@@ -472,32 +476,78 @@ module Internal = struct
     type t =
       | Recursive of t Lazy.t
       | NULL
-      | SYMBOL of string option
+      | SYMBOL of (string * t) option
+      | ARG of string
+      | LIST of t list
       | PROMISE of promise
+      | CALL of t * (t list)
+      | BUILTIN
+      | STRING of string
+      | INT of int list
       | Unknown
 
     and promise = { value: t; expr: t; env: t }
 
     let recursive x = Recursive (lazy (Lazy.force x))
 
-    let build rec_build s =
-      match sexptype s with
+    exception Esoteric
+
+    let symbol_of_symsxp builder (s : sym sexp) =
+      let pname    = inspect_symsxp_pname    s
+      and value    = inspect_symsxp_value    s
+      and internal = inspect_symsxp_internal s in
+      match (sexptype pname), (sexptype value), (sexptype internal) with
+      | (NilSxp,  _, NilSxp) when sexp_equality s value -> SYMBOL None
+      | (CharSxp, BuiltinSxp, NilSxp) ->
+          let symbol_name = string_of_charsexp (Obj.magic pname) in
+          SYMBOL (Some (symbol_name, (builder value)))
+      | (CharSxp, SymSxp, NilSxp) ->
+          begin match (sexp_equality value (inspect_symsxp_value value))  &&
+                      (NilSxp = sexptype (inspect_symsxp_pname value))    &&
+                      (NilSxp = sexptype (inspect_symsxp_internal value)) with
+          | true -> ARG (string_of_charsexp (Obj.magic pname))
+          | false -> raise Esoteric end
+      | _ -> raise Esoteric
+
+    let rec list_of_listsxp builder s =
+      let carval = inspect_listsxp_carval s
+      and cdrval = inspect_listsxp_cdrval s
+      and tagval = inspect_listsxp_tagval s in
+      LIST begin match sexptype tagval with
+      | NilSxp ->  (builder carval) :: begin
+                   match builder cdrval with
+                   | LIST l -> l | NULL -> []
+                   | _ -> raise Esoteric end
+      | _ -> raise Esoteric end
+         
+    let rec build rec_build =
+      let phi = fun f -> f (build rec_build) in
+      function s -> match sexptype s with
       | NilSxp     -> NULL
-      | SymSxp     -> SYMBOL None
-      | ListSxp    -> Unknown
+      | SymSxp     -> begin try phi symbol_of_symsxp (Obj.magic s) with
+                      | Esoteric -> Unknown end
+      | ListSxp    -> begin try phi list_of_listsxp s with
+                      | Esoteric -> Unknown end
       | ClosSxp    -> Unknown
       | EnvSxp     -> Unknown
       | PromSxp    -> PROMISE {
-            value = rec_build (inspect_promsxp_value s);
-            expr  = rec_build (inspect_promsxp_expr  s);
-            env   = rec_build (inspect_promsxp_env   s)
-          }
-      | LangSxp    -> Unknown
+          value = rec_build (inspect_promsxp_value s);
+          expr  = rec_build (inspect_promsxp_expr  s);
+          env   = rec_build (inspect_promsxp_env   s)}
+      | LangSxp    -> 
+          let carval = inspect_listsxp_carval s
+          and cdrval = inspect_listsxp_cdrval s
+          and tagval = inspect_listsxp_tagval s in
+          begin match build rec_build cdrval with
+          | LIST l -> begin match sexptype tagval with
+                      | NilSxp -> CALL ((build rec_build carval), l)
+                      | _ -> Unknown end
+          | _ -> Unknown end
       | SpecialSxp -> Unknown
-      | BuiltinSxp -> Unknown
-      | CharSxp    -> Unknown
+      | BuiltinSxp -> BUILTIN
+      | CharSxp    -> STRING (string_of_charsexp ((Obj.magic s) : vec_char sexp))
       | LglSxp     -> Unknown
-      | IntSxp     -> Unknown
+      | IntSxp     -> INT (int_list_of_int_vecsexp ((Obj.magic s) : vec_int sexp))
       | RealSxp    -> Unknown
       | CplxSxp    -> Unknown
       | StrSxp     -> Unknown

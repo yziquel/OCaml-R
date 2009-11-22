@@ -118,7 +118,7 @@ SEXP Sexp_val (value sexp) {
 }
 
 #define Val_vecsexp(x) Val_sexp(x)
-#define Vecsexp_val(x) (VECSEXP) Sexp_val(x)
+#define Vecsexp_val(x) ((VECSEXP) Sexp_val(x))
 
 
 /* Comparison operator. */
@@ -201,7 +201,17 @@ CAMLprim value r_string_of_charsexp (value charsexp) {
   CAMLparam1(charsexp);
   /* Maxence Guesdon declares something like CAMLlocal1(result) for
      the output of caml_copy_string. To which extent is it necessary? */
+  /* Moreover, it is yet unclear whether or not R strings are NULL
+     terminated, or if they simply have a size fixed in the VECSEXP structure. */
   CAMLreturn(caml_copy_string(CHAR(Sexp_val(charsexp))));
+}
+
+CAMLprim value r_access_int_vecsexp (value intsexp, value offset) {
+  CAMLparam2(intsexp, offset);
+  /* The R macro is #define INTEGER(x) ((int *) DATAPTR(x)).
+     Should use Val_int, or int32s? More the generally, the typing
+     is here somewhat confusing (or confused)... Is offset an int? */
+  CAMLreturn(Val_int(INTEGER((int *) Vecsexp_val(intsexp))[Int_val(offset)]));
 }
 
 
@@ -349,10 +359,10 @@ CAMLprim value r_print_value (value sexp) {
    CHARSXP cache. */
 
 
-/*CAMLprim value inspect_vecsxp_length (value vecsexp) {
+CAMLprim value inspect_vecsxp_length (value vecsexp) {
   CAMLparam1(vecsexp);
   CAMLreturn(Val_int(Vecsexp_val(vecsexp)->vecsxp.length));
-}*/
+}
 
 /*CAMLprim value inspect_vecsxp_truelength (value vecsexp) {
   CAMLparam1(vecsexp);
@@ -360,6 +370,11 @@ CAMLprim value r_print_value (value sexp) {
 }*/
 
 /* Concerning various types of SEXPs: */
+
+CAMLprim value inspect_primsxp_offset (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_int(Sexp_val(sexp)->u.primsxp.offset));
+}
 
 CAMLprim value inspect_symsxp_pname (value sexp) {
   CAMLparam1(sexp);

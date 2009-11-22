@@ -140,7 +140,8 @@ module Raw : sig
 
   type nil
   type lang
-  type char
+  type vec_char
+  type vec_int
   type raw
 
   type 'a sexp
@@ -204,10 +205,10 @@ module Internal : sig
       | PROMSXP of sxp_prom
       | LANGSXP of sxp_list
       | SPECIALSXP
-      | BUILTINSXP
+      | BUILTINSXP of int
       | CHARSXP of string
       | LGLSXP
-      | INTSXP
+      | INTSXP of int list
       | REALSXP
       | CPLXSXP
       | STRSXP
@@ -235,8 +236,14 @@ module Internal : sig
     type t =
       | Recursive of t Lazy.t
       | NULL
-      | SYMBOL of string option
+      | SYMBOL of (string * t) option
+      | ARG of string
+      | LIST of t list
       | PROMISE of promise
+      | CALL of t * (t list)
+      | BUILTIN
+      | STRING of string
+      | INT of int list
       | Unknown
 
     and promise = { value: t; expr: t; env: t }
