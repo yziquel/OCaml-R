@@ -246,8 +246,7 @@ external symbol : 'a symbol -> 'a t = "r_sexp_of_symbol"
 
 external string_of_charsxp : vec_char sxp -> string = "r_string_of_charsxp"
 let string_of_t : string t -> string = string_of_charsxp
-
-let string : string -> string R.t =
+external string : string -> string t = "r_charsxp_of_string"
 
 (* -9.2- Conversion of vectors of integers. *)
 

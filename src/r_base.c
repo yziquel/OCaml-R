@@ -220,6 +220,16 @@ CAMLprim value r_string_of_charsxp (value charsxp) {
   CAMLreturn(caml_copy_string(CHAR(Sexp_val(charsxp))));
 }
 
+CAMLprim value r_charsxp_of_string (value s) {
+  /* Documentation for generating R strings can be found in "Writing R
+     extensions", section 5.9.7 "Handling character data". */
+  CAMLparam1(s);
+  SEXP charsxp;
+  PROTECT(charsxp = mkChar(String_val(s)));
+  UNPROTECT(1);
+  CAMLreturn(Val_sexp(charsxp));
+}
+
 CAMLprim value r_access_int_vecsxp (value intsxp, value offset) {
   CAMLparam2(intsxp, offset);
   /* The R macro is #define INTEGER(x) ((int *) DATAPTR(x)).

@@ -60,6 +60,7 @@
 //CAMLprim value sexp_of_string (value v) {
 //  CAMLparam1(v); SEXP sexp ;
 //  /* don't ask me why it is mkString and not mkChar... */
+//  /* according to R-exts.pdf, it should be mkChar... */
 //  PROTECT (sexp=mkString(String_val(v)));
 //  UNPROTECT(1);
 //  CAMLreturn(Val_sexp(duplicate(sexp)));

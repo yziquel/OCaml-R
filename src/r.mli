@@ -79,9 +79,11 @@ val mlfun : ('a -> 'b) t -> 'a t -> 'b t
 type 'a symbol = string
 val symbol : 'a symbol -> 'a t
 
+(** String conversion function. *)
+val string_of_t : string t -> string
+val string : string -> string t
 
 
-(*type symbol = string*)
 (*type arg = [ `Anon of Raw.sexp | `Named of symbol * Raw.sexp ]*)
 
 (*val sexptype : Raw.sexp -> Raw.sexptype*)
