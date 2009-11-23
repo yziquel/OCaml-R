@@ -83,6 +83,7 @@ module Raw0 = struct
   type 'a lisplist                (* For LISTSXP, and LANGSXP *)
   type simple                     (* For LISTSXP *)
   type pairlist = simple lisplist (* For LISTSXP *)
+  type clos                       (* For CLOSXP *)
   type env                        (* For ENVSXP *)
   type prom                       (* For PROMSXP *)
   type call                       (* For LANGSXP *)
@@ -223,6 +224,9 @@ end include Raw4
    In R, promises are forced recursively ... *)
 let force : 'a promise -> 'a t = force_promsxp
 
+(* -7.3- Mapping functions. *)
+
+let mlfun (f: ('a -> 'b) t) (x: 'a) : 'b t = eval [f; x]
 
 
 (* -8- Dealing with the R symbol table. *)
@@ -390,6 +394,10 @@ module Internal = struct
   external inspect_envsxp_enclos   : env sxp -> sexp = "inspect_envsxp_enclos"
   external inspect_envsxp_hashtab  : env sxp -> sexp = "inspect_envsxp_hashtab"
 
+  external inspect_closxp_formals  : clos sxp -> sexp = "inspect_closxp_formals"
+  external inspect_closxp_body     : clos sxp -> sexp = "inspect_closxp_body"
+  external inspect_closxp_env      : clos sxp -> sexp = "inspect_closxp_env"
+
   external inspect_promsxp_value   : prom sxp -> sexp = "inspect_promsxp_value"
   external inspect_promsxp_expr    : prom sxp -> sexp = "inspect_promsxp_expr"
   external inspect_promsxp_env     : prom sxp -> sexp = "inspect_promsxp_env"
@@ -425,7 +433,7 @@ module Internal = struct
       | NILSXP
       | SYMSXP of sxp_sym
       | LISTSXP of sxp_list
-      | CLOSSXP
+      | CLOSXP of sxp_clos
       | ENVSXP of sxp_env
       | PROMSXP of sxp_prom
       | LANGSXP of sxp_list
@@ -451,7 +459,8 @@ module Internal = struct
     and sxp_sym  = { pname: t; sym_value: t; internal: t }
     and sxp_list = { carval: t; cdrval: t; tagval: t }
     and sxp_env  = { frame: t; enclos: t; hashtab: t }
-    and sxp_prom = { prom_value: t; expr: t; env: t }
+    and sxp_clos = { formals: t; body: t; clos_env: t }
+    and sxp_prom = { prom_value: t; expr: t; prom_env: t }
 
     let recursive x = Recursive (lazy (Lazy.force x))
 
@@ -466,7 +475,10 @@ module Internal = struct
           carval     = rec_build (inspect_listsxp_carval s);
           cdrval     = rec_build (inspect_listsxp_cdrval s);
           tagval     = rec_build (inspect_listsxp_tagval s)}}
-      | ClosSxp    -> Val { content = CLOSSXP }
+      | ClosSxp    -> Val { content = CLOSXP {
+          formals    = rec_build (inspect_closxp_formals s);
+          body       = rec_build (inspect_closxp_body    s);
+          clos_env   = rec_build (inspect_closxp_env     s)}}
       | EnvSxp     -> Val { content = ENVSXP {
           frame      = rec_build (inspect_envsxp_frame   s);
           enclos     = rec_build (inspect_envsxp_enclos  s);
@@ -474,7 +486,7 @@ module Internal = struct
       | PromSxp    -> Val { content = PROMSXP {
           prom_value = rec_build (inspect_promsxp_value s);
           expr       = rec_build (inspect_promsxp_expr  s);
-          env        = rec_build (inspect_promsxp_env   s)}}
+          prom_env   = rec_build (inspect_promsxp_env   s)}}
       | LangSxp    -> Val { content = LANGSXP {
           carval     = rec_build (inspect_listsxp_carval s);
           cdrval     = rec_build (inspect_listsxp_cdrval s);
@@ -507,7 +519,9 @@ module Internal = struct
       | NULL
       | SYMBOL of (string * t) option
       | ARG of string
+      | PLACE
       | LIST of pairlist
+      | CLOSURE of closure
       | ENV of environment
       | PROMISE of promise
       | CALL of t * pairlist
@@ -516,14 +530,16 @@ module Internal = struct
       | INT of int list
       | Unknown
 
+    and closure     = { formals: t; body: t; clos_env: t }
     and environment = { frame: t; (* enclos: t; *) hashtab: t }
-    and promise     = { value: t; expr: t; env: t }
+    and promise     = { value: t; expr: t; prom_env: t }
 
     and pairlist = (t * t) list (* For strict list parsing, t list. *)
 
     let recursive x = Recursive (lazy (Lazy.force x))
 
-    exception Esoteric
+    exception Sexp_to_inspect of sexp
+    exception Esoteric of sexp
 
     let symbol_of_symsxp builder (s : sym sxp) =
       let pname    = inspect_symsxp_pname    s
@@ -531,16 +547,20 @@ module Internal = struct
       and internal = inspect_symsxp_internal s in
       match (sexptype pname), (sexptype value), (sexptype internal) with
       | (NilSxp,  _, NilSxp) when sexp_equality s value -> SYMBOL None
-      | (CharSxp, BuiltinSxp, NilSxp) ->
+      | (CharSxp, BuiltinSxp, NilSxp) | (CharSxp, SpecialSxp, NilSxp) ->
           let symbol_name = string_of_charsxp pname in
           SYMBOL (Some (symbol_name, (builder value)))
       | (CharSxp, SymSxp, NilSxp) ->
+          begin match (sexp_equality s value) &&
+                      ("" = string_of_charsxp pname) with
+          | true -> PLACE | false ->
           begin match (sexp_equality value (inspect_symsxp_value value))  &&
                       (NilSxp = sexptype (inspect_symsxp_pname value))    &&
                       (NilSxp = sexptype (inspect_symsxp_internal value)) with
           | true -> ARG (string_of_charsxp pname)
-          | false -> raise Esoteric end
-      | _ -> raise Esoteric
+          | false -> raise ((*Esoteric*) Sexp_to_inspect s)
+          end end
+      | _ -> raise (Esoteric s)
 
     let rec list_of_listsxp builder s =
       let carval = inspect_listsxp_carval s
@@ -551,32 +571,35 @@ module Internal = struct
       | NilSxp ->  (builder carval) :: begin
                    match builder cdrval with
                    | LIST l -> l | NULL -> []
-                   | _ -> raise Esoteric end
+                   | _ -> raise (Esoteric s) end
       | _ -> raise Esoteric end *)
       (* Lax parsing of the LIST: *)
       LIST begin ((builder tagval), (builder carval))::
         begin match builder cdrval with
         | LIST l -> l | NULL -> []
-        | _ -> raise Esoteric end
+        | _ -> raise (Esoteric s) end
       end
-         
+
     let rec build rec_build =
       let phi = fun f -> f (build rec_build) in
       function s -> match sexptype s with
       | NilSxp     -> NULL
       | SymSxp     -> begin try phi symbol_of_symsxp (Obj.magic s) with
-                      | Esoteric -> Unknown end
+                      | Esoteric s -> Unknown end
       | ListSxp    -> begin try phi list_of_listsxp s with
-                      | Esoteric -> Unknown end
-      | ClosSxp    -> Unknown
+                      | Esoteric _ -> Unknown end
+      | ClosSxp    -> CLOSURE {
+          formals  = rec_build (inspect_closxp_formals s);
+          body     = rec_build (inspect_closxp_body    s);
+          clos_env = rec_build (inspect_closxp_env     s)}
       | EnvSxp     -> ENV {
           frame   = rec_build (inspect_envsxp_frame   s);
        (* enclos  = rec_build (inspect_envsxp_enclos  s); *) (* We do not care for now. *)
           hashtab = rec_build (inspect_envsxp_hashtab s)}
       | PromSxp    -> PROMISE {
-          value = rec_build (inspect_promsxp_value s);
-          expr  = rec_build (inspect_promsxp_expr  s);
-          env   = rec_build (inspect_promsxp_env   s)}
+          value    = rec_build (inspect_promsxp_value s);
+          expr     = rec_build (inspect_promsxp_expr  s);
+          prom_env = rec_build (inspect_promsxp_env   s)}
       | LangSxp    -> 
           let carval = inspect_listsxp_carval s
           and cdrval = inspect_listsxp_cdrval s

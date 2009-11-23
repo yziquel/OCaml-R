@@ -73,6 +73,8 @@ type sexp = Raw0.sexp
 val eval : sexp list -> sexp
 val force : 'a promise -> 'a t
 
+val mlfun : ('a -> 'b) t -> 'a t -> 'b t
+
 (** Dealing with the R symbol table. *)
 type 'a symbol = string
 val symbol : 'a symbol -> 'a t
@@ -199,7 +201,7 @@ module Internal : sig
       | NILSXP
       | SYMSXP of sxp_sym
       | LISTSXP of sxp_list
-      | CLOSSXP
+      | CLOSXP of sxp_clos
       | ENVSXP of sxp_env
       | PROMSXP of sxp_prom
       | LANGSXP of sxp_list
@@ -225,7 +227,8 @@ module Internal : sig
     and sxp_sym  = { pname: t; sym_value: t; internal: t }
     and sxp_list = { carval: t; cdrval: t; tagval: t }
     and sxp_env  = { frame: t; enclos: t; hashtab: t }
-    and sxp_prom = { prom_value: t; expr: t; env: t }
+    and sxp_clos = { formals: t; body: t; clos_env: t }
+    and sxp_prom = { prom_value: t; expr: t; prom_env: t }
 
     val t_of_sexp : Raw.sexp -> t
 
@@ -238,7 +241,9 @@ module Internal : sig
       | NULL
       | SYMBOL of (string * t) option
       | ARG of string
+      | PLACE
       | LIST of pairlist
+      | CLOSURE of closure
       | ENV of environment
       | PROMISE of promise
       | CALL of t * pairlist
@@ -247,10 +252,13 @@ module Internal : sig
       | INT of int list
       | Unknown
 
+    and closure     = { formals: t; body: t; clos_env: t }
     and environment = { frame: t; (* enclos: t; *) hashtab: t }
-    and promise     = { value: t; expr: t; env: t }
+    and promise     = { value: t; expr: t; prom_env: t }
 
     and pairlist = (t * t) list (* For strict list parsing, t list. *)
+
+    exception Sexp_to_inspect of Raw.sexp
 
     val t_of_sexp : Raw.sexp -> t
 

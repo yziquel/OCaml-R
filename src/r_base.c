@@ -435,6 +435,21 @@ CAMLprim value inspect_envsxp_hashtab (value sexp) {
   CAMLreturn(Val_sexp(Sexp_val(sexp)->u.envsxp.hashtab));
 }
 
+CAMLprim value inspect_closxp_formals (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.closxp.formals));
+}
+
+CAMLprim value inspect_closxp_body (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.closxp.body));
+}
+
+CAMLprim value inspect_closxp_env (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.closxp.env));
+}
+
 CAMLprim value inspect_promsxp_value (value sexp) {
   CAMLparam1(sexp);
   CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.value));

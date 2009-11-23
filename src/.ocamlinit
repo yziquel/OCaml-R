@@ -3,10 +3,8 @@
 #load "r.cma";;
 #load "oCamlR.cma";;
 
-let (s : 'a R.promise) = R.symbol "str";;
-let s' = R.Raw.sexp_of_t s;;
-let s_type = R.Raw.sexptype s';;
+let r name = R.force (R.symbol name);;
+let display x = R.Internal.Pretty.t_of_sexp (R.Raw.sexp_of_t x);;
+let show name = display (r name);;
 
-let forced_s = R.force s;;
-let forced_s' = R.Raw.sexp_of_t forced_s;;
-let forced_s_type = R.Raw.sexptype forced_s';;
+open R.Internal.Pretty;;
