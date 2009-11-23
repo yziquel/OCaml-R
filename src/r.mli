@@ -58,17 +58,24 @@ val init : ?name:string ->
 val terminate : unit -> unit
 
 (** Static types for R values. *)
-type t
+type 'a t
+type 'a promise = 'a Lazy.t t
 
 (* R constants - global symbols in libR.so. *)
-val null : t
+(* such as NULL... *)
 
 (** Beta-reduction in R. *)
-val eval : t list -> t
+module Raw0 : sig
+  type sexp
+end
+type sexp = Raw0.sexp
+
+val eval : sexp list -> sexp
+val force : 'a promise -> 'a t
 
 (** Dealing with the R symbol table. *)
-type symbol = string
-val symbol : symbol -> t
+type 'a symbol = string
+val symbol : 'a symbol -> 'a t
 
 
 
@@ -123,7 +130,7 @@ module type LibraryDescription = sig
 end
 
 module type Library = sig
-  val root : t list
+  val root : sexp list
 end
 
 module type Interpreter = sig
@@ -138,17 +145,10 @@ module Interpreter : functor (Env : Environment) -> Interpreter
 
 module Raw : sig
 
-  type nil
-  type prom
-  type lang
-  type vec_char
-  type vec_int
-  type raw
+  type sexp = Raw0.sexp
 
-  type 'a sexp
-
-  val sexp_of_t : t -> raw sexp
-  val sexp_equality : 'a sexp -> 'b sexp -> bool
+  val sexp_of_t : 'a t -> sexp
+  val sexp_equality : sexp -> sexp -> bool
 
   type sexptype =
     | NilSxp
@@ -177,11 +177,7 @@ module Raw : sig
     | S4Sxp
     | FunSxp
 
-  val sexptype : 'a sexp -> sexptype
-
-  val force_promsxp : prom sexp -> raw sexp
-
-  val sexp_of_symbol : symbol -> raw sexp
+  val sexptype : sexp -> sexptype
 
 end
 
@@ -231,7 +227,7 @@ module Internal : sig
     and sxp_env  = { frame: t; enclos: t; hashtab: t }
     and sxp_prom = { prom_value: t; expr: t; env: t }
 
-    val t_of_sexp : 'a Raw.sexp -> t
+    val t_of_sexp : Raw.sexp -> t
 
   end
 
@@ -256,7 +252,7 @@ module Internal : sig
 
     and pairlist = (t * t) list (* For strict list parsing, t list. *)
 
-    val t_of_sexp : 'a Raw.sexp -> t
+    val t_of_sexp : Raw.sexp -> t
 
   end
 

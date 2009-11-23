@@ -1,13 +1,12 @@
 #use "topfind";;
 #require "unix";;
 #load "r.cma";;
-R.init ();;
+#load "oCamlR.cma";;
 
-let symbol_structure x = R.Internal.C.t_of_sexp (R.Raw.sexp_of_t (R.symbol x));;
-let symbol_pretty x = R.Internal.Pretty.t_of_sexp (R.Raw.sexp_of_t (R.symbol x));;
+let (s : 'a R.promise) = R.symbol "str";;
+let s' = R.Raw.sexp_of_t s;;
+let s_type = R.Raw.sexptype s';;
 
-let t = symbol_structure "str";;
-open R.Internal.C;;
-
-let t' = symbol_pretty "str";;
-open R.Internal.Pretty;;
+let forced_s = R.force s;;
+let forced_s' = R.Raw.sexp_of_t forced_s;;
+let forced_s_type = R.Raw.sexptype forced_s';;

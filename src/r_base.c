@@ -211,21 +211,21 @@ CAMLprim value r_eval_sxp (value sexp_list) {
 
 /* Data conversion to and from OCaml and R. */
 
-CAMLprim value r_string_of_charsexp (value charsexp) {
-  CAMLparam1(charsexp);
+CAMLprim value r_string_of_charsxp (value charsxp) {
+  CAMLparam1(charsxp);
   /* Maxence Guesdon declares something like CAMLlocal1(result) for
      the output of caml_copy_string. To which extent is it necessary? */
   /* Moreover, it is yet unclear whether or not R strings are NULL
      terminated, or if they simply have a size fixed in the VECSEXP structure. */
-  CAMLreturn(caml_copy_string(CHAR(Sexp_val(charsexp))));
+  CAMLreturn(caml_copy_string(CHAR(Sexp_val(charsxp))));
 }
 
-CAMLprim value r_access_int_vecsexp (value intsexp, value offset) {
-  CAMLparam2(intsexp, offset);
+CAMLprim value r_access_int_vecsxp (value intsxp, value offset) {
+  CAMLparam2(intsxp, offset);
   /* The R macro is #define INTEGER(x) ((int *) DATAPTR(x)).
      Should use Val_int, or int32s? More the generally, the typing
      is here somewhat confusing (or confused)... Is offset an int? */
-  CAMLreturn(Val_int(INTEGER((int *) Vecsexp_val(intsexp))[Int_val(offset)]));
+  CAMLreturn(Val_int(INTEGER((int *) Vecsexp_val(intsxp))[Int_val(offset)]));
 }
 
 

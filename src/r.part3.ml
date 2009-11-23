@@ -78,41 +78,50 @@ let init ?(name    = try Sys.argv.(0) with _ -> "OCaml-R")
 module Raw0 = struct
 
   (* Argument types for the polymorphic 'a sexp type. *)
-  type nil          (* For NILSXP *)
-  type sym          (* For SYMSXP *)
-  type prom         (* For PROMSXP *)
-  type lang         (* For LANGSXP *)
-  type vec_char     (* For CHARSEXP *)
-  type vec_int      (* For INTSEXP *)
-  type raw          (* universal type 'raw sexp' *)
+  type nil                        (* For NILSXP *)
+  type sym                        (* For SYMSXP *)
+  type 'a lisplist                (* For LISTSXP, and LANGSXP *)
+  type simple                     (* For LISTSXP *)
+  type pairlist = simple lisplist (* For LISTSXP *)
+  type env                        (* For ENVSXP *)
+  type prom                       (* For PROMSXP *)
+  type call                       (* For LANGSXP *)
+  type lang = call lisplist       (* For LANGSXP *)
+  type builtin                    (* For BUILTINSXP *)
+  type 'a vec                     (* For all the VECSXPs *)
+  type vec_char = char vec        (* For CHARSXP *)
+  type vec_int = int vec          (* For INTSEXP *)
+    (* Or shouldn't it be int32 vec ? *)
 
-  (* Types of wrapped R SEXP values. sexp is a polymorphic type. *)
-  type 'a sexp
+  (* Types of wrapped R SEXP values. sxp is a polymorphic type
+     wrapping up the monomorphic type sexp *)
+  type sexp
+  type 'a sxp = sexp
+  type 'a vecsxp = 'a vec sxp
 
-  (* Forgetful 'functor'. *)
-  let forget_sexptype : 'a sexp -> raw sexp = Obj.magic
-
-  external sexp_equality : 'a sexp -> 'b sexp -> bool = "r_sexp_equality"
+  external sexp_equality : sexp -> sexp -> bool = "r_sexp_equality"
 
 end include Raw0
 
-type t = Sexp of raw sexp | NULL
+type 'a t = sexp
+type 'a promise = 'a Lazy.t t
 
 
 
 (* -3- R constants - global symbols in libR.so. *)
-
-external null_creator : unit -> nil sexp = "r_null"
-let null = NULL
+(* Commented out until one finds a clean solution
+   for the typing of the R NULL. What should it be
+   in OCaml? An 'a option mapping to None? *)
+external null_creator : unit -> nil sxp = "r_null"
 
 
 
 (* -4- Conversion of R types from OCaml side to R side. *)
 
 module Raw1 = struct
-  let sexp_of_t : t -> raw sexp = function
-    | Sexp s -> s
-    | NULL -> forget_sexptype (null_creator ())
+  (* sexp will be an opaque type in the interface, and so
+     will 'a t. Therefore we provide this conversion function. *)
+  let sexp_of_t : 'a t -> sexp = fun x -> x
 end include Raw1
 
 
@@ -148,7 +157,7 @@ module Raw2 = struct
     | FunSxp
 end include Raw2
 
-external sexptype_of_sexp : 'a sexp -> int = "r_sexptype_of_sexp"
+external sexptype_of_sexp : sexp -> int = "r_sexptype_of_sexp"
 module Raw3 = struct
   let sexptype s = match (sexptype_of_sexp s) with
     | 0  -> NilSxp
@@ -186,9 +195,7 @@ end include Raw3
 
 (* -6- Conversion of R types from R side to OCaml side. *)
 
-let t_of_sexp s = match sexptype s with
-  | NilSxp -> NULL
-  | _ -> Sexp s
+let t_of_sexp : sexp -> 'a t = fun x -> x
 
 
 
@@ -196,87 +203,89 @@ let t_of_sexp s = match sexptype s with
 
 (* -7.1- Execution of calls. *)
 
-external langsxp_of_list : 'a sexp list -> int -> lang sexp = "r_langsxp_of_list"
-external eval_langsxp : lang sexp -> raw sexp = "r_eval_sxp"
+external langsxp_of_list : sexp list -> int -> lang sxp = "r_langsxp_of_list"
+external eval_langsxp : lang sxp -> sexp = "r_eval_sxp"
 
-let eval l =
-  let sexps, n = (List.map sexp_of_t l), (List.length l) in
-  let langsxp = langsxp_of_list sexps n in
-  t_of_sexp (eval_langsxp langsxp)
+let eval (l : sexp list) : sexp =
+  (* The typing of l needs to be amended and moved to 'a t stuff. *)
+  eval_langsxp (langsxp_of_list l (List.length l))
 
 (* -7.2- Forcing R promises. *)
 
 module Raw4 = struct
 
-  external force_promsxp : prom sexp -> raw sexp = "r_eval_sxp"
+  external force_promsxp : prom sxp -> sexp = "r_eval_sxp"
 
 end include Raw4
+
+(* It seems to me that the R.force function breaks the type
+   system: forcing a 'a Lazy.t promise would not give a 'a promise...
+   In R, promises are forced recursively ... *)
+let force : 'a promise -> 'a t = force_promsxp
 
 
 
 (* -8- Dealing with the R symbol table. *)
 
-type symbol = string
+type 'a symbol = string
 
-module Raw5 = struct
-  (* Currently, sexp_of_symbol segfaults. This has to be corrected. *)
-  external sexp_of_symbol : symbol -> raw sexp = "r_sexp_of_symbol"
-end include Raw5
-
-let symbol (sym : symbol) = t_of_sexp (sexp_of_symbol sym)
+(* I am not satisfied with the internals of r_sexp_of_symbol. *)
+external symbol : 'a symbol -> 'a t = "r_sexp_of_symbol"
 
 
 
 (* -9- Data conversions. *)
 
-external string_of_charsexp : vec_char sexp -> string = "r_string_of_charsexp"
-(* let string_of_t (t : string R.t) = *)
+external string_of_charsxp : vec_char sxp -> string = "r_string_of_charsxp"
+let string_of_t : string t -> string = string_of_charsxp
 
-external access_int_vecsexp : vec_int sexp -> int -> int = "r_access_int_vecsexp"
-external length_of_vecsexp : 'a sexp -> int = "inspect_vecsxp_length"
-let int_list_of_int_vecsexp s =
-  let lngth = length_of_vecsexp s in
+external access_int_vecsxp : vec_int sxp -> int -> int = "r_access_int_vecsxp"
+external length_of_vecsxp : 'a vecsxp -> int = "inspect_vecsxp_length"
+let int_list_of_int_vecsxp s =
+  let lngth = length_of_vecsxp s in
   let rec aux n s = match n with | 0 -> [] | _ ->
-    (access_int_vecsexp s (lngth - n))::(aux (n - 1) s)
+    (access_int_vecsxp s (lngth - n))::(aux (n - 1) s)
   in aux lngth s
 
 
-type arg = [
+(* Code that is left to audit. *)
+
+(*type arg = [
     `Named of symbol * raw sexp
   | `Anon of raw sexp
-  ]
+  ]*)
 
-external sexp : string -> raw sexp = "r_sexp_of_string"
-external set_var : symbol -> 'a sexp -> unit = "r_set_var"
-external print : 'a sexp -> unit = "r_print_value"
+external eval_string : string -> sexp = "r_sexp_of_string"
+(*external set_var : symbol -> 'a sexp -> unit = "r_set_var"*)
+(*external print : 'a sexp -> unit = "r_print_value"*)
 
 (*external exec : string -> arg array -> unit = "r_exec"
   Commented out because of C warning. Will uncoment when OCaml-R compiles on 64 bits. *)
 
-external to_bool : 'a sexp -> bool = "bool_of_sexp"
-external to_int : 'a sexp -> int = "int_of_sexp"
-external to_float : 'a sexp -> float = "float_of_sexp"
-external to_string : 'a sexp -> string = "string_of_sexp"
+(*external to_bool : 'a sexp -> bool = "bool_of_sexp"*)
+(*external to_int : 'a sexp -> int = "int_of_sexp"*)
+(*external to_float : 'a sexp -> float = "float_of_sexp"*)
+(*external to_string : 'a sexp -> string = "string_of_sexp"*)
 
-external of_bool : bool -> 'a sexp = "sexp_of_bool"
-external of_int : int -> 'a sexp = "sexp_of_int"
-external of_float : float -> 'a sexp = "sexp_of_float"
-external of_string : string -> 'a sexp = "sexp_of_string"
+(*external of_bool : bool -> 'a sexp = "sexp_of_bool"*)
+(*external of_int : int -> 'a sexp = "sexp_of_int"*)
+(*external of_float : float -> 'a sexp = "sexp_of_float"*)
+(*external of_string : string -> 'a sexp = "sexp_of_string"*)
 
 (*external to_bool_array : 'a sexp -> bool array = "bool_array_of_sexp"
   Commented out while working on 64 bits compilation. *)
 (*external to_int_array : 'a sexp -> int array = "int_array_of_sexp"
   Commented out while working on 64 bits compilation. *)
-external to_float_array : 'a sexp -> float array = "float_array_of_sexp"
+(*external to_float_array : 'a sexp -> float array = "float_array_of_sexp"*)
 (*external to_string_array : 'a sexp -> string array = "string_array_of_sexp"
   Commented out while working on 64 bits compilation. *)
 
-external of_bool_array : bool array -> 'a sexp = "sexp_of_bool_array"
-external of_int_array : int array -> 'a sexp = "sexp_of_int_array"
-external of_float_array : float array -> 'a sexp = "sexp_of_float_array"
-external of_string_array : string array -> 'a sexp = "sexp_of_string_array"
+(*external of_bool_array : bool array -> 'a sexp = "sexp_of_bool_array"*)
+(*external of_int_array : int array -> 'a sexp = "sexp_of_int_array"*)
+(*external of_float_array : float array -> 'a sexp = "sexp_of_float_array"*)
+(*external of_string_array : string array -> 'a sexp = "sexp_of_string_array"*)
 
-external get_attrib : 'a sexp -> string -> 'b sexp = "r_get_attrib"
+(*external get_attrib : 'a sexp -> string -> 'b sexp = "r_get_attrib"*)
 
 (*let dim sexp = to_int_array (get_attrib sexp "dim");;
   Commented out while working on 64 bits compilation. *)
@@ -305,7 +314,7 @@ module type LibraryDescription = sig
 end
 
 module type Library = sig
-  val root : t list 
+  val root : sexp list 
 end
 
 module type Interpreter = sig
@@ -321,7 +330,7 @@ module Interpreter (Env : Environment) : Interpreter = struct
                 ()
 
   module Require (Lib : LibraryDescription) : Library = struct
-    let () = ignore (sexp ("require("^Lib.name^")"))
+    let () = ignore (eval_string ("require("^Lib.name^")"))
     let root = List.map symbol Lib.symbols
   end
 
@@ -338,7 +347,6 @@ module Raw = struct
   include Raw2
   include Raw3
   include Raw4
-  include Raw5
 end
 
 module Internal = struct
@@ -347,7 +355,7 @@ module Internal = struct
 
     type t
     val recursive : t Lazy.t -> t
-    val build : (raw sexp -> t) -> raw sexp -> t
+    val build : (sexp -> t) -> sexp -> t
 
   end
 
@@ -355,36 +363,36 @@ module Internal = struct
 
     (* General parsing function for internal R structures, i.e. SEXPs. *)
 
-    let t_of_sexp (s : 'a sexp) =
+    let t_of_sexp (s : sexp) =
       let rec aux sexps_seen s =
         let is_found (ss, _) = sexp_equality s ss in
         begin match (try Some (List.find is_found sexps_seen) with _ -> None) with
         | None -> let rec x = lazy (M.build (aux ((s, x)::sexps_seen)) s) in Lazy.force x
         | Some (_, t_lazy) -> M.recursive t_lazy
         end
-      in aux [] ((Obj.magic s) : raw sexp)
+      in aux [] s
 
   end
 
   (* Inspection functions. *)
 
-  external inspect_primsxp_offset  : 'a sexp -> int = "inspect_primsxp_offset"
+  external inspect_primsxp_offset  : builtin sxp -> int = "inspect_primsxp_offset"
 
-  external inspect_symsxp_pname    : 'a sexp -> 'b sexp = "inspect_symsxp_pname"
-  external inspect_symsxp_value    : 'a sexp -> 'b sexp = "inspect_symsxp_value"
-  external inspect_symsxp_internal : 'a sexp -> 'b sexp = "inspect_symsxp_internal"
+  external inspect_symsxp_pname    : sym sxp -> sexp = "inspect_symsxp_pname"
+  external inspect_symsxp_value    : sym sxp -> sexp = "inspect_symsxp_value"
+  external inspect_symsxp_internal : sym sxp -> sexp = "inspect_symsxp_internal"
 
-  external inspect_listsxp_carval  : 'a sexp -> 'b sexp = "inspect_listsxp_carval"
-  external inspect_listsxp_cdrval  : 'a sexp -> 'b sexp = "inspect_listsxp_cdrval"
-  external inspect_listsxp_tagval  : 'a sexp -> 'b sexp = "inspect_listsxp_tagval"
+  external inspect_listsxp_carval  : 'a lisplist sxp -> sexp = "inspect_listsxp_carval"
+  external inspect_listsxp_cdrval  : 'a lisplist sxp -> sexp = "inspect_listsxp_cdrval"
+  external inspect_listsxp_tagval  : 'a lisplist sxp -> sexp = "inspect_listsxp_tagval"
 
-  external inspect_envsxp_frame    : 'a sexp -> 'b sexp = "inspect_envsxp_frame"
-  external inspect_envsxp_enclos   : 'a sexp -> 'b sexp = "inspect_envsxp_enclos"
-  external inspect_envsxp_hashtab  : 'a sexp -> 'b sexp = "inspect_envsxp_hashtab"
+  external inspect_envsxp_frame    : env sxp -> sexp = "inspect_envsxp_frame"
+  external inspect_envsxp_enclos   : env sxp -> sexp = "inspect_envsxp_enclos"
+  external inspect_envsxp_hashtab  : env sxp -> sexp = "inspect_envsxp_hashtab"
 
-  external inspect_promsxp_value   : 'a sexp -> 'b sexp = "inspect_promsxp_value"
-  external inspect_promsxp_expr    : 'a sexp -> 'b sexp = "inspect_promsxp_expr"
-  external inspect_promsxp_env     : 'a sexp -> 'b sexp = "inspect_promsxp_env"
+  external inspect_promsxp_value   : prom sxp -> sexp = "inspect_promsxp_value"
+  external inspect_promsxp_expr    : prom sxp -> sexp = "inspect_promsxp_expr"
+  external inspect_promsxp_env     : prom sxp -> sexp = "inspect_promsxp_env"
 
   module CTypes = struct
 
@@ -473,9 +481,9 @@ module Internal = struct
           tagval     = rec_build (inspect_listsxp_tagval s)}}
       | SpecialSxp -> Val { content = SPECIALSXP }
       | BuiltinSxp -> Val { content = BUILTINSXP (inspect_primsxp_offset s)}
-      | CharSxp    -> Val { content = CHARSXP (string_of_charsexp ((Obj.magic s) : vec_char sexp)) }
+      | CharSxp    -> Val { content = CHARSXP (string_of_charsxp s) }
       | LglSxp     -> Val { content = LGLSXP }
-      | IntSxp     -> Val { content = INTSXP (int_list_of_int_vecsexp ((Obj.magic s) : vec_int sexp))}
+      | IntSxp     -> Val { content = INTSXP (int_list_of_int_vecsxp s)}
       | RealSxp    -> Val { content = REALSXP }
       | CplxSxp    -> Val { content = CPLXSXP }
       | StrSxp     -> Val { content = STRSXP }
@@ -517,20 +525,20 @@ module Internal = struct
 
     exception Esoteric
 
-    let symbol_of_symsxp builder (s : sym sexp) =
+    let symbol_of_symsxp builder (s : sym sxp) =
       let pname    = inspect_symsxp_pname    s
       and value    = inspect_symsxp_value    s
       and internal = inspect_symsxp_internal s in
       match (sexptype pname), (sexptype value), (sexptype internal) with
       | (NilSxp,  _, NilSxp) when sexp_equality s value -> SYMBOL None
       | (CharSxp, BuiltinSxp, NilSxp) ->
-          let symbol_name = string_of_charsexp (Obj.magic pname) in
+          let symbol_name = string_of_charsxp pname in
           SYMBOL (Some (symbol_name, (builder value)))
       | (CharSxp, SymSxp, NilSxp) ->
           begin match (sexp_equality value (inspect_symsxp_value value))  &&
                       (NilSxp = sexptype (inspect_symsxp_pname value))    &&
                       (NilSxp = sexptype (inspect_symsxp_internal value)) with
-          | true -> ARG (string_of_charsexp (Obj.magic pname))
+          | true -> ARG (string_of_charsxp pname)
           | false -> raise Esoteric end
       | _ -> raise Esoteric
 
@@ -580,9 +588,9 @@ module Internal = struct
           | _ -> Unknown end
       | SpecialSxp -> Unknown
       | BuiltinSxp -> BUILTIN
-      | CharSxp    -> STRING (string_of_charsexp ((Obj.magic s) : vec_char sexp))
+      | CharSxp    -> STRING (string_of_charsxp s)
       | LglSxp     -> Unknown
-      | IntSxp     -> INT (int_list_of_int_vecsexp ((Obj.magic s) : vec_int sexp))
+      | IntSxp     -> INT (int_list_of_int_vecsxp s)
       | RealSxp    -> Unknown
       | CplxSxp    -> Unknown
       | StrSxp     -> Unknown
