@@ -347,7 +347,6 @@ module Raw = struct
   include Raw2
   include Raw3
   include Raw4
-  include Raw5
 end
 
 module Internal = struct
@@ -371,7 +370,7 @@ module Internal = struct
         | None -> let rec x = lazy (M.build (aux ((s, x)::sexps_seen)) s) in Lazy.force x
         | Some (_, t_lazy) -> M.recursive t_lazy
         end
-      in aux [] ((Obj.magic s) : raw sexp)
+      in aux [] s
 
   end
 
