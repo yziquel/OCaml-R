@@ -251,7 +251,6 @@ let int_list_of_int_vecsxp s =
     (access_int_vecsxp s (lngth - n))::(aux (n - 1) s)
   in aux lngth s
 
-
 (* Code that is left to audit. *)
 
 (*type arg = [
@@ -351,6 +350,7 @@ module Raw = struct
   include Raw2
   include Raw3
   include Raw4
+  include Raw5
 end
 
 module Internal = struct
@@ -374,7 +374,7 @@ module Internal = struct
         | None -> let rec x = lazy (M.build (aux ((s, x)::sexps_seen)) s) in Lazy.force x
         | Some (_, t_lazy) -> M.recursive t_lazy
         end
-      in aux [] s
+      in aux [] ((Obj.magic s) : raw sexp)
 
   end
 
