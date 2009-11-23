@@ -557,7 +557,7 @@ module Internal = struct
                       (NilSxp = sexptype (inspect_symsxp_pname value))    &&
                       (NilSxp = sexptype (inspect_symsxp_internal value)) with
           | true -> ARG (string_of_charsxp pname)
-          | false -> raise ((*Esoteric*) Sexp_to_inspect s)
+          | false -> raise (Esoteric s)
           end end
       | _ -> raise (Esoteric s)
 
