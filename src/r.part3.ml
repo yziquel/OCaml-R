@@ -30,13 +30,13 @@ end
 (* Summary:
 
      -1- Functions to initialise and terminate the R interpreter.
-           [init and terminate functions.]
+           [init_r and terminate functions.]
 
      -2- Static types for R values.
-           [types 'a R.t, 'a R.promise, R.Raw.sexp, and phantom sexptypes.]
+           [types R.t and 'a R.Raw.sexp, and phantom sexptypes.]
 
      -3- R constants - global symbols in libR.so.
-           [null_creator.]
+           [null/null_creator.]
 
      -4- Conversion of R types from OCaml side to R side.
            [sexp_of_t : R.t -> raw sexp.]
@@ -46,15 +46,13 @@ end
            [sexptype : 'a sexp -> sexptype.]
 
      -6- Conversion of R types from R side to OCaml side.
-           [t_of_sexp : sexp -> 'a R.t.]
+           [t_of_sexp : 'a sexp -> R.t.]
 
      -7- Beta-reduction in R.
-           [R.eval : sexp list -> sexp]
-           [R.force : 'a R.promise -> 'a R.t]
-           [R.mlfun : ('a -> 'b) R.t -> 'a R.t -> 'b R.t]
+           [R.eval : R.t list -> R.t.]
 
      -8- Dealing with the R symbol table.
-           [R.symbol : 'a symbol -> 'a R.t]
+           [R.symbol : symbol -> R.t]
 
 ================================================================================ *)
 
@@ -198,7 +196,7 @@ end include Raw3
 
 (* -6- Conversion of R types from R side to OCaml side. *)
 
-let t_of_sexp : sexp -> 'a t = fun x -> x (* Extremely unsafe... *)
+let t_of_sexp : sexp -> 'a t = fun x -> x
 
 
 
@@ -242,14 +240,8 @@ external symbol : 'a symbol -> 'a t = "r_sexp_of_symbol"
 
 (* -9- Data conversions. *)
 
-(* -9.1- Conversion of strings. *)
-
 external string_of_charsxp : vec_char sxp -> string = "r_string_of_charsxp"
 let string_of_t : string t -> string = string_of_charsxp
-
-let string : string -> string R.t =
-
-(* -9.2- Conversion of vectors of integers. *)
 
 external access_int_vecsxp : vec_int sxp -> int -> int = "r_access_int_vecsxp"
 external length_of_vecsxp : 'a vecsxp -> int = "inspect_vecsxp_length"
@@ -259,9 +251,6 @@ let int_list_of_int_vecsxp s =
     (access_int_vecsxp s (lngth - n))::(aux (n - 1) s)
   in aux lngth s
 
-
-
-
 (* Code that is left to audit. *)
 
 (*type arg = [
@@ -269,12 +258,7 @@ let int_list_of_int_vecsxp s =
   | `Anon of raw sexp
   ]*)
 
-module Raw5 = struct
-
-  external eval_string : string -> sexp = "r_sexp_of_string"
-
-end include Raw5
-
+external eval_string : string -> sexp = "r_sexp_of_string"
 (*external set_var : symbol -> 'a sexp -> unit = "r_set_var"*)
 (*external print : 'a sexp -> unit = "r_print_value"*)
 
@@ -370,7 +354,6 @@ module Raw = struct
   include Raw2
   include Raw3
   include Raw4
-  include Raw5
 end
 
 module Internal = struct

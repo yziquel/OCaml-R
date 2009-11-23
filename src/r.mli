@@ -181,8 +181,6 @@ module Raw : sig
 
   val sexptype : sexp -> sexptype
 
-  val eval_string : string -> sexp
-
 end
 
 module Internal : sig
