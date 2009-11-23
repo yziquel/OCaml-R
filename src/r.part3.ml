@@ -311,17 +311,21 @@ let of_float_matrix = of_matrix of_float;;
 let of_string_matrix = of_matrix of_string;;
 *)
 
-module type LibraryDescription = sig
+(* This functorial loading is bad, because it's not correct
+   from a typing point of view. A good solution would be a
+   camlp4 extension to write these library description
+   automatically, directly from the R library itself. *)
+(*module type LibraryDescription = sig
   val name : string
   val symbols : string list
 end
 
 module type Library = sig
   val root : sexp list 
-end
+end*)
 
 module type Interpreter = sig
-  module Require : functor (L : LibraryDescription) -> Library
+  (*module Require : functor (L : LibraryDescription) -> Library*)
 end
 
 module Interpreter (Env : Environment) : Interpreter = struct
@@ -332,10 +336,10 @@ module Interpreter (Env : Environment) : Interpreter = struct
                 ~sigs: Env.signal_handlers
                 ()
 
-  module Require (Lib : LibraryDescription) : Library = struct
+  (*module Require (Lib : LibraryDescription) : Library = struct
     let () = ignore (eval_string ("require("^Lib.name^")"))
     let root = List.map symbol Lib.symbols
-  end
+  end*)
 
 end
 
