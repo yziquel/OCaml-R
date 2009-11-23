@@ -126,17 +126,17 @@ A functor interface is provided so it is possible to ensure that the interpreter
    {!init}. As environement, you can specify your own or use the {!Standard} module.
 *)
 
-module type LibraryDescription = sig
+(*module type LibraryDescription = sig
   val name : string
   val symbols : string list
 end
 
 module type Library = sig
   val root : sexp list
-end
+end*)
 
 module type Interpreter = sig
-  module Require : functor (L : LibraryDescription) -> Library
+  (*module Require : functor (L : LibraryDescription) -> Library*)
 end
 
 module Interpreter : functor (Env : Environment) -> Interpreter
@@ -180,6 +180,8 @@ module Raw : sig
     | FunSxp
 
   val sexptype : sexp -> sexptype
+
+  val eval_string : string -> sexp
 
 end
 
