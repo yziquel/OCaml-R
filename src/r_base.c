@@ -212,7 +212,7 @@ CAMLprim value r_eval_sxp (value sexp_list) {
 
 /* Data conversion to and from OCaml and R. */
 
-CAMLprim value r_string_of_charsxp (value charsxp) {
+CAMLprim value r_internal_string_of_charsxp (value charsxp) {
   CAMLparam1(charsxp);
   /* Maxence Guesdon declares something like CAMLlocal1(result) for
      the output of caml_copy_string. To which extent is it necessary? */
@@ -231,10 +231,26 @@ CAMLprim value r_charsxp_of_string (value s) {
   CAMLreturn(Val_sexp(charsxp));
 }
 
+CAMLprim value r_access_str_vecsxp (value strsxp, value offset) {
+  CAMLparam2(strsxp, offset);
+  /* Same comments as for r_accesas_int_vecsxp and for
+     r_internal_string_of_charsxp. */
+  CAMLreturn(caml_copy_string(CHAR(STRING_ELT(
+    (char **) Vecsexp_val(strsxp), (Int_val(offset))))));
+}
+
+CAMLprim value r_strsxp_of_string (value s) {
+  CAMLparam1(s);
+  SEXP strsxp;
+  PROTECT(strsxp = mkString(String_val(s)));
+  UNPROTECT(1);
+  CAMLreturn(Val_sexp(strsxp));
+}
+
 CAMLprim value r_access_int_vecsxp (value intsxp, value offset) {
   CAMLparam2(intsxp, offset);
   /* The R macro is #define INTEGER(x) ((int *) DATAPTR(x)).
-     Should use Val_int, or int32s? More the generally, the typing
+     Should use Val_int, or int32s? More generally, the typing
      is here somewhat confusing (or confused)... Is offset an int? */
   CAMLreturn(Val_int(INTEGER((int *) Vecsexp_val(intsxp))[Int_val(offset)]));
 }

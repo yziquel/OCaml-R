@@ -93,7 +93,8 @@ module Raw0 = struct
   type builtin                    (* For BUILTINSXP *)
   type 'a vec                     (* For all the VECSXPs *)
   type vec_char = char vec        (* For CHARSXP *)
-  type vec_int = int vec          (* For INTSEXP *)
+  type vec_int = int vec          (* For INTSXP *)
+  type vec_str = string vec       (* For STRSXP *)
     (* Or shouldn't it be int32 vec ? *)
 
   (* Types of wrapped R SEXP values. sxp is a polymorphic type
@@ -242,21 +243,33 @@ external symbol : 'a symbol -> 'a t = "r_sexp_of_symbol"
 
 (* -9- Data conversions. *)
 
-(* -9.1- Conversion of strings. *)
+(* -9.1- Generic accessor and conversion function for vectors. *)
 
-external string_of_charsxp : vec_char sxp -> string = "r_string_of_charsxp"
-let string_of_t : string t -> string = string_of_charsxp
-external string : string -> string t = "r_charsxp_of_string"
-
-(* -9.2- Conversion of vectors of integers. *)
-
-external access_int_vecsxp : vec_int sxp -> int -> int = "r_access_int_vecsxp"
 external length_of_vecsxp : 'a vecsxp -> int = "inspect_vecsxp_length"
-let int_list_of_int_vecsxp s =
+let list_of_vecsxp (access: 'a vecsxp -> int -> 'b) (s: 'a vecsxp) : 'b list =
   let lngth = length_of_vecsxp s in
   let rec aux n s = match n with | 0 -> [] | _ ->
-    (access_int_vecsxp s (lngth - n))::(aux (n - 1) s)
+    (access s (lngth - n))::(aux (n - 1) s)
   in aux lngth s
+
+(* -9.2- Conversion of strings. *)
+
+external string_of_charsxp : vec_char sxp -> string = "r_internal_string_of_charsxp"
+
+external access_str_vecsxp : vec_str sxp -> int -> string = "r_access_str_vecsxp"
+let string_list_of_str_vecsxp = list_of_vecsxp access_str_vecsxp
+
+let strings_of_t : string list t -> string list = string_list_of_str_vecsxp
+let string_of_t : string t -> string = fun t -> access_str_vecsxp t 0
+  (* We access only the first element, because static typing is supposed to
+     ensure that the str vecsxp contains only one element. *)
+
+external string : string -> string t = "r_strsxp_of_string"
+
+(* -9.3- Conversion of vectors of integers. *)
+
+external access_int_vecsxp : vec_int sxp -> int -> int = "r_access_int_vecsxp"
+let int_list_of_int_vecsxp = list_of_vecsxp access_int_vecsxp
 
 
 
