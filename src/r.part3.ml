@@ -336,7 +336,7 @@ let of_string_matrix = of_matrix of_string;;
 end
 
 module type Library = sig
-  val root : sexp list 
+  val root : sexp list
 end*)
 
 module type Interpreter = sig
@@ -370,6 +370,13 @@ module Raw = struct
   include Raw3
   include Raw4
   include Raw5
+
+  exception Parse_incomplete of string
+  let _ = Callback.register_exception "Parse_incomplete" (Parse_incomplete "any string")
+  exception Parse_error of string
+  let _ = Callback.register_exception "Parse_error" (Parse_error "any string")
+
+  external parse_sexp : string -> sexp = "parse_sexp"
 end
 
 module Internal = struct
@@ -619,7 +626,7 @@ module Internal = struct
           value    = rec_build (inspect_promsxp_value s);
           expr     = rec_build (inspect_promsxp_expr  s);
           prom_env = rec_build (inspect_promsxp_env   s)}
-      | LangSxp    -> 
+      | LangSxp    ->
           let carval = inspect_listsxp_carval s
           and cdrval = inspect_listsxp_cdrval s
           and tagval = inspect_listsxp_tagval s in

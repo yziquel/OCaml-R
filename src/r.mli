@@ -182,9 +182,11 @@ module Raw : sig
     | FunSxp
 
   val sexptype : sexp -> sexptype
-
   val eval_string : string -> sexp
 
+  exception Parse_incomplete of string
+  exception Parse_error of string
+  val parse_sexp : string -> sexp
 end
 
 module Internal : sig

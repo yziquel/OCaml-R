@@ -115,10 +115,15 @@ r.part2.ml: r.part2.R
 r.ml: r.part1.ml r.part2.ml r.part3.ml
 	cat r.part1.ml r.part2.ml r.part3.ml > r.ml
 
+# Testing :
+###########
 test.x: $(LIB) $(LIBMATH) test.cmx
 	$(OCAMLOPT) -verbose -o $@ unix.cmxa $(LIBMATH) $(LIB) test.cmx
 test.byte: $(LIB_BYTE) $(LIBMATH_BYTE) test.cmo
 	$(OCAMLC) -verbose -o $@ unix.cma $(LIB_BYTE) $(LIBMATH_BYTE) test.cmo
+
+tests/test_parse.x: $(LIB) tests/test_parse.ml
+	$(OCAMLOPT) -o $@ unix.cmxa $^
 
 # Documentation :
 #################
