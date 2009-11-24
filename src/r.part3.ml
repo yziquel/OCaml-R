@@ -483,7 +483,7 @@ module Internal = struct
       | INTSXP of int list
       | REALSXP
       | CPLXSXP
-      | STRSXP
+      | STRSXP of string list
       | DOTSXP
       | ANYSXP
       | VECSXP
@@ -537,7 +537,7 @@ module Internal = struct
       | IntSxp     -> Val { content = INTSXP (int_list_of_int_vecsxp s)}
       | RealSxp    -> Val { content = REALSXP }
       | CplxSxp    -> Val { content = CPLXSXP }
-      | StrSxp     -> Val { content = STRSXP }
+      | StrSxp     -> Val { content = STRSXP (string_list_of_str_vecsxp s)}
       | DotSxp     -> Val { content = DOTSXP }
       | AnySxp     -> Val { content = ANYSXP }
       | VecSxp     -> Val { content = VECSXP }
@@ -566,6 +566,7 @@ module Internal = struct
       | CALL of t * pairlist
       | BUILTIN
       | STRING of string
+      | STRINGS of string list
       | INT of int list
       | Unknown
 
@@ -655,7 +656,7 @@ module Internal = struct
       | IntSxp     -> INT (int_list_of_int_vecsxp s)
       | RealSxp    -> Unknown
       | CplxSxp    -> Unknown
-      | StrSxp     -> Unknown
+      | StrSxp     -> STRINGS (string_list_of_str_vecsxp s)
       | DotSxp     -> Unknown
       | AnySxp     -> Unknown
       | VecSxp     -> Unknown

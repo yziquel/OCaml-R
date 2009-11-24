@@ -218,7 +218,7 @@ module Internal : sig
       | INTSXP of int list
       | REALSXP
       | CPLXSXP
-      | STRSXP
+      | STRSXP of string list
       | DOTSXP
       | ANYSXP
       | VECSXP
@@ -255,6 +255,7 @@ module Internal : sig
       | CALL of t * pairlist
       | BUILTIN
       | STRING of string
+      | STRINGS of string list
       | INT of int list
       | Unknown
 

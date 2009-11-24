@@ -3,8 +3,11 @@
 #load "r.cma";;
 #load "oCamlR.cma";;
 
-let r name = R.force (R.symbol name);;
-let display x = R.Internal.Pretty.t_of_sexp (R.Raw.sexp_of_t x);;
-let show name = display (r name);;
+let _ = R.Raw.eval_string "library(quantmod)";;
+let getSymbols = R.force (R.symbol "getSymbols");;
+
+let x = R.Raw.parse_sexp "getSymbols(\"YHOO\")";;
+
+let t = R.Internal.Pretty.t_of_sexp x;;
 
 open R.Internal.Pretty;;
