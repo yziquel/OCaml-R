@@ -790,13 +790,17 @@ module RevEngineering = struct
       | false -> (tag, (mkPROMISE car))::[] end
     in lisplist_of_list (List.flatten (List.map phi (list_of_lisplist args)))
 
-  (*let eval (call : lang sxp) =                                               (* call is called e in eval.c *)
+  external apply_closure : lang sxp -> clos sxp -> pairlist sxp -> sexp = "r_apply_closure"
+
+  let ml_eval (call : lang sxp) =                                               (* call is called e in eval.c *)
     (* In eval.c, there are dynamic type checks and different behaviours
        depending on whether the functions are symbols or else... We ajust
        it to our own use case: it's a symbol. *)
-    let (f : clos sxp = R.findfun (fun_of_call call) in                           (* f is called op in eval.c *)
+    let (f : clos sxp) = findfun (fun_of_call call) in                           (* f is called op in eval.c *)
     (* Subsequently, we'll be assuming that f is a CLOSXP, conforming to
        our use case. *)
-    let args : pairlist sxp = args_of_call call*)
+    let args : pairlist sxp = args_of_call call in
+    let prom_args : pairlist sxp = promiseArgs args in
+    apply_closure call f prom_args
 
 end

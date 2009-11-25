@@ -314,5 +314,7 @@ module RevEngineering : sig
 
   val mkPROMISE : Raw.sexp -> Raw.prom Raw.sxp
   val promiseArgs : Raw.pairlist Raw.sxp -> Raw.pairlist Raw.sxp
+  val apply_closure : Raw.lang Raw.sxp -> Raw.clos Raw.sxp -> Raw.pairlist Raw.sxp -> Raw.sexp
+  val ml_eval : Raw.lang Raw.sxp -> Raw.sexp
 
 end

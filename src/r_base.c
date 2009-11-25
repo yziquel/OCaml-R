@@ -353,6 +353,13 @@ CAMLprim value r_eval_sxp (value sexp_list) {
   CAMLreturn(Val_sexp(e));
 }
 
+CAMLprim value r_apply_closure ( value call, value op, value arglist) {
+  CAMLparam3(call, op, arglist);
+  CAMLreturn(Val_sexp(Rf_applyClosure(Sexp_val(call), Sexp_val(op),
+    Sexp_val(arglist), R_GlobalEnv, R_BaseEnv)));
+}
+
+
 /* Parsing R code. */
 
 CAMLprim value parse_sexp (value s) {
