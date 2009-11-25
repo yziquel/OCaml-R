@@ -122,6 +122,7 @@ type 'a promise = 'a Lazy.t t
    in OCaml? An 'a option mapping to None? *)
 external null_creator : unit -> nil sxp = "r_null"
 external dots_symbol_creator : unit -> sexp = "r_dots_symbol"
+external missing_arg_creator : unit -> sexp = "r_missing_arg"
 
 
 
@@ -725,21 +726,30 @@ module RevEngineering = struct
   let args_of_call    : lang sxp -> pairlist sxp = Internal.inspect_listsxp_cdrval
   let car_of_pairlist : pairlist sxp -> sexp     = Internal.inspect_listsxp_carval
   let cdr_of_pairlist : pairlist sxp -> sexp     = Internal.inspect_listsxp_cdrval
+  let tag_of_pairlist : pairlist sxp -> sexp     = Internal.inspect_listsxp_tagval
 
 
   (* Now the real work: *)
 
-  (*let mkPROMISE (expression : sexp) =
-    let s = sexp_allocate () in*)
+  let mkPROMISE (expression : sexp) =
+    let s = sexp_allocate () in
+    let () = write_promise s expression in
+    s
 
   (*let rec promiseArgs (args : pairlist sexp) =
     (* promiseArgs is called by eval on the list of arguments of the call. *)
     match sexptype args with | NilSxp -> null_creator () | _ ->
     let element = car_of_pairlist args in
     begin match sexp_equality element (dots_symbol_creator ()) with
-    | true -> let h = findvar element in let opt_args =
-        begin match sexptype h with | NilSxp -> [] | _ ->
-        (* we now have to use mkPROMISE... *) *)
+    | true -> let h = findvar element in
+        let tail = begin match sexptype h with | NilSxp -> | _ ->
+          let rec aux h =
+            begin match sexptype h with | NilSxp -> [] | _ ->
+              ((mkPROMISE (car_of_pairlist h)), (tag_of_pairlist h))
+              ::(aux (cdr_of_pairlist)) end
+          in aux h
+          | _ -> *)
+        
     
 
   (*let eval (call : lang sxp) =                                               (* call is called e in eval.c *)

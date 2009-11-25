@@ -65,6 +65,7 @@ type 'a promise = 'a Lazy.t t
 (* such as NULL, DOTS... Typing below is freaky. *)
 val null_creator        : unit -> 'a option t
 val dots_symbol_creator : unit -> 'a list t
+val missing_arg_creator : unit -> unit t
 
 (** Beta-reduction in R. *)
 
@@ -329,5 +330,7 @@ module RevEngineering : sig
   val sexp_allocate : unit -> Raw.sexp
   val init_ocaml_node : unit -> unit
   val write_promise : Raw.prom Raw.sxp -> Raw.sexp -> unit
+
+  val mkPROMISE : Raw.sexp -> Raw.prom Raw.sxp
 
 end

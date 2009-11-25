@@ -129,7 +129,7 @@ CAMLprim value r_sexp_equality (value s1, value s2) {
 }
 
 
-/* The NULL constant in R... */
+/* The NULL constant, and others, in R... */
 
 CAMLprim value r_null (value unit) {
   CAMLparam1(unit);
@@ -139,6 +139,11 @@ CAMLprim value r_null (value unit) {
 CAMLprim value r_dots_symbol (value unit) {
   CAMLparam1(unit);
   CAMLreturn(Val_sexp(R_DotsSymbol));
+}
+
+CAMLprim value r_missing_arg (value unit) {
+  CAMLparam1(unit);
+  CAMLreturn(Val_sexp(R_MissingArg));
 }
 
 
