@@ -48,15 +48,15 @@ end
      -06- Conversion of R types from R side to OCaml side.
             [t_of_sexp : sexp -> 'a R.t.]
 
-     -07- Beta-reduction in R.
+     -07- Low-level data conversions.
+
+     -08- Beta-reduction in R.
             [R.eval : sexp list -> sexp]
             [R.force : 'a R.promise -> 'a R.t]
             [R.mlfun : ('a -> 'b) R.t -> 'a R.t -> 'b R.t]
 
-     -08- Dealing with the R symbol table.
+     -09- Dealing with the R symbol table.
             [R.symbol : 'a symbol -> 'a R.t]
-
-     -09- Data conversion.
 
      -10- Parsing R code.
 
@@ -209,57 +209,47 @@ let t_of_sexp : sexp -> 'a t = fun x -> x (* Extremely unsafe... *)
 
 
 
-(* -7- Beta-reduction in R. *)
+(* -7- Low-level data manipulation. *)
 
-(* -7.1- Execution of calls. *)
+(* -7.1- Pairlists and calls. *)
+
+(* -7.1.1- Allocator and accessor function for LISTSXP data structures. *)
+
+external alloc_list : int -> 'a lisplist sxp = "r_alloc_list"
 
 module Raw4 = struct
 
-  external langsxp_of_list : sexp list -> int -> lang sxp = "r_langsxp_of_list"
-  external eval_langsxp : lang sxp -> sexp = "r_eval_sxp"
-
-  let eval (l : sexp list) : sexp =
-    (* The typing of l needs to be amended and moved to 'a t stuff. *)
-    eval_langsxp (langsxp_of_list l (List.length l))
-
-(* -7.2- Forcing R promises. *)
-
-  external force_promsxp : prom sxp -> sexp = "r_eval_sxp"
+  external inspect_listsxp_carval  : 'a lisplist sxp -> sexp = "inspect_listsxp_carval"
+  external inspect_listsxp_cdrval  : 'a lisplist sxp -> sexp = "inspect_listsxp_cdrval"
+  external inspect_listsxp_tagval  : 'a lisplist sxp -> sexp = "inspect_listsxp_tagval"
 
 end include Raw4
 
-(* It seems to me that the R.force function breaks the type
-   system: forcing a 'a Lazy.t promise would not give a 'a promise...
-   In R, promises are forced recursively ... *)
-let force : 'a promise -> 'a t = force_promsxp
+external write_lisplist_element : 'a lisplist sxp -> sexp -> sexp -> unit = "r_write_lisplist_element"
 
-(* -7.3- Mapping functions. *)
+(* -7.1.2- Conversion of lisplists to lists of pairs. *)
 
-let mlfun (f: ('a -> 'b) t) (x: 'a) : 'b t = eval [f; x]
+let rec list_of_lisplist (ll : 'a lisplist sxp) =
+  match sexptype ll with
+  | NilSxp -> []   (* Typing will have to take into account that NULL is a list. *)
+  | ListSxp | LangSxp | DotSxp ->  (* There's also a typing issue here... *)
+  ( (inspect_listsxp_tagval ll), (inspect_listsxp_carval ll))
+  :: (list_of_lisplist (inspect_listsxp_cdrval ll))
+  | _ -> failwith "Conversion failure in list_of_lisplist."
 
+(* -7.1.3- Conversion of lists of pairs to a pairlist or a call. *)
 
-(* -8- Dealing with the R symbol table. *)
+let lisplist_of_list (l: (sexp * sexp) list) =
+  let r_l = alloc_list (List.length l) in
+  let cursor = ref r_l in List.iter
+  begin function (tag, value) ->
+    let () = write_lisplist_element !cursor tag value in
+    cursor := inspect_listsxp_cdrval !cursor
+  end l; r_l
 
-type 'a symbol = string
+(* -7.2- Vectors. *)
 
-(* I am not satisfied with the internals of r_sexp_of_symbol. *)
-(*external symbol : 'a symbol -> 'a t = "r_sexp_of_symbol"*)
-
-(* There's a lot of stuff concerning symbols and environments in the
-   envir.c file of the R source code.
-   We will not wrap up findFun, because it essentially is findVar with
-   some dynamic type checking for function SEXPs. *)
-module Raw5 = struct
-  external install : 'a symbol -> 'a sym sxp = "r_install"
-end include Raw5
-external findvar : 'a symbol t -> 'a promise = "r_findvar"
-external findfun : ('a -> 'b) symbol t -> ('a -> 'b) t = "r_findfun"
-let symbol : 'a symbol -> 'a promise = fun s -> findvar (install s)
-
-
-(* -9- Data conversions. *)
-
-(* -9.1- Generic accessor and conversion function for vectors. *)
+(* -7.2.1- Generic accessor and conversion function for vectors. *)
 
 external length_of_vecsxp : 'a vecsxp -> int = "inspect_vecsxp_length"
 let list_of_vecsxp (access: 'a vecsxp -> int -> 'b) (s: 'a vecsxp) : 'b list =
@@ -268,7 +258,7 @@ let list_of_vecsxp (access: 'a vecsxp -> int -> 'b) (s: 'a vecsxp) : 'b list =
     (access s (lngth - n))::(aux (n - 1) s)
   in aux lngth s
 
-(* -9.2- Conversion of strings. *)
+(* -7.2.2- Conversion of strings. *)
 
 external string_of_charsxp : vec_char sxp -> string = "r_internal_string_of_charsxp"
 
@@ -282,10 +272,61 @@ let string_of_t : string t -> string = fun t -> access_str_vecsxp t 0
 
 external string : string -> string t = "r_strsxp_of_string"
 
-(* -9.3- Conversion of vectors of integers. *)
+(* -7.2.3- Conversion of vectors of integers. *)
 
 external access_int_vecsxp : vec_int sxp -> int -> int = "r_access_int_vecsxp"
 let int_list_of_int_vecsxp = list_of_vecsxp access_int_vecsxp
+
+
+
+
+(* -8- Beta-reduction in R. *)
+
+(* -8.1- Execution of calls. *)
+
+module Raw5 = struct
+
+  external langsxp_of_list : sexp list -> int -> lang sxp = "r_langsxp_of_list"
+  external eval_langsxp : lang sxp -> sexp = "r_eval_sxp"
+
+  let eval (l : sexp list) : sexp =
+    (* The typing of l needs to be amended and moved to 'a t stuff. *)
+    eval_langsxp (langsxp_of_list l (List.length l))
+
+(* -8.2- Forcing R promises. *)
+
+  external force_promsxp : prom sxp -> sexp = "r_eval_sxp"
+
+end include Raw5
+
+(* It seems to me that the R.force function breaks the type
+   system: forcing a 'a Lazy.t promise would not give a 'a promise...
+   In R, promises are forced recursively ... *)
+let force : 'a promise -> 'a t = force_promsxp
+
+(* -8.3- Mapping functions. *)
+
+let mlfun (f: ('a -> 'b) t) (x: 'a) : 'b t = eval [f; x]
+
+
+(* -9- Dealing with the R symbol table. *)
+
+type 'a symbol = string
+
+(* I am not satisfied with the internals of r_sexp_of_symbol. *)
+(*external symbol : 'a symbol -> 'a t = "r_sexp_of_symbol"*)
+
+(* There's a lot of stuff concerning symbols and environments in the
+   envir.c file of the R source code.
+   We will not wrap up findFun, because it essentially is findVar with
+   some dynamic type checking for function SEXPs. *)
+module Raw6 = struct
+  external install : 'a symbol -> 'a sym sxp = "r_install"
+end include Raw6
+external findvar : 'a symbol t -> 'a promise = "r_findvar"
+external findfun : ('a -> 'b) symbol t -> ('a -> 'b) t = "r_findfun"
+let symbol : 'a symbol -> 'a promise = fun s -> findvar (install s)
+
 
 
 (* -10- Parsing R code. *)
@@ -312,11 +353,11 @@ end include Raw7
   | `Anon of raw sexp
   ]*)
 
-module Raw6 = struct
+module Raw8 = struct
 
   external eval_string : string -> sexp = "r_sexp_of_string"
 
-end include Raw6
+end include Raw8
 
 (*external set_var : symbol -> 'a sexp -> unit = "r_set_var"*)
 (*external print : 'a sexp -> unit = "r_print_value"*)
@@ -416,6 +457,7 @@ module Raw = struct
   include Raw5
   include Raw6
   include Raw7
+  include Raw8
 end
 
 module Internal = struct
@@ -450,10 +492,6 @@ module Internal = struct
   external inspect_symsxp_pname    : 'a sym sxp -> sexp = "inspect_symsxp_pname"
   external inspect_symsxp_value    : 'a sym sxp -> sexp = "inspect_symsxp_value"
   external inspect_symsxp_internal : 'a sym sxp -> sexp = "inspect_symsxp_internal"
-
-  external inspect_listsxp_carval  : 'a lisplist sxp -> sexp = "inspect_listsxp_carval"
-  external inspect_listsxp_cdrval  : 'a lisplist sxp -> sexp = "inspect_listsxp_cdrval"
-  external inspect_listsxp_tagval  : 'a lisplist sxp -> sexp = "inspect_listsxp_tagval"
 
   external inspect_envsxp_frame    : env sxp -> sexp = "inspect_envsxp_frame"
   external inspect_envsxp_enclos   : env sxp -> sexp = "inspect_envsxp_enclos"
@@ -722,11 +760,11 @@ module RevEngineering = struct
   external write_promise : prom sxp -> sexp -> unit = "r_write_promise"
 
   (* Convenience declarations *)
-  let fun_of_call     : lang sxp -> sexp         = Internal.inspect_listsxp_carval
-  let args_of_call    : lang sxp -> pairlist sxp = Internal.inspect_listsxp_cdrval
-  let car_of_pairlist : pairlist sxp -> sexp     = Internal.inspect_listsxp_carval
-  let cdr_of_pairlist : pairlist sxp -> sexp     = Internal.inspect_listsxp_cdrval
-  let tag_of_pairlist : pairlist sxp -> sexp     = Internal.inspect_listsxp_tagval
+  let fun_of_call     : lang sxp -> sexp         = inspect_listsxp_carval
+  let args_of_call    : lang sxp -> pairlist sxp = inspect_listsxp_cdrval
+  let car_of_pairlist : pairlist sxp -> sexp     = inspect_listsxp_carval
+  let cdr_of_pairlist : pairlist sxp -> sexp     = inspect_listsxp_cdrval
+  let tag_of_pairlist : pairlist sxp -> sexp     = inspect_listsxp_tagval
 
 
   (* Now the real work: *)
@@ -736,21 +774,21 @@ module RevEngineering = struct
     let () = write_promise s expression in
     s
 
-  (*let rec promiseArgs (args : pairlist sexp) =
+  let rec promiseArgs (args : pairlist sxp) =
     (* promiseArgs is called by eval on the list of arguments of the call. *)
-    match sexptype args with | NilSxp -> null_creator () | _ ->
-    let element = car_of_pairlist args in
-    begin match sexp_equality element (dots_symbol_creator ()) with
-    | true -> let h = findvar element in
-        let tail = begin match sexptype h with | NilSxp -> | _ ->
-          let rec aux h =
-            begin match sexptype h with | NilSxp -> [] | _ ->
-              ((mkPROMISE (car_of_pairlist h)), (tag_of_pairlist h))
-              ::(aux (cdr_of_pairlist)) end
-          in aux h
-          | _ -> *)
-        
-    
+    let phi (tag, car) = match sexp_equality car (dots_symbol_creator ()) with
+      | true -> let h = findvar car in
+                begin match sexptype h with
+                | NilSxp | DotSxp -> List.map
+                  begin function (tag, car) -> (tag, (mkPROMISE car)) end
+                  (list_of_lisplist h)
+                | _ -> begin match sexp_equality h (missing_arg_creator ()) with
+                       | true -> [] | false -> failwith "promiseArgs" end
+                end
+      | false -> begin match sexp_equality car (missing_arg_creator ()) with
+      | true  -> (tag, (missing_arg_creator ()))::[]
+      | false -> (tag, (mkPROMISE car))::[] end
+    in lisplist_of_list (List.flatten (List.map phi (list_of_lisplist args)))
 
   (*let eval (call : lang sxp) =                                               (* call is called e in eval.c *)
     (* In eval.c, there are dynamic type checks and different behaviours

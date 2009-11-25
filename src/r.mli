@@ -204,6 +204,11 @@ module Raw : sig
 
   val sexptype : sexp -> sexptype
 
+  (** Low-level data manipulation. *)
+  val inspect_listsxp_carval  : 'a lisplist sxp -> sexp
+  val inspect_listsxp_cdrval  : 'a lisplist sxp -> sexp
+  val inspect_listsxp_tagval  : 'a lisplist sxp -> sexp
+
   val eval_string : string -> sexp
 
   val langsxp_of_list : sexp list -> int -> lang sxp
@@ -218,30 +223,6 @@ module Raw : sig
 end
 
 module Internal : sig
-
-  (* Inspection functions. *)
-
-  val inspect_primsxp_offset  : Raw.builtin Raw.sxp -> int
-
-  val inspect_symsxp_pname    : 'a Raw.sym Raw.sxp -> Raw.sexp
-  val inspect_symsxp_value    : 'a Raw.sym Raw.sxp -> Raw.sexp
-  val inspect_symsxp_internal : 'a Raw.sym Raw.sxp -> Raw.sexp
-
-  val inspect_listsxp_carval  : 'a Raw.lisplist Raw.sxp -> Raw.sexp
-  val inspect_listsxp_cdrval  : 'a Raw.lisplist Raw.sxp -> Raw.sexp
-  val inspect_listsxp_tagval  : 'a Raw.lisplist Raw.sxp -> Raw.sexp
-
-  val inspect_envsxp_frame    : Raw.env Raw.sxp -> Raw.sexp
-  val inspect_envsxp_enclos   : Raw.env Raw.sxp -> Raw.sexp
-  val inspect_envsxp_hashtab  : Raw.env Raw.sxp -> Raw.sexp
-
-  val inspect_closxp_formals  : Raw.clos Raw.sxp -> Raw.sexp
-  val inspect_closxp_body     : Raw.clos Raw.sxp -> Raw.sexp
-  val inspect_closxp_env      : Raw.clos Raw.sxp -> Raw.sexp
-
-  val inspect_promsxp_value   : Raw.prom Raw.sxp -> Raw.sexp
-  val inspect_promsxp_expr    : Raw.prom Raw.sxp -> Raw.sexp
-  val inspect_promsxp_env     : Raw.prom Raw.sxp -> Raw.sexp
 
   module C : sig
 
@@ -332,5 +313,6 @@ module RevEngineering : sig
   val write_promise : Raw.prom Raw.sxp -> Raw.sexp -> unit
 
   val mkPROMISE : Raw.sexp -> Raw.prom Raw.sxp
+  val promiseArgs : Raw.pairlist Raw.sxp -> Raw.pairlist Raw.sxp
 
 end

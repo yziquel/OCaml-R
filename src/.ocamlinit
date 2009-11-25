@@ -6,7 +6,8 @@
 let _ = R.Raw.eval_string "library(quantmod)";;
 let getSymbols = R.force (R.symbol "getSymbols");;
 
-let fun_of_call : R.Raw.lang R.Raw.sxp -> R.Raw.sexp = R.Internal.inspect_listsxp_carval;;
+let fun_of_call  : R.Raw.lang R.Raw.sxp -> R.Raw.sexp               = R.Raw.inspect_listsxp_carval;;
+let args_of_call : R.Raw.lang R.Raw.sxp -> R.Raw.pairlist R.Raw.sxp = R.Raw.inspect_listsxp_cdrval;;
 
 let x  = R.Raw.parse_sexp "getSymbols(\"YHOO\")";;
 let f  = fun_of_call x;;
@@ -22,3 +23,5 @@ open R.RevEngineering;;
 let () = init_ocaml_node ();;
 let s = sexp_allocate ();;
 let () = write_promise s f';;
+
+let t' = show (promiseArgs (args_of_call x));;

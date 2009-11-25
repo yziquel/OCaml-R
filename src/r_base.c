@@ -155,6 +155,140 @@ CAMLprim value r_sexptype_of_sexp (value sexp) {
 }
 
 
+/* Low-level data manipulation functions. */
+
+/* Memory allocation is done via functions exported from memory.c. */
+
+CAMLprim value r_alloc_list (value i) {
+  CAMLparam1(i);
+  CAMLreturn(Val_sexp(Rf_allocList(Int_val(i))));
+}
+
+/* What follows is low-level accessor functions, in order to inspect
+   in details the contents of SEXPs and VECSEXPs. The implementation
+   details are in Rinternals.h, enclosed in #ifdef USE_RINTERNALS
+   directives, making these opaque pointers when not turned on. */
+
+/* Concerning VECSEXPs: */
+
+/* Quotation from section 1.1.3 "The 'data'" of "R Internals" (R-ints.pdf):
+   'This [i.e. vecsxp.truelength] is almost unused. The only current use is for
+   hash tables of environments (VECSXPs), where length is the size of the table
+   and truelength is the number of primary slots in use, and for the reference
+   hash tables in serialization (VECSXPs),where truelength is the number of
+   slots in use.' */
+
+/* CHARSXPs are in fact VECSEXPs. Concerning encoding, quotation from section 1.1.2
+   "Rest_of_header" of "R internals" (R-ints.pdf): 'As from R 2.5.0, bits 2 and 3 for
+   a CHARSXP are used to note that it is known to be in Latin-1 and UTF-8 respectively.
+   (These are not usually set if it is also known to be in ASCII, since code does not
+   need to know the charset to handle ASCII strings. From R 2.8.0 it is guaranteed that
+   they will not be set for CHARSXPs created by R itself.) As from R 2.8.0 bit 5 is used
+   to indicate that a CHARSXP is hashed by its address, that is NA STRING or in the
+   CHARSXP cache. */
+
+
+CAMLprim value inspect_vecsxp_length (value vecsexp) {
+  CAMLparam1(vecsexp);
+  CAMLreturn(Val_int(Vecsexp_val(vecsexp)->vecsxp.length));
+}
+
+/*CAMLprim value inspect_vecsxp_truelength (value vecsexp) {
+  CAMLparam1(vecsexp);
+  CAMLreturn(Val_int(Vecsexp_val(vecsexp)->vecsxp.truelength));
+}*/
+
+/* Concerning various types of SEXPs: */
+
+CAMLprim value inspect_primsxp_offset (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_int(Sexp_val(sexp)->u.primsxp.offset));
+}
+
+CAMLprim value inspect_symsxp_pname (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.symsxp.pname));
+}
+
+CAMLprim value inspect_symsxp_value (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.symsxp.value));
+}
+
+CAMLprim value inspect_symsxp_internal (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.symsxp.internal));
+}
+
+CAMLprim value inspect_listsxp_carval (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.listsxp.carval));
+}
+
+CAMLprim value inspect_listsxp_cdrval (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.listsxp.cdrval));
+}
+
+CAMLprim value inspect_listsxp_tagval (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.listsxp.tagval));
+}
+
+CAMLprim value r_write_lisplist_element (value lisplist, value tag, value elmnt) {
+  CAMLparam3(lisplist, tag, elmnt);
+  Sexp_val(lisplist)->u.listsxp.tagval = Sexp_val(tag);
+  Sexp_val(lisplist)->u.listsxp.carval = Sexp_val(elmnt);
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value inspect_envsxp_frame (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.envsxp.frame));
+}
+
+CAMLprim value inspect_envsxp_enclos (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.envsxp.enclos));
+}
+
+CAMLprim value inspect_envsxp_hashtab (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.envsxp.hashtab));
+}
+
+CAMLprim value inspect_closxp_formals (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.closxp.formals));
+}
+
+CAMLprim value inspect_closxp_body (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.closxp.body));
+}
+
+CAMLprim value inspect_closxp_env (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.closxp.env));
+}
+
+CAMLprim value inspect_promsxp_value (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.value));
+}
+
+CAMLprim value inspect_promsxp_expr (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.expr));
+}
+
+CAMLprim value inspect_promsxp_env (value sexp) {
+  CAMLparam1(sexp);
+  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.env));
+}
+
+
+
 /* Beta-reduction in R. */
 
 /* r_langsxp_of_list creates a lisp-like list out of an
@@ -170,7 +304,7 @@ CAMLprim value r_langsxp_of_list (value l, value n) {
   CAMLlocal1(l_cursor);
   SEXP s, t;
 
-  PROTECT(t = s = allocList(Int_val(n)));
+  PROTECT(t = s = Rf_allocList(Int_val(n)));
   SET_TYPEOF(s, LANGSXP);
 
   /* Fill in list s, with t moving over the pairlist,
@@ -218,6 +352,30 @@ CAMLprim value r_eval_sxp (value sexp_list) {
 
   CAMLreturn(Val_sexp(e));
 }
+
+/* Parsing R code. */
+
+CAMLprim value parse_sexp (value s) {
+  CAMLparam1(s);
+  SEXP text ;
+  SEXP pr ;
+  ParseStatus status;
+  PROTECT(text = mkString(String_val(s)));
+  PROTECT(pr=R_ParseVector(text, 1, &status, R_NilValue));
+  UNPROTECT(2);
+  switch (status) {
+    case PARSE_OK:
+     break;
+    case PARSE_INCOMPLETE:
+    case PARSE_EOF:
+      caml_raise_with_string(*caml_named_value("Parse_incomplete"), (String_val(s)));
+    case PARSE_NULL:
+    case PARSE_ERROR:
+      caml_raise_with_string(*caml_named_value("Parse_error"), (String_val(s)));
+      }
+  CAMLreturn(Val_sexp(VECTOR_ELT(pr,0)));
+}
+
 
 
 /* Data conversion to and from OCaml and R. */
@@ -420,144 +578,6 @@ CAMLprim value r_print_value (value sexp) {
 //}
 
 
-/* What follows is low-level accessor functions, in order to inspect
-   in details the contents of SEXPs and VECSEXPs. The implementation
-   details are in Rinternals.h, enclosed in #ifdef USE_RINTERNALS
-   directives, making these opaque pointers when not turned on. */
-
-/* Concerning VECSEXPs: */
-
-/* Quotation from section 1.1.3 "The 'data'" of "R Internals" (R-ints.pdf):
-   'This [i.e. vecsxp.truelength] is almost unused. The only current use is for
-   hash tables of environments (VECSXPs), where length is the size of the table
-   and truelength is the number of primary slots in use, and for the reference
-   hash tables in serialization (VECSXPs),where truelength is the number of
-   slots in use.' */
-
-/* CHARSXPs are in fact VECSEXPs. Concerning encoding, quotation from section 1.1.2
-   "Rest_of_header" of "R internals" (R-ints.pdf): 'As from R 2.5.0, bits 2 and 3 for
-   a CHARSXP are used to note that it is known to be in Latin-1 and UTF-8 respectively.
-   (These are not usually set if it is also known to be in ASCII, since code does not
-   need to know the charset to handle ASCII strings. From R 2.8.0 it is guaranteed that
-   they will not be set for CHARSXPs created by R itself.) As from R 2.8.0 bit 5 is used
-   to indicate that a CHARSXP is hashed by its address, that is NA STRING or in the
-   CHARSXP cache. */
-
-
-CAMLprim value inspect_vecsxp_length (value vecsexp) {
-  CAMLparam1(vecsexp);
-  CAMLreturn(Val_int(Vecsexp_val(vecsexp)->vecsxp.length));
-}
-
-/*CAMLprim value inspect_vecsxp_truelength (value vecsexp) {
-  CAMLparam1(vecsexp);
-  CAMLreturn(Val_int(Vecsexp_val(vecsexp)->vecsxp.truelength));
-}*/
-
-/* Concerning various types of SEXPs: */
-
-CAMLprim value inspect_primsxp_offset (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_int(Sexp_val(sexp)->u.primsxp.offset));
-}
-
-CAMLprim value inspect_symsxp_pname (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.symsxp.pname));
-}
-
-CAMLprim value inspect_symsxp_value (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.symsxp.value));
-}
-
-CAMLprim value inspect_symsxp_internal (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.symsxp.internal));
-}
-
-CAMLprim value inspect_listsxp_carval (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.listsxp.carval));
-}
-
-CAMLprim value inspect_listsxp_cdrval (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.listsxp.cdrval));
-}
-
-CAMLprim value inspect_listsxp_tagval (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.listsxp.tagval));
-}
-
-CAMLprim value inspect_envsxp_frame (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.envsxp.frame));
-}
-
-CAMLprim value inspect_envsxp_enclos (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.envsxp.enclos));
-}
-
-CAMLprim value inspect_envsxp_hashtab (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.envsxp.hashtab));
-}
-
-CAMLprim value inspect_closxp_formals (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.closxp.formals));
-}
-
-CAMLprim value inspect_closxp_body (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.closxp.body));
-}
-
-CAMLprim value inspect_closxp_env (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.closxp.env));
-}
-
-CAMLprim value inspect_promsxp_value (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.value));
-}
-
-CAMLprim value inspect_promsxp_expr (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.expr));
-}
-
-CAMLprim value inspect_promsxp_env (value sexp) {
-  CAMLparam1(sexp);
-  CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.env));
-}
-
-CAMLprim value parse_sexp (value s) {
-  CAMLparam1(s);
-  SEXP text ;
-  SEXP pr ;
-  ParseStatus status;
-  PROTECT(text = mkString(String_val(s)));
-  PROTECT(pr=R_ParseVector(text, 1, &status, R_NilValue));
-  UNPROTECT(2);
-  switch (status) {
-    case PARSE_OK:
-     break;
-    case PARSE_INCOMPLETE:
-    case PARSE_EOF:
-      caml_raise_with_string(*caml_named_value("Parse_incomplete"), (String_val(s)));
-    case PARSE_NULL:
-    case PARSE_ERROR:
-      caml_raise_with_string(*caml_named_value("Parse_error"), (String_val(s)));
-      }
-  CAMLreturn(Val_sexp(VECTOR_ELT(pr,0)));
-}
-
-
 /********************************************/
 /* For reverse-engineering purposes ONLY!!! */
 /********************************************/
@@ -586,6 +606,9 @@ CAMLprim value r_init_ocaml_node (value unit) {
 /* Now the real code: */
 
 CAMLprim value r_sexp_allocate (value unit) {
+  /* We should be using allocSExp from memory.c instead. This would take
+     care of all the stupid stuff up there concerning UnmarkedNode,
+     garbage collection et tutti quanti. */
   CAMLparam1(unit);
   CAMLreturn(Val_sexp((SEXP) Calloc(1, SEXPREC)));
 }
