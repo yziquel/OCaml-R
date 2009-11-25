@@ -711,29 +711,44 @@ module Internal = struct
 
 end
 
-(*module RevEngineering = struct
+module RevEngineering = struct
 
   (* This module is an ugly work in progress. It is supposed to be ugly... *)
 
-  (* Convenience declarations *)
-  let fun_of_call     : lang sxp -> sexp         = R.Internal.inspect_listsxp_carval
-  let args_of_call    : lang sxp -> pairlist sxp = R.Internal.inspect_listsxp_cdrval
-  let car_of_pairlist : pairlist sxp -> sexp     = R.Internal.inspect_listsxp_carval
-  let cdr_of_pairlist : pairlist sxp -> sexp     = R.Internal.inspect_listsxp_cdrval
+  (* Ugly memory allocation and management functions. *)
+  external sexp_allocate : unit -> sexp = "r_sexp_allocate"
+  external init_ocaml_node : unit -> unit = "r_init_ocaml_node"
+  external write_promise : prom sxp -> sexp -> unit = "r_write_promise"
 
-  let rec promiseArgs (args : pairlist sexp) =
+  (* Convenience declarations *)
+  let fun_of_call     : lang sxp -> sexp         = Internal.inspect_listsxp_carval
+  let args_of_call    : lang sxp -> pairlist sxp = Internal.inspect_listsxp_cdrval
+  let car_of_pairlist : pairlist sxp -> sexp     = Internal.inspect_listsxp_carval
+  let cdr_of_pairlist : pairlist sxp -> sexp     = Internal.inspect_listsxp_cdrval
+
+
+  (* Now the real work: *)
+
+  (*let mkPROMISE (expression : sexp) =
+    let s = sexp_allocate () in*)
+
+  (*let rec promiseArgs (args : pairlist sexp) =
     (* promiseArgs is called by eval on the list of arguments of the call. *)
     match sexptype args with | NilSxp -> null_creator () | _ ->
-    let 
+    let element = car_of_pairlist args in
+    begin match sexp_equality element (dots_symbol_creator ()) with
+    | true -> let h = findvar element in let opt_args =
+        begin match sexptype h with | NilSxp -> [] | _ ->
+        (* we now have to use mkPROMISE... *) *)
     
 
-  let eval (call : lang sxp) =                                               (* call is called e in eval.c *)
+  (*let eval (call : lang sxp) =                                               (* call is called e in eval.c *)
     (* In eval.c, there are dynamic type checks and different behaviours
        depending on whether the functions are symbols or else... We ajust
        it to our own use case: it's a symbol. *)
     let (f : clos sxp = R.findfun (fun_of_call call) in                           (* f is called op in eval.c *)
     (* Subsequently, we'll be assuming that f is a CLOSXP, conforming to
        our use case. *)
-    let args : pairlist sxp = args_of_call call
+    let args : pairlist sxp = args_of_call call*)
 
-end*)
+end

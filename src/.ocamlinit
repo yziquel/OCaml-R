@@ -16,3 +16,9 @@ let show = R.Internal.Pretty.t_of_sexp;;
 let t = show x;;
 
 open R.Internal.Pretty;;
+
+(* Testing functions for reverse engineering. *)
+open R.RevEngineering;;
+let () = init_ocaml_node ();;
+let s = sexp_allocate ();;
+let () = write_promise s f';;

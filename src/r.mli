@@ -323,3 +323,11 @@ module Internal : sig
   end
 
 end
+
+module RevEngineering : sig
+
+  val sexp_allocate : unit -> Raw.sexp
+  val init_ocaml_node : unit -> unit
+  val write_promise : Raw.prom Raw.sxp -> Raw.sexp -> unit
+
+end
