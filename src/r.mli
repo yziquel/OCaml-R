@@ -62,22 +62,24 @@ type 'a t
 type 'a promise = 'a Lazy.t t
 
 (* R constants - global symbols in libR.so. *)
-(* such as NULL... *)
+(* such as NULL, DOTS... Typing below is freaky. *)
+val null_creator        : unit -> 'a option t
+val dots_symbol_creator : unit -> 'a list t
 
 (** Beta-reduction in R. *)
-module Raw0 : sig
-  type sexp
-end
-type sexp = Raw0.sexp
 
-val eval : sexp list -> sexp
 val force : 'a promise -> 'a t
 
 val mlfun : ('a -> 'b) t -> 'a t -> 'b t
 
 (** Dealing with the R symbol table. *)
 type 'a symbol = string
-val symbol : 'a symbol -> 'a t
+
+(* val install : 'a symbol -> 'a sym sxp *) (* Is in Raw module *)
+val findvar : 'a symbol t -> 'a promise
+val findfun : ('a -> 'b) symbol t -> ('a -> 'b) t (* Will have to remove this one... *)
+val symbol : 'a symbol -> 'a promise
+
 
 (** String conversion function. *)
 val string_of_t : string t -> string
@@ -143,13 +145,31 @@ end
 
 module Interpreter : functor (Env : Environment) -> Interpreter
 
-
 (* The Raw module is here to help people deal with internals of the R
    module. It will eventually be hidden. *)
 
 module Raw : sig
 
-  type sexp = Raw0.sexp
+  (* Argument types for the polymorphic 'a sexp type. *)
+  type nil                        (* For NILSXP *)
+  type 'a sym                     (* For SYMSXP *)
+  type 'a lisplist                (* For LISTSXP, and LANGSXP *)
+  type simple                     (* For LISTSXP *)
+  type pairlist = simple lisplist (* For LISTSXP *)
+  type clos                       (* For CLOSXP *)
+  type env                        (* For ENVSXP *)
+  type prom                       (* For PROMSXP *)
+  type call                       (* For LANGSXP *)
+  type lang = call lisplist       (* For LANGSXP *)
+  type builtin                    (* For BUILTINSXP *)
+  type 'a vec                     (* For all the VECSXPs *)
+  type vec_char = char vec        (* For CHARSXP *)
+  type vec_int = int vec          (* For INTSXP *)
+  type vec_str = string vec       (* For STRSXP *)
+    (* Or shouldn't it be int32 vec ? *)
+
+  type sexp
+  type 'a sxp = sexp
 
   val sexp_of_t : 'a t -> sexp
   val sexp_equality : sexp -> sexp -> bool
@@ -182,7 +202,14 @@ module Raw : sig
     | FunSxp
 
   val sexptype : sexp -> sexptype
+
   val eval_string : string -> sexp
+
+  val langsxp_of_list : sexp list -> int -> lang sxp
+  val eval_langsxp : lang sxp -> sexp
+  val eval : sexp list -> sexp
+
+  val install : 'a symbol -> 'a sym sxp
 
   exception Parse_incomplete of string
   exception Parse_error of string
@@ -190,6 +217,30 @@ module Raw : sig
 end
 
 module Internal : sig
+
+  (* Inspection functions. *)
+
+  val inspect_primsxp_offset  : Raw.builtin Raw.sxp -> int
+
+  val inspect_symsxp_pname    : 'a Raw.sym Raw.sxp -> Raw.sexp
+  val inspect_symsxp_value    : 'a Raw.sym Raw.sxp -> Raw.sexp
+  val inspect_symsxp_internal : 'a Raw.sym Raw.sxp -> Raw.sexp
+
+  val inspect_listsxp_carval  : 'a Raw.lisplist Raw.sxp -> Raw.sexp
+  val inspect_listsxp_cdrval  : 'a Raw.lisplist Raw.sxp -> Raw.sexp
+  val inspect_listsxp_tagval  : 'a Raw.lisplist Raw.sxp -> Raw.sexp
+
+  val inspect_envsxp_frame    : Raw.env Raw.sxp -> Raw.sexp
+  val inspect_envsxp_enclos   : Raw.env Raw.sxp -> Raw.sexp
+  val inspect_envsxp_hashtab  : Raw.env Raw.sxp -> Raw.sexp
+
+  val inspect_closxp_formals  : Raw.clos Raw.sxp -> Raw.sexp
+  val inspect_closxp_body     : Raw.clos Raw.sxp -> Raw.sexp
+  val inspect_closxp_env      : Raw.clos Raw.sxp -> Raw.sexp
+
+  val inspect_promsxp_value   : Raw.prom Raw.sxp -> Raw.sexp
+  val inspect_promsxp_expr    : Raw.prom Raw.sxp -> Raw.sexp
+  val inspect_promsxp_env     : Raw.prom Raw.sxp -> Raw.sexp
 
   module C : sig
 

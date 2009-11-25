@@ -6,8 +6,13 @@
 let _ = R.Raw.eval_string "library(quantmod)";;
 let getSymbols = R.force (R.symbol "getSymbols");;
 
-let x = R.Raw.parse_sexp "getSymbols(\"YHOO\")";;
+let fun_of_call : R.Raw.lang R.Raw.sxp -> R.Raw.sexp = R.Internal.inspect_listsxp_carval;;
 
-let t = R.Internal.Pretty.t_of_sexp x;;
+let x  = R.Raw.parse_sexp "getSymbols(\"YHOO\")";;
+let f  = fun_of_call x;;
+let f' = R.Raw.sexp_of_t (R.findfun (Obj.magic f));;
+
+let show = R.Internal.Pretty.t_of_sexp;;
+let t = show x;;
 
 open R.Internal.Pretty;;

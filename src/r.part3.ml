@@ -29,32 +29,36 @@ end
 
 (* Summary:
 
-     -1- Functions to initialise and terminate the R interpreter.
-           [init and terminate functions.]
+     -01- Functions to initialise and terminate the R interpreter.
+            [init and terminate functions.]
 
-     -2- Static types for R values.
-           [types 'a R.t, 'a R.promise, R.Raw.sexp, and phantom sexptypes.]
+     -02- Static types for R values.
+            [types 'a R.t, 'a R.promise, R.Raw.sexp, and phantom sexptypes.]
 
-     -3- R constants - global symbols in libR.so.
-           [null_creator.]
+     -03- R constants - global symbols in libR.so.
+            [null_creator.]
 
-     -4- Conversion of R types from OCaml side to R side.
-           [sexp_of_t : R.t -> raw sexp.]
+     -04- Conversion of R types from OCaml side to R side.
+            [sexp_of_t : R.t -> raw sexp.]
 
-     -5- Runtime types internal to R.
-           [runtime algebraic types, *NOT* static phantom types.]
-           [sexptype : 'a sexp -> sexptype.]
+     -05- Runtime types internal to R.
+            [runtime algebraic types, *NOT* static phantom types.]
+            [sexptype : 'a sexp -> sexptype.]
 
-     -6- Conversion of R types from R side to OCaml side.
-           [t_of_sexp : sexp -> 'a R.t.]
+     -06- Conversion of R types from R side to OCaml side.
+            [t_of_sexp : sexp -> 'a R.t.]
 
-     -7- Beta-reduction in R.
-           [R.eval : sexp list -> sexp]
-           [R.force : 'a R.promise -> 'a R.t]
-           [R.mlfun : ('a -> 'b) R.t -> 'a R.t -> 'b R.t]
+     -07- Beta-reduction in R.
+            [R.eval : sexp list -> sexp]
+            [R.force : 'a R.promise -> 'a R.t]
+            [R.mlfun : ('a -> 'b) R.t -> 'a R.t -> 'b R.t]
 
-     -8- Dealing with the R symbol table.
-           [R.symbol : 'a symbol -> 'a R.t]
+     -08- Dealing with the R symbol table.
+            [R.symbol : 'a symbol -> 'a R.t]
+
+     -09- Data conversion.
+
+     -10- Parsing R code.
 
 ================================================================================ *)
 
@@ -81,7 +85,7 @@ module Raw0 = struct
 
   (* Argument types for the polymorphic 'a sexp type. *)
   type nil                        (* For NILSXP *)
-  type sym                        (* For SYMSXP *)
+  type 'a sym                     (* For SYMSXP *)
   type 'a lisplist                (* For LISTSXP, and LANGSXP *)
   type simple                     (* For LISTSXP *)
   type pairlist = simple lisplist (* For LISTSXP *)
@@ -117,6 +121,7 @@ type 'a promise = 'a Lazy.t t
    for the typing of the R NULL. What should it be
    in OCaml? An 'a option mapping to None? *)
 external null_creator : unit -> nil sxp = "r_null"
+external dots_symbol_creator : unit -> sexp = "r_dots_symbol"
 
 
 
@@ -207,16 +212,16 @@ let t_of_sexp : sexp -> 'a t = fun x -> x (* Extremely unsafe... *)
 
 (* -7.1- Execution of calls. *)
 
-external langsxp_of_list : sexp list -> int -> lang sxp = "r_langsxp_of_list"
-external eval_langsxp : lang sxp -> sexp = "r_eval_sxp"
+module Raw4 = struct
 
-let eval (l : sexp list) : sexp =
-  (* The typing of l needs to be amended and moved to 'a t stuff. *)
-  eval_langsxp (langsxp_of_list l (List.length l))
+  external langsxp_of_list : sexp list -> int -> lang sxp = "r_langsxp_of_list"
+  external eval_langsxp : lang sxp -> sexp = "r_eval_sxp"
+
+  let eval (l : sexp list) : sexp =
+    (* The typing of l needs to be amended and moved to 'a t stuff. *)
+    eval_langsxp (langsxp_of_list l (List.length l))
 
 (* -7.2- Forcing R promises. *)
-
-module Raw4 = struct
 
   external force_promsxp : prom sxp -> sexp = "r_eval_sxp"
 
@@ -237,8 +242,18 @@ let mlfun (f: ('a -> 'b) t) (x: 'a) : 'b t = eval [f; x]
 type 'a symbol = string
 
 (* I am not satisfied with the internals of r_sexp_of_symbol. *)
-external symbol : 'a symbol -> 'a t = "r_sexp_of_symbol"
+(*external symbol : 'a symbol -> 'a t = "r_sexp_of_symbol"*)
 
+(* There's a lot of stuff concerning symbols and environments in the
+   envir.c file of the R source code.
+   We will not wrap up findFun, because it essentially is findVar with
+   some dynamic type checking for function SEXPs. *)
+module Raw5 = struct
+  external install : 'a symbol -> 'a sym sxp = "r_install"
+end include Raw5
+external findvar : 'a symbol t -> 'a promise = "r_findvar"
+external findfun : ('a -> 'b) symbol t -> ('a -> 'b) t = "r_findfun"
+let symbol : 'a symbol -> 'a promise = fun s -> findvar (install s)
 
 
 (* -9- Data conversions. *)
@@ -272,6 +287,21 @@ external access_int_vecsxp : vec_int sxp -> int -> int = "r_access_int_vecsxp"
 let int_list_of_int_vecsxp = list_of_vecsxp access_int_vecsxp
 
 
+(* -10- Parsing R code. *)
+
+module Raw7 = struct
+
+  exception Parse_incomplete of string
+  let _ = Callback.register_exception "Parse_incomplete" (Parse_incomplete "any string")
+  exception Parse_error of string
+  let _ = Callback.register_exception "Parse_error" (Parse_error "any string")
+
+  external parse_sexp : string -> sexp = "parse_sexp"
+
+end include Raw7
+
+
+
 
 
 (* Code that is left to audit. *)
@@ -281,11 +311,11 @@ let int_list_of_int_vecsxp = list_of_vecsxp access_int_vecsxp
   | `Anon of raw sexp
   ]*)
 
-module Raw5 = struct
+module Raw6 = struct
 
   external eval_string : string -> sexp = "r_sexp_of_string"
 
-end include Raw5
+end include Raw6
 
 (*external set_var : symbol -> 'a sexp -> unit = "r_set_var"*)
 (*external print : 'a sexp -> unit = "r_print_value"*)
@@ -383,13 +413,8 @@ module Raw = struct
   include Raw3
   include Raw4
   include Raw5
-
-  exception Parse_incomplete of string
-  let _ = Callback.register_exception "Parse_incomplete" (Parse_incomplete "any string")
-  exception Parse_error of string
-  let _ = Callback.register_exception "Parse_error" (Parse_error "any string")
-
-  external parse_sexp : string -> sexp = "parse_sexp"
+  include Raw6
+  include Raw7
 end
 
 module Internal = struct
@@ -421,9 +446,9 @@ module Internal = struct
 
   external inspect_primsxp_offset  : builtin sxp -> int = "inspect_primsxp_offset"
 
-  external inspect_symsxp_pname    : sym sxp -> sexp = "inspect_symsxp_pname"
-  external inspect_symsxp_value    : sym sxp -> sexp = "inspect_symsxp_value"
-  external inspect_symsxp_internal : sym sxp -> sexp = "inspect_symsxp_internal"
+  external inspect_symsxp_pname    : 'a sym sxp -> sexp = "inspect_symsxp_pname"
+  external inspect_symsxp_value    : 'a sym sxp -> sexp = "inspect_symsxp_value"
+  external inspect_symsxp_internal : 'a sym sxp -> sexp = "inspect_symsxp_internal"
 
   external inspect_listsxp_carval  : 'a lisplist sxp -> sexp = "inspect_listsxp_carval"
   external inspect_listsxp_cdrval  : 'a lisplist sxp -> sexp = "inspect_listsxp_cdrval"
@@ -581,7 +606,7 @@ module Internal = struct
     exception Sexp_to_inspect of sexp
     exception Esoteric of sexp
 
-    let symbol_of_symsxp builder (s : sym sxp) =
+    let symbol_of_symsxp builder (s : 'a sym sxp) =
       let pname    = inspect_symsxp_pname    s
       and value    = inspect_symsxp_value    s
       and internal = inspect_symsxp_internal s in
@@ -685,3 +710,30 @@ module Internal = struct
   end
 
 end
+
+(*module RevEngineering = struct
+
+  (* This module is an ugly work in progress. It is supposed to be ugly... *)
+
+  (* Convenience declarations *)
+  let fun_of_call     : lang sxp -> sexp         = R.Internal.inspect_listsxp_carval
+  let args_of_call    : lang sxp -> pairlist sxp = R.Internal.inspect_listsxp_cdrval
+  let car_of_pairlist : pairlist sxp -> sexp     = R.Internal.inspect_listsxp_carval
+  let cdr_of_pairlist : pairlist sxp -> sexp     = R.Internal.inspect_listsxp_cdrval
+
+  let rec promiseArgs (args : pairlist sexp) =
+    (* promiseArgs is called by eval on the list of arguments of the call. *)
+    match sexptype args with | NilSxp -> null_creator () | _ ->
+    let 
+    
+
+  let eval (call : lang sxp) =                                               (* call is called e in eval.c *)
+    (* In eval.c, there are dynamic type checks and different behaviours
+       depending on whether the functions are symbols or else... We ajust
+       it to our own use case: it's a symbol. *)
+    let (f : clos sxp = R.findfun (fun_of_call call) in                           (* f is called op in eval.c *)
+    (* Subsequently, we'll be assuming that f is a CLOSXP, conforming to
+       our use case. *)
+    let args : pairlist sxp = args_of_call call
+
+end*)
