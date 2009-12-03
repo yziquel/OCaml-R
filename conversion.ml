@@ -16,7 +16,7 @@ let lisplist_of_list (l: (sexp * sexp) list) =
 
 external cons : sexp -> sexp -> sexp = "r_cons"
 external tag : sexp -> string -> unit = "r_tag"
-external set_langsxp : sexp -> unit = "r_langsxp"
+external set_langsxp : sexp -> unit = "r_set_langsxp"
 
 let langsxp (f: sexp) (args: (string option * sexp) list) : lang sxp =
   let lcons hd tl = let x = cons hd tl in set_langsxp x; x in
