@@ -7,6 +7,7 @@ external promise_args : pairlist sxp -> sexp = "r_reveng_promise_args"
 type context
 external begin_context : int -> sexp -> sexp -> sexp -> sexp -> sexp -> context =
   "r_reveng_begin_context_bytecode" "r_reveng_begin_context_native"
+external end_context : context -> unit = "r_reveng_end_context"
 external match_args : pairlist sxp -> pairlist sxp -> lang sxp -> sexp = "r_reveng_match_args"
 external new_environment : sexp -> sexp -> sexp -> sexp = "r_reveng_new_environment"
 external mkPROMISE : sexp -> sexp -> sexp = "r_reveng_mkPROMISE"
@@ -36,7 +37,8 @@ let rec ml_apply_closure call closure arglist rho supplied_env =
       try ignore (List.find begin function (t, _) -> sexp_equality tag t end
         (list_of_lisplist actuals))
       with Not_found -> define_var tag v new_rho
-      end (list_of_lisplist (inspect_envsxp_frame supplied_env)) end 
+      end (list_of_lisplist (inspect_envsxp_frame supplied_env)) end;
+  end_context cntxt 
 
 let rec ml_unsafe_eval call =
   print_endline "Entering ml_unsafe_eval."; 

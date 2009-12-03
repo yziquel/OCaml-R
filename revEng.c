@@ -13,7 +13,56 @@ CAMLprim value r_reveng_promise_args (value args) {
   CAMLreturn(Val_sexp(Rf_promiseArgs(Sexp_val(args), R_GlobalEnv)));
 }
 
-/* Copy-pasted from Defn.h. */
+/* Following context definitions are copy-pasted from Defn.h. */
+
+#include <setjmp.h>
+
+//#ifdef HAVE_POSIX_SETJMP
+# define SIGJMP_BUF sigjmp_buf
+# define SIGSETJMP(x,s) sigsetjmp(x,s)
+# define SIGLONGJMP(x,i) siglongjmp(x,i)
+# define JMP_BUF sigjmp_buf
+# define SETJMP(x) sigsetjmp(x,0)
+# define LONGJMP(x,i) siglongjmp(x,i)
+//#else
+//# define SIGJMP_BUF jmp_buf
+//# define SIGSETJMP(x,s) setjmp(x)
+//# define SIGLONGJMP(x,i) longjmp(x,i)
+//# define JMP_BUF jmp_buf
+//# define SETJMP(x) setjmp(x)
+//# define LONGJMP(x,i) longjmp(x,i)
+//#endif
+
+
+/* Evaluation Context Structure */
+typedef struct RCNTXT {
+    struct RCNTXT *nextcontext; /* The next context up the chain */
+    int callflag;               /* The context "type" */
+    JMP_BUF cjmpbuf;            /* C stack and register information */
+    int cstacktop;              /* Top of the pointer protection stack */
+    int evaldepth;              /* evaluation depth at inception */
+    SEXP promargs;              /* Promises supplied to closure */
+    SEXP callfun;               /* The closure called */
+    SEXP sysparent;             /* environment the closure was called from */
+    SEXP call;                  /* The call that effected this context*/
+    SEXP cloenv;                /* The environment */
+    SEXP conexit;               /* Interpreted "on.exit" code */
+    void (*cend)(void *);       /* C "on.exit" thunk */
+    void *cenddata;             /* data for C "on.exit" thunk */
+    void *vmax;                 /* top of R_alloc stack */
+    int intsusp;                /* interrupts are suspended */
+    SEXP handlerstack;          /* condition handler stack */
+    SEXP restartstack;          /* stack of available restarts */
+    struct RPRSTACK *prstack;   /* stack of pending promises */
+//#ifdef BYTECODE
+//    SEXP *nodestack;
+//# ifdef BC_INT_STACK
+//    IStackval *intstack;
+//# endif
+//#endif
+    SEXP srcref;                /* The source line in effect */
+} RCNTXT, *context;
+
 /* The Various Context Types.
 
  * In general the type is a bitwise OR of the values below.
