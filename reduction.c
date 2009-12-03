@@ -1,3 +1,10 @@
+/**********************************************************************
+ *                                                                    *
+ *                   Beta reduction of R calls.                       *
+ *                                                                    *
+ **********************************************************************/
+
+
 CAMLprim value r_eval_sxp (value sexp_list) {
 
   /* sexp_list is an OCaml value containing a SEXP of sexptype LANGSXP.
@@ -33,3 +40,36 @@ CAMLprim value r_apply_closure ( value call, value op, value arglist) {
     Sexp_val(arglist), R_GlobalEnv, R_BaseEnv)));
 }
 
+/**********************************************************************
+ *                                                                    *
+ *                  Execution of R expressions.                       *
+ *                                                                    *
+ **********************************************************************/
+
+/* The function below has been commented, because it should be a
+   combination of a parsing function and of an eval function. */
+
+//CAMLprim value r_sexp_of_string (value expression) {
+//
+//  /* This function makes use of the camlrtmp symbol. We'd like
+//     to create a function with similar semantics which does not
+//     populate the symbols table. */
+//
+//  CAMLparam1(expression);
+//  char* c_name = "camlrtmp";
+//  char* s_exp;
+//  CAMLlocal1(result);
+//  SEXP e, tmp;
+//  int hadError;
+//  ParseStatus status;
+//
+//  asprintf(&s_exp, "%s = %s", c_name, String_val(expression));
+//  PROTECT(tmp = mkString(s_exp));
+//  PROTECT(e = R_ParseVector(tmp, 1, &status, R_NilValue));
+//  /* PrintValue(e); DEBUG */
+//  R_tryEval(VECTOR_ELT(e,0), R_GlobalEnv, &hadError);
+//  UNPROTECT(2);
+//  free(s_exp);
+//  result = r_sexp_of_symbol(caml_copy_string(c_name));
+//  CAMLreturn(result);
+//}
