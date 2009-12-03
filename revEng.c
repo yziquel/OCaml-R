@@ -71,6 +71,11 @@ CAMLprim value r_global_context (value unit) {
   CAMLreturn(result);
 }
 
+CAMLprim value inspect_context_callflag (value cntxt) {
+  CAMLparam1(cntxt);
+  CAMLreturn(Val_int(((context) Field(cntxt, 0))->callflag));
+}
+
 CAMLprim value inspect_context_callfun (value cntxt) {
   CAMLparam1(cntxt);
   CAMLreturn(Val_sexp(((context) Field(cntxt, 0))->callfun));

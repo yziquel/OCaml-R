@@ -6,6 +6,7 @@ external unsafe_eval : lang sxp -> sexp = "r_reveng_eval_sxp"
 external promise_args : pairlist sxp -> sexp = "r_reveng_promise_args"
 type context
 external global_context : unit -> context = "r_global_context"
+external inspect_context_callflag : context -> int = "inspect_context_callflag"
 external inspect_context_callfun : context -> sexp = "inspect_context_callfun"
 external inspect_context_sysparent : context -> sexp = "inspect_context_sysparent"
 external begin_context : int -> sexp -> sexp -> sexp -> sexp -> sexp -> context =
@@ -42,7 +43,7 @@ let rec ml_apply_closure call closure arglist rho supplied_env =
       with Not_found -> define_var tag v new_rho
       end (list_of_lisplist (inspect_envsxp_frame supplied_env)) end;
   end_context cntxt;
-  let sysparent = begin match inspect_context_callfun (global_context ()) with
+  let sysparent = begin match inspect_context_callflag (global_context ()) with
                   | (* CTXT_GENERIC = *) 20 -> inspect_context_sysparent (global_context ())
                   | _ -> rho end in
   let cntxt = begin_context (* CTXT_RETURN = *) 12 call new_rho sysparent arglist closure in 
