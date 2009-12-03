@@ -12,5 +12,5 @@ let opt f name x = match x with
   | None -> None
   | Some xx -> Some ((Some name), (f xx))
 
-let eval phi (args: (string option * sexp) list) =
-  eval_langsxp (langsxp phi args)
+let eval phi (args: (string option * sexp) option list) =
+  eval_langsxp (langsxp phi (prepare_args args))
