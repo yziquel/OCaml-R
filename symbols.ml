@@ -1,6 +1,3 @@
-open Sexptype
-open Data
-
 type 'a symbol = string
 
 (* There's a lot of stuff concerning symbols and environments in the

@@ -1,5 +1,3 @@
-open R_Env
-
 (* Functions to initialise and terminate the R interpreter. *)
 
 external init_r : string array -> int -> int = "init_r"

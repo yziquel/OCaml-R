@@ -1,8 +1,3 @@
-open Sexptype
-open Sexprec
-open Read_internal
-open Conversion
-
 module type Types = sig
 
   type t

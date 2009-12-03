@@ -1,5 +1,3 @@
-open Sexptype
-
 external sexp_equality : sexp -> sexp -> bool = "r_sexp_equality"
 
 (* R constants - global symbols in libR.so. *)

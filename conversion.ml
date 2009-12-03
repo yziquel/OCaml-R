@@ -1,9 +1,3 @@
-open Sexptype
-open Data
-open Allocation
-open Read_internal
-open Write_internal
-
 let rec list_of_lisplist (ll : 'a lisplist sxp) =
   match sexptype ll with
   | NilSxp -> []   (* Typing will have to take into account that NULL is a list. *)

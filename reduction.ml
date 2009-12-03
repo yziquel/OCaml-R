@@ -1,7 +1,3 @@
-open Sexptype
-open Data
-open Conversion
-
 external eval_string : string -> sexp = "r_sexp_of_string"
 
 external eval_langsxp : lang sxp -> sexp = "r_eval_sxp"

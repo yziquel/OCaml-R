@@ -1,5 +1,3 @@
-open Sexptype
-
 (* Inspection functions. *)
 
 external inspect_primsxp_offset  : builtin sxp -> int = "inspect_primsxp_offset"
