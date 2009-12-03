@@ -19,6 +19,8 @@ external set_missing : sexp -> int -> unit = "r_reveng_SET_MISSING"
 external define_var : sexp -> sexp -> sexp -> unit = "r_reveng_define_var"
 external apply_closure : lang sxp -> clos sxp -> pairlist sxp -> sexp = "r_apply_closure"
 
+exception Feedback of string * sexp
+
 let rec ml_apply_closure call closure arglist rho supplied_env =
   let formals   = inspect_closxp_formals closure in
   let body      = inspect_closxp_body    closure in
@@ -69,6 +71,6 @@ and ml_unsafe_eval call rho =
    (* | BuiltinSxp -> *)
       | CloSxp -> let pr_args = promise_args (inspect_listsxp_cdrval call) in
                   ml_apply_closure call op pr_args rho (base_env_creator ())
-      | _ -> failwith ("Attempt to apply non-function. Sexptype: "^(string_of_sexptype (sexptype op))^".")
+      | _ -> raise (Feedback ("Attempt to apply non-function.", op)) 
       end
   | _ -> failwith "Wrong sexptype for call."
