@@ -1,0 +1,23 @@
+#use "topfind";;
+#require "unix";;
+#load "r.cma";;
+#load "oCamlR.cma";;
+
+open R;;
+
+let show x = (Pretty.t_of_sexp x);;
+open R.PrettyTypes;;
+
+let x1 = parse_sexp "str(lm)";;
+let x1_f = findfun (fun_of_call x);;
+let x1_args = args_of_call x;;
+let x1_prom_args = promiseArgs x_args;;
+
+let x2 = parse_sexp "ls(n, pos = -1, envir = as.environment(-1), all.names = FALSE, \"n\")";;
+
+let x3 = parse_sexp "rnorm(20, mean = 2, sd = 1)";;
+
+let str = R.force (R.symbol "str");;
+let lm = R.force (R.symbol "lm");;
+
+let z = R.langsxp_of_list [str; lm] 2;;

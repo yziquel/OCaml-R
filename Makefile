@@ -1,113 +1,56 @@
-#################################################################################
-#                OCaml-R                                                        #
-#                                                                               #
-#    Copyright (C) 2008-2009 Institut National de Recherche en                  #
-#    Informatique et en Automatique. All rights reserved.                       #
-#                                                                               #
-#    This program is free software; you can redistribute it and/or modify       #
-#    it under the terms of the GNU General Public License as                    #
-#    published by the Free Software Foundation; either version 3 of the         #
-#    License, or  any later version.                                            #
-#                                                                               #
-#    This program is distributed in the hope that it will be useful,            #
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of             #
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              #
-#    GNU Library General Public License for more details.                       #
-#                                                                               #
-#    You should have received a copy of the GNU General Public                  #
-#    License along with this program; if not, write to the Free Software        #
-#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA                   #
-#    02111-1307  USA                                                            #
-#                                                                               #
-#    Contact: Maxence.Guesdon@inria.fr                                          #
-#                                                                               #
-#################################################################################
+RLIBDIR=/usr/lib/R/lib
+RINCLUDES=-I . -I /usr/share/R/include
+INCLUDES=       -I +ocamldoc -I `ocamlc -where`/caml $(RINCLUDES)
 
-include master.Makefile
+COMPFLAGS=$(INCLUDES)
+LINKFLAGS=$(INCLUDES) -ccopt -L$(RLIBDIR) -cclib -lR
+LINKFLAGS_BYTE=$(INCLUDES) -ccopt -L$(RLIBDIR)  -cclib -lR
 
-# Compilation
-#############
+all: build
 
-first: src
-all:
-	cd src && $(MAKE) all
+build: r.cma r.cmxa oCamlR.cma oCamlR.cmxa
 
-src: dummy
-	cd src && $(MAKE)
+r.cma: dllr_stubs.so camlobjs
+	ocamlc -a -dllpath /usr/lib/R/lib -dllib dllr_stubs.so -dllib libR.so -o r.cma r_Env.cmo standard.cmo initialisation.cmo sexptype.cmo sexprec.cmo data.cmo allocation.cmo read_internal.cmo write_internal.cmo symbols.cmo conversion.cmo internal.cmo reduction.cmo parser.cmo revEng.cmo r.cmo
 
-re : depend clean all
+r.cmxa: dllr_stubs.so camlobjs
+	ocamlopt -a -ccopt -L/usr/lib/R/lib -cclib -lr_stubs -cclib -lR -o r.cmxa r_Env.cmx standard.cmx initialisation.cmx sexptype.cmx sexprec.cmx data.cmx allocation.cmx read_internal.cmx write_internal.cmx symbols.cmx conversion.cmx internal.cmx reduction.cmx parser.cmx revEng.cmx r.cmx
 
+oCamlR.cma: camlobjs
+	ocamlc -a -o oCamlR.cma oCamlR.cmo
 
-# Documentation :
-#################
-doc: dummy
-	cd src && $(MAKE) doc
+oCamlR.cmxa: camlobjs
+	ocamlopt -a -o oCamlR.cmxa oCamlR.cmx
 
-# myself
+camlobjs: standard.ml
+	ocamlbuild -classic-display -no-hygiene r_Env.cmo standard.cmo initialisation.cmo sexptype.cmo sexprec.cmo data.cmo allocation.cmo read_internal.cmo write_internal.cmo symbols.cmo conversion.cmo internal.cmo reduction.cmo parser.cmo revEng.cmo r.cmo r_Env.cmx standard.cmx initialisation.cmx sexptype.cmx sexprec.cmx data.cmx allocation.cmx read_internal.cmx write_internal.cmx symbols.cmx conversion.cmx internal.cmx reduction.cmx parser.cmx revEng.cmx r.cmx r.cmi oCamlR.cmo oCamlR.cmx oCamlR.cmi sexptype.cmi data.cmi
+	cp _build/*.cmo .
+	cp _build/*.cmx .
+	cp _build/r.cmi .
+	cp _build/oCamlR.cmi .
+	cp _build/sexptype.cmi .
+	cp _build/data.cmi .
+	cp _build/*.o .
 
-master.Makefile: master.Makefile.in config.status
-	./config.status
+standard.ml: standard.R
+	R --silent --vanilla --slave < standard.R > standard.ml
 
-config.status: configure master.Makefile.in
-	./config.status --recheck
+r_stubs.o: r_stubs.c
+	ocamlopt -ccopt -Wall $(COMPFLAGS) -ccopt -fPIC -c $<
 
-configure: configure.in
-	autoconf
+libr_stubs.a: r_stubs.o
+	ar rcs libr_stubs.a r_stubs.o
 
-# headers :
-###########
-HEADFILES= configure.in configure \
-	master.Makefile.in Makefile \
-	src/*.ml src/*.mli src/*.mll src/*.mly src/*.in src/*.c \
-	src/Makefile checkocaml.ml
-headers: dummy
-	echo $(HEADFILES)
-	headache -h header -c .headache_config `ls $(HEADFILES)`
+dllr_stubs.so: libr_stubs.a r_stubs.o
+	ocamlmklib -o r_stubs r_stubs.o
 
-noheaders: dummy
-	headache -r -c .headache_config `ls $(HEADFILES)`
+debug:
+	ocamlbuild -tag debug r.cma
 
-# backup, clean and depend :
-############################
+clean:
+	rm -f standard.ml
+	rm -f *.o *.so *.a *.cmi *.cmo *.cmx *.cma *.cmxa
+	ocamlbuild -clean
 
-distclean: clean
-	cd src && $(MAKE) distclean
-	$(RM) config.cache config.log config.status configure.lineno config.status.lineno
-	$(RM) master.Makefile
-	$(RM) config_check.log ocaml_config.sh
-	$(RM) autom4te.cache
-#	cd utils && $(MAKE) distclean
-#	cd doc && $(MAKE) distclean
-
-clean:: dummy
-	$(RM) *~ \#*\#
-	cd src && $(MAKE) clean
-#	cd utils && $(MAKE) clean
-#	cd doc && $(MAKE) clean
-
-
-depend: dummy
-	cd src && $(MAKE) depend
-
-dummy:
-
-#################
-# code count
-#################
-codecount:
-	@echo `cat src/*.ml src/*.mli | wc -l` lines
-
-
-#################
-# installation
-#################
-
-install: dummy
-	cd src && $(MAKE) install
-
-
-###########################
-# additional dependencies
-###########################
-
-# DO NOT DELETE
+test: build
+	ocaml -init ocamlinit
