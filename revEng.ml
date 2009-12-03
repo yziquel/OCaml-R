@@ -5,6 +5,8 @@
 external unsafe_eval : lang sxp -> sexp = "r_reveng_eval_sxp"
 external promise_args : pairlist sxp -> sexp = "r_reveng_promise_args"
 type context
+external global_context : unit -> context = "r_global_context"
+external inspect_context_callfun : context -> sexp = "inspect_context_callfun"
 external begin_context : int -> sexp -> sexp -> sexp -> sexp -> sexp -> context =
   "r_reveng_begin_context_bytecode" "r_reveng_begin_context_native"
 external end_context : context -> unit = "r_reveng_end_context"

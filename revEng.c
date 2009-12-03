@@ -63,6 +63,19 @@ typedef struct RCNTXT {
     SEXP srcref;                /* The source line in effect */
 } RCNTXT, *context;
 
+CAMLprim value r_global_context (value unit) {
+  CAMLparam1(unit);
+  CAMLlocal1(result);
+  result = caml_alloc(1, Abstract_tag);
+  Field(result, 0) = (value) R_GlobalContext;
+  CAMLreturn(result);
+}
+
+CAMLprim value inspect_context_callfun (value cntxt) {
+  CAMLparam1(cntxt);
+  CAMLreturn(Val_sexp(((context) Field(cntxt, 0))->callfun));
+}
+
 /* The Various Context Types.
 
  * In general the type is a bitwise OR of the values below.
