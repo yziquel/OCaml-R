@@ -6,7 +6,10 @@ COMPFLAGS=$(INCLUDES)
 LINKFLAGS=$(INCLUDES) -ccopt -L$(RLIBDIR) -cclib -lR
 LINKFLAGS_BYTE=$(INCLUDES) -ccopt -L$(RLIBDIR)  -cclib -lR
 
+FLAVOUR=INTERNAL
+
 all: build
+	echo $(FLAVOUR)
 
 build: r.cma r.cmxa oCamlR.cma oCamlR.cmxa
 

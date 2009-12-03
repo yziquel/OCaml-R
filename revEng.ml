@@ -18,10 +18,27 @@ external mkPROMISE : sexp -> sexp -> sexp = "r_reveng_mkPROMISE"
 external set_missing : sexp -> int -> unit = "r_reveng_SET_MISSING"
 external define_var : sexp -> sexp -> sexp -> unit = "r_reveng_define_var"
 external apply_closure : lang sxp -> clos sxp -> pairlist sxp -> sexp = "r_apply_closure"
+external pointer_protection_stack_top : unit -> int = "r_reveng_PPStackTop"
+type ccode
+external primfun : sexp -> ccode = "r_reveng_PRIMFUN"
+external execute_primfun : ccode -> sexp -> sexp -> sexp -> sexp -> sexp = "r_reveng_execute_primfun" 
+(*external primprint : sexp -> int = "r_reveng_PRIMPRINT"*)
+type protection_pointer
+external vmaxget : unit -> protection_pointer = "r_reveng_vmaxget"
+external vmaxset : protection_pointer -> unit = "r_reveng_vmaxset" 
 
 exception Feedback of string * sexp
 
+type trace_element = Val of sexp
+let trace_stack : trace_element list ref = ref []
+let clear_trace () = trace_stack := []
+let track x = trace_stack := x::!trace_stack
+let trace () = List.map begin function
+  | Val x -> Pretty.t_of_sexp x
+  end !trace_stack
+
 let rec ml_apply_closure call closure arglist rho supplied_env =
+  track (Val closure);
   let formals   = inspect_closxp_formals closure in
   let body      = inspect_closxp_body    closure in
   let saved_rho = inspect_closxp_env     closure in
@@ -55,6 +72,7 @@ let rec ml_apply_closure call closure arglist rho supplied_env =
   tmp
 
 and ml_unsafe_eval call rho =
+  track (Val call);
   print_endline "Entering ml_unsafe_eval.";
   (*let srcrefsave = R.srcref_creator () *)
   (* int depthsave = R_EvalDepth++; *)
@@ -67,10 +85,18 @@ and ml_unsafe_eval call rho =
                | _      -> ml_unsafe_eval (inspect_listsxp_carval call) rho
                end in
       begin match sexptype op with
-   (* | SpecialSxp -> *)
+      | SpecialSxp -> let save = pointer_protection_stack_top () in
+                      (* let flag = primprint op*) (* We do not care about R
+                         autoprinting stuff at the moment. *)
+                      let vmax = vmaxget () in
+                      (* We forget PROTECT for now... *)
+                      (* We do not care about Visibility... *)
+                      let tmp = execute_primfun (primfun op) call op (inspect_listsxp_cdrval op) rho in
+                      vmaxset vmax;
+                      tmp
    (* | BuiltinSxp -> *)
-      | CloSxp -> let pr_args = promise_args (inspect_listsxp_cdrval call) in
-                  ml_apply_closure call op pr_args rho (base_env_creator ())
+      | CloSxp     -> let pr_args = promise_args (inspect_listsxp_cdrval call) in
+                      ml_apply_closure call op pr_args rho (base_env_creator ())
       | _ -> raise (Feedback ("Attempt to apply non-function.", op)) 
       end
   | _ -> failwith "Wrong sexptype for call."

@@ -10,4 +10,4 @@ external force_promsxp : prom sxp -> sexp = "r_eval_sxp"
 
 let force : 'a promise -> 'a t = force_promsxp
 
-let mlfun (f: ('a -> 'b) t) (x: 'a) : 'b t = eval [f; x]
+let mlfun (f: ('a -> 'b) t) (x: 'a t) : 'b t = eval [f; x]

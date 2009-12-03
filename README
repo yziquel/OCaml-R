@@ -1,0 +1,13 @@
+OCaml-R comes into two different flavours:
+
+You can compile the first flavour, which compiles against
+the official API for R, by issuing the following command:
+
+           make FLAVOUR=DEFAULT
+
+You can compile the second flavour, which accesses all the
+symbols from libR.so (thus requiring a libR.so which doesn't
+hide symbols, i.e. NOT the official R API) by issuing the
+following command:
+
+           make FLAVOUR=INTERNAL
