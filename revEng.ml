@@ -21,11 +21,11 @@ let rec ml_apply_closure call closure arglist =
     if (sexp_equality (inspect_listsxp_carval !actuals_cursor) (missing_arg_creator ()))
     && (not (sexp_equality value (missing_arg_creator ())))
     then begin
-      write_lisplist_carval !actuals_cursor (mkPROMISE value new_rho);
+      write_listsxp_carval !actuals_cursor (mkPROMISE value new_rho);
       set_missing !actuals_cursor 2
     end;
-    actuals_cursor := inspect_lisplist_cdrval !actuals_cursor
-  end (list_of_listsxp formals)
+    actuals_cursor := inspect_listsxp_cdrval !actuals_cursor
+  end (list_of_lisplist formals)
 
 let rec ml_unsafe_eval call =
   print_endline "Entering ml_unsafe_eval."; 

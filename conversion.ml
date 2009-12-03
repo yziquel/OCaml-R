@@ -10,7 +10,7 @@ let lisplist_of_list (l: (sexp * sexp) list) =
   let r_l = alloc_list (List.length l) in
   let cursor = ref r_l in List.iter
   begin function (tag, value) ->
-    let () = write_lisplist_element !cursor tag value in
+    let () = write_listsxp_element !cursor tag value in
     cursor := inspect_listsxp_cdrval !cursor
   end l; r_l
 

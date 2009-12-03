@@ -33,7 +33,7 @@ CAMLprim value r_reveng_mkPROMISE (value expr, value rho) {
 
 void (SET_MISSING) (SEXP x, int v);
 CAMLprim value r_reveng_SET_MISSING (value x, value v){
-  CAMLparam2(expr, rho);
+  CAMLparam2(x, v);
   (SET_MISSING) (Sexp_val(x), Int_val(v));
   CAMLreturn(Val_unit);
 }
