@@ -1,1 +1,0 @@
-let symbol : 'a symbol -> 'a t
