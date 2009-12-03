@@ -48,11 +48,11 @@ let rec ml_apply_closure call closure arglist rho supplied_env =
                   | _ -> rho end in
   let cntxt = begin_context (* CTXT_RETURN = *) 12 call new_rho sysparent arglist closure in
   (* We will have to reimplement the SETJMP in the source code. *)
-  let tmp = ml_eval body new_rho in
+  let tmp = ml_unsafe_eval body new_rho in
   end_context cntxt;
   tmp
 
-let rec ml_unsafe_eval call rho =
+and ml_unsafe_eval call rho =
   print_endline "Entering ml_unsafe_eval.";
   (*let srcrefsave = R.srcref_creator () *)
   (* int depthsave = R_EvalDepth++; *)
