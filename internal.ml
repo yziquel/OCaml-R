@@ -59,7 +59,7 @@ module CTypes = struct
     | SPECIALSXP
     | BUILTINSXP of int
     | CHARSXP of string
-    | LGLSXP
+    | LGLSXP of bool list
     | INTSXP of int list
     | REALSXP
     | CPLXSXP
@@ -113,7 +113,7 @@ module CTypes = struct
     | SpecialSxp -> Val { content = SPECIALSXP }
     | BuiltinSxp -> Val { content = BUILTINSXP (inspect_primsxp_offset s)}
     | CharSxp    -> Val { content = CHARSXP (string_of_charsxp s) }
-    | LglSxp     -> Val { content = LGLSXP }
+    | LglSxp     -> Val { content = LGLSXP (bool_list_of_lgl_vecsxp s)}
     | IntSxp     -> Val { content = INTSXP (int_list_of_int_vecsxp s)}
     | RealSxp    -> Val { content = REALSXP }
     | CplxSxp    -> Val { content = CPLXSXP }
@@ -150,10 +150,11 @@ module PrettyTypes = struct
     | STRINGS of string list
     | INT of int list
     | VECSXP of t list
+    | BOOL of bool list
     | Unknown
 
   and closure     = { formals: t; (* body: t; *) clos_env: t }
-  and environment = { frame: t; (* enclos: t; *) hashtab: t }
+  and environment = { frame: t; (* enclos: t; hashtab: t *) }
   and promise     = { value: t; expr: t; prom_env: t }
 
   and pairlist = (t * t) list (* For strict list parsing, t list. *)
@@ -219,7 +220,7 @@ module PrettyTypes = struct
     | EnvSxp     -> ENV {
         frame   = rec_build (inspect_envsxp_frame   s);
      (* enclos  = rec_build (inspect_envsxp_enclos  s); *) (* We do not care for now. *)
-        hashtab = rec_build (inspect_envsxp_hashtab s)}
+     (* hashtab = rec_build (inspect_envsxp_hashtab s)  *) }
     | PromSxp    -> PROMISE {
         value    = rec_build (inspect_promsxp_value s);
         expr     = rec_build (inspect_promsxp_expr  s);
@@ -235,15 +236,15 @@ module PrettyTypes = struct
         | _ -> Unknown end
     | SpecialSxp -> SPECIAL
     | BuiltinSxp -> BUILTIN
-    | CharSxp    -> STRING (string_of_charsxp s)
-    | LglSxp     -> Unknown
-    | IntSxp     -> INT (int_list_of_int_vecsxp s)
+    | CharSxp    -> STRING  (string_of_charsxp s)
+    | LglSxp     -> BOOL    (bool_list_of_lgl_vecsxp s)
+    | IntSxp     -> INT     (int_list_of_int_vecsxp s)
     | RealSxp    -> Unknown
     | CplxSxp    -> Unknown
     | StrSxp     -> STRINGS (string_list_of_str_vecsxp s)
     | DotSxp     -> Unknown
     | AnySxp     -> Unknown
-    | VecSxp     -> VECSXP (List.map rec_build (sexp_list_of_sexp_vecsxp s))
+    | VecSxp     -> VECSXP  (List.map rec_build (sexp_list_of_sexp_vecsxp s))
     | ExprSxp    -> Unknown
     | BcodeSxp   -> Unknown
     | ExtptrSxp  -> Unknown

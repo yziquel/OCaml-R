@@ -116,6 +116,11 @@ CAMLprim value inspect_promsxp_env (value sexp) {
   CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.env));
 }
 
+CAMLprim value r_access_lgl_vecsxp (value lglsxp, value offset) {
+  CAMLparam2(lglsxp, offset);
+  CAMLreturn(Val_bool(LOGICAL((int *) Vecsexp_val(lglsxp))[Int_val(offset)]));
+}
+
 CAMLprim value r_access_int_vecsxp (value intsxp, value offset) {
   CAMLparam2(intsxp, offset);
   /* The R macro is #define INTEGER(x) ((int *) DATAPTR(x)).

@@ -24,6 +24,7 @@ external inspect_promsxp_env     : prom sxp -> sexp = "inspect_promsxp_env"
 
 external length_of_vecsxp : 'a vecsxp -> int = "inspect_vecsxp_length"
 
+external access_lgl_vecsxp  : vec_lgl  sxp -> int -> bool   = "r_access_lgl_vecsxp"
 external access_int_vecsxp  : vec_int  sxp -> int -> int    = "r_access_int_vecsxp"
 external access_str_vecsxp  : vec_str  sxp -> int -> string = "r_access_str_vecsxp"
 external access_sexp_vecsxp : vec_sexp sxp -> int -> sexp   = "r_access_sexp_vecsxp"

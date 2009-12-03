@@ -19,7 +19,8 @@ type builtin                     (* For BUILTINSXP *)
 type 'a vec                      (* For all the VECSXPs *)
 type 'a vecsxp = 'a vec sxp
 type vec_char = char vec         (* For CHARSXP *)
-type vec_int  = int vec          (* For INTSXP *)
+type vec_lgl  = bool vec         (* For LGLSXP *)
+type vec_int  = int  vec         (* For INTSXP *)
     (* Or shouldn't it be int32 vec ? *)
 type vec_str  = string vec       (* For STRSXP *)
 type vec_sexp = sexp vec
