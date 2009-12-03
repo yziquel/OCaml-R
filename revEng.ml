@@ -6,6 +6,8 @@ external unsafe_eval : lang sxp -> sexp = "r_reveng_eval_sxp"
 external promise_args : pairlist sxp -> sexp = "r_reveng_promise_args"
 external match_args : pairlist sxp -> pairlist sxp -> lang sxp -> sexp = "r_reveng_match_args"
 external new_environment : sexp -> sexp -> sexp -> sexp = "r_reveng_new_environment"
+external mkPROMISE : sexp -> sexp -> sexp = "r_reveng_mkPROMISE"
+external set_missing : sexp -> int -> unit = "r_reveng_SET_MISSING"
 external apply_closure : lang sxp -> clos sxp -> pairlist sxp -> sexp = "r_apply_closure"
 
 let rec ml_apply_closure call closure arglist =
@@ -19,7 +21,10 @@ let rec ml_apply_closure call closure arglist =
     if (sexp_equality (inspect_listsxp_carval !actuals_cursor) (missing_arg_creator ()))
     && (not (sexp_equality value (missing_arg_creator ())))
     then begin
-    end
+      write_lisplist_carval !actuals_cursor (mkPROMISE value new_rho);
+      set_missing !actuals_cursor 2
+    end;
+    actuals_cursor := inspect_lisplist_cdrval !actuals_cursor
   end (list_of_listsxp formals)
 
 let rec ml_unsafe_eval call =

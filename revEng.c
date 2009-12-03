@@ -25,6 +25,18 @@ CAMLprim value r_reveng_new_environment (value namelist, value valuelist, value 
   CAMLreturn(Val_sexp(Rf_NewEnvironment(Sexp_val(namelist), Sexp_val(valuelist), Sexp_val(rho))));
 }
 
+SEXP Rf_mkPROMISE (SEXP expr, SEXP rho);
+CAMLprim value r_reveng_mkPROMISE (value expr, value rho) {
+  CAMLparam2(expr, rho);
+  CAMLreturn(Val_sexp(Rf_mkPROMISE(Sexp_val(expr), Sexp_val(rho))));
+}
+
+void (SET_MISSING) (SEXP x, int v);
+CAMLprim value r_reveng_SET_MISSING (value x, value v){
+  CAMLparam2(expr, rho);
+  (SET_MISSING) (Sexp_val(x), Int_val(v));
+  CAMLreturn(Val_unit);
+}
 
 /*************************************************************************/
 
