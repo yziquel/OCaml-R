@@ -76,6 +76,11 @@ CAMLprim value inspect_context_callfun (value cntxt) {
   CAMLreturn(Val_sexp(((context) Field(cntxt, 0))->callfun));
 }
 
+CAMLprim value inspect_context_sysparent (value cntxt) {
+  CAMLparam1(cntxt);
+  CAMLreturn(Val_sexp(((context) Field(cntxt, 0))->sysparent));
+}
+
 /* The Various Context Types.
 
  * In general the type is a bitwise OR of the values below.
