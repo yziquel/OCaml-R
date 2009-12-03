@@ -13,6 +13,52 @@ CAMLprim value r_reveng_promise_args (value args) {
   CAMLreturn(Val_sexp(Rf_promiseArgs(Sexp_val(args), R_GlobalEnv)));
 }
 
+/* Copy-pasted from Defn.h. */
+/* The Various Context Types.
+
+ * In general the type is a bitwise OR of the values below.
+ * Note that CTXT_LOOP is already the or of CTXT_NEXT and CTXT_BREAK.
+ * Only functions should have the third bit turned on;
+ * this allows us to move up the context stack easily
+ * with either RETURN's or GENERIC's or RESTART's.
+ * If you add a new context type for functions make sure
+ *   CTXT_NEWTYPE & CTXT_FUNCTION > 0
+ */
+enum {
+    CTXT_TOPLEVEL = 0,
+    CTXT_NEXT     = 1,
+    CTXT_BREAK    = 2,
+    CTXT_LOOP     = 3,  /* break OR next target */
+    CTXT_FUNCTION = 4,
+    CTXT_CCODE    = 8,
+    CTXT_RETURN   = 12,
+    CTXT_BROWSER  = 16,
+    CTXT_GENERIC  = 20,
+    CTXT_RESTART  = 32,
+    CTXT_BUILTIN  = 64  /* used in profiling */
+};
+
+void Rf_begincontext (RCNTXT * cptr, int flags, SEXP syscall, SEXP env, SEXP sysp, SEXP promargs, SEXP callfun);
+CAMLprim value r_reveng_begin_context_native (value flags, value syscall, value env, value sysp, value promargs, value callfun) {
+  CAMLparam5(flags, syscall, env, sysp, promargs);
+  CAMLxparam1(callfun);
+  CAMLlocal1(result);
+  result = caml_alloc(1, Abstract_tag);
+  Rf_begincontext ( (context) Field(result, 0), Int_val(flags), Sexp_val(syscall), Sexp_val(env),
+                    Sexp_val(sysp), Sexp_val(promargs), Sexp_val(callfun));
+  CAMLreturn(result);
+}
+CAMLprim value r_reveng_begin_context_bytecode (value * argv, int argn) {
+  return r_reveng_begin_context_native(argv[0], argv[1], argv[2], argv[3], argv[4], argv[5]);
+}
+
+void Rf_endcontext (RCNTXT * cptr);
+CAMLprim value r_reveng_end_context (value ctxt) {
+  CAMLparam1(ctxt);
+  Rf_endcontext((context) Field(ctxt, 0));
+  CAMLreturn(Val_unit);
+} 
+
 SEXP Rf_matchArgs (SEXP formals, SEXP supplied, SEXP call);
 CAMLprim value r_reveng_match_args (value formals, value supplied, value call) {
   CAMLparam3(formals, supplied, call);

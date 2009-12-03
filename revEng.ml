@@ -4,6 +4,9 @@
 
 external unsafe_eval : lang sxp -> sexp = "r_reveng_eval_sxp"
 external promise_args : pairlist sxp -> sexp = "r_reveng_promise_args"
+type context
+external begin_context : int -> sexp -> sexp -> sexp -> sexp -> sexp -> context =
+  "r_reveng_begin_context_bytecode" "r_reveng_begin_context_native"
 external match_args : pairlist sxp -> pairlist sxp -> lang sxp -> sexp = "r_reveng_match_args"
 external new_environment : sexp -> sexp -> sexp -> sexp = "r_reveng_new_environment"
 external mkPROMISE : sexp -> sexp -> sexp = "r_reveng_mkPROMISE"
@@ -11,10 +14,11 @@ external set_missing : sexp -> int -> unit = "r_reveng_SET_MISSING"
 external define_var : sexp -> sexp -> sexp -> unit = "r_reveng_define_var"
 external apply_closure : lang sxp -> clos sxp -> pairlist sxp -> sexp = "r_apply_closure"
 
-let rec ml_apply_closure call closure arglist supplied_env =
+let rec ml_apply_closure call closure arglist rho supplied_env =
   let formals   = inspect_closxp_formals closure in
   let body      = inspect_closxp_body    closure in
   let saved_rho = inspect_closxp_env     closure in
+  let cntxt     = begin_context (* CTXT_RETURN = *) 12 call saved_rho rho arglist closure in  
   let actuals   = match_args formals arglist call in
   let new_rho   = new_environment formals actuals saved_rho in
   let actuals_cursor = ref actuals in
