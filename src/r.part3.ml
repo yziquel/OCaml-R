@@ -634,7 +634,7 @@ module Internal = struct
       | INT of int list
       | Unknown
 
-    and closure     = { formals: t; body: t; clos_env: t }
+    and closure     = { formals: t; (* body: t; *) clos_env: t }
     and environment = { frame: t; (* enclos: t; *) hashtab: t }
     and promise     = { value: t; expr: t; prom_env: t }
 
@@ -694,7 +694,7 @@ module Internal = struct
                       | Esoteric _ -> Unknown end
       | ClosSxp    -> CLOSURE {
           formals  = rec_build (inspect_closxp_formals s);
-          body     = rec_build (inspect_closxp_body    s);
+       (* body     = rec_build (inspect_closxp_body    s); *)
           clos_env = rec_build (inspect_closxp_env     s)}
       | EnvSxp     -> ENV {
           frame   = rec_build (inspect_envsxp_frame   s);
