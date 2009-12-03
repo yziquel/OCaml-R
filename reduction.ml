@@ -7,15 +7,10 @@ let rec prepare_args = function
   | None::l     -> prepare_args l
   | []          -> []
 
-let arg f x = Some (f x)
-let opt f x = match x with
+let arg f ?name x = Some (name, (f x))
+let opt f name x = match x with
   | None -> None
-  | Some xx -> Some (f xx)
+  | Some xx -> Some ((Some name), (f xx))
 
-let eval (l : sexp list) : sexp =
-    (* The typing of l needs to be amended and moved to 'a t stuff. *)
-    eval_langsxp (langsxp_of_list l (List.length l))
-
-let eval phi args =
-  let l = phi::(prepare_args args) in
-  eval_langsxp (langsxp_of_list l (List.length l))
+let eval phi (args: (string option * sexp) list) =
+  eval_langsxp (langsxp phi args)

@@ -14,7 +14,16 @@ let lisplist_of_list (l: (sexp * sexp) list) =
     cursor := inspect_listsxp_cdrval !cursor
   end l; r_l
 
-external langsxp_of_list : sexp list -> int -> lang sxp = "r_langsxp_of_list"
+external cons : sexp -> sexp -> sexp = "r_cons"
+external tag : sexp -> string -> unit = "r_tag"
+external set_langsxp : sexp -> unit = "r_langsxp"
+
+let langsxp (f: sexp) (args: (string option * sexp) list) : lang sxp =
+  let lcons hd tl = let x = cons hd tl in set_langsxp x; x in
+  lcons f begin List.fold_right begin fun (t, hd) tl ->
+    let x = cons hd tl in match t with
+    | None -> x | Some name -> tag x name; x
+  end args (null_creator ()) end
 
 external string_of_charsxp : vec_char sxp -> string = "r_internal_string_of_charsxp"
 
