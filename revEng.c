@@ -93,6 +93,7 @@ CAMLprim value r_reveng_begin_context_native (value flags, value syscall, value 
   CAMLxparam1(callfun);
   CAMLlocal1(result);
   result = caml_alloc(1, Abstract_tag);
+  Field(result, 0) = (value) malloc(sizeof(RCNTXT));
   Rf_begincontext ( (context) Field(result, 0), Int_val(flags), Sexp_val(syscall), Sexp_val(env),
                     Sexp_val(sysp), Sexp_val(promargs), Sexp_val(callfun));
   CAMLreturn(result);
