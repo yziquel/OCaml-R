@@ -8,6 +8,7 @@ external match_args : pairlist sxp -> pairlist sxp -> lang sxp -> sexp = "r_reve
 external new_environment : sexp -> sexp -> sexp -> sexp = "r_reveng_new_environment"
 external mkPROMISE : sexp -> sexp -> sexp = "r_reveng_mkPROMISE"
 external set_missing : sexp -> int -> unit = "r_reveng_SET_MISSING"
+external define_var : sexp -> sexp -> sexp -> unit = "r_reveng_define_var"
 external apply_closure : lang sxp -> clos sxp -> pairlist sxp -> sexp = "r_apply_closure"
 
 let rec ml_apply_closure call closure arglist supplied_env =
@@ -27,7 +28,11 @@ let rec ml_apply_closure call closure arglist supplied_env =
     actuals_cursor := inspect_listsxp_cdrval !actuals_cursor
   end (list_of_lisplist formals);
   begin match sexp_equality supplied_env (null_creator ()) with
-  | true -> () | false -> print_endline "supplied_env isn't NULL. Please develop." end
+  | true -> () | false -> List.iter begin function (tag, v) ->
+      try ignore (List.find begin function (t, _) -> sexp_equality tag t end
+        (list_of_lisplist actuals))
+      with Not_found -> define_var tag v new_rho
+      end (list_of_lisplist (inspect_envsxp_frame supplied_env)) end 
 
 let rec ml_unsafe_eval call =
   print_endline "Entering ml_unsafe_eval."; 

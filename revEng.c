@@ -37,3 +37,10 @@ CAMLprim value r_reveng_SET_MISSING (value x, value v) {
   (SET_MISSING) (Sexp_val(x), Int_val(v));
   CAMLreturn(Val_unit);
 }
+
+void Rf_defineVar (SEXP symbol, SEXP v, SEXP rho);
+CAMLprim value r_reveng_define_var (value symbol, value v, value rho) {
+  CAMLparam3(symbol, v, rho);
+  Rf_defineVar(Sexp_val(symbol), Sexp_val(v), Sexp_val(rho));
+  CAMLreturn(Val_unit);
+}
