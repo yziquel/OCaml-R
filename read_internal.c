@@ -116,3 +116,24 @@ CAMLprim value inspect_promsxp_env (value sexp) {
   CAMLreturn(Val_sexp(Sexp_val(sexp)->u.promsxp.env));
 }
 
+CAMLprim value r_access_int_vecsxp (value intsxp, value offset) {
+  CAMLparam2(intsxp, offset);
+  /* The R macro is #define INTEGER(x) ((int *) DATAPTR(x)).
+     Should use Val_int, or int32s? More generally, the typing
+     is here somewhat confusing (or confused)... Is offset an int? */
+  CAMLreturn(Val_int(INTEGER((int *) Vecsexp_val(intsxp))[Int_val(offset)]));
+}
+
+CAMLprim value r_access_str_vecsxp (value strsxp, value offset) {
+  CAMLparam2(strsxp, offset);
+  /* Same comments as for r_accesas_int_vecsxp and for
+     r_internal_string_of_charsxp. */
+  CAMLreturn(caml_copy_string(CHAR(STRING_ELT(
+    (char **) Vecsexp_val(strsxp), (Int_val(offset))))));
+}
+
+CAMLprim value r_access_sexp_vecsxp (value sexpsxp, value offset) {
+  CAMLparam2(sexpsxp, offset);
+  SEXP * v = (SEXP *) Vecsexp_val(sexpsxp);
+  CAMLreturn(Val_sexp(VECTOR_ELT(v,Int_val(offset))));
+}

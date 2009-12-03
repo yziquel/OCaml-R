@@ -24,17 +24,13 @@ let list_of_vecsxp (access: 'a vecsxp -> int -> 'a) (s: 'a vecsxp) : 'a list =
     (access s (lngth - n))::(aux (n - 1) s)
   in aux lngth s
 
+let int_list_of_int_vecsxp = list_of_vecsxp access_int_vecsxp
+
 let string_list_of_str_vecsxp = list_of_vecsxp access_str_vecsxp
-
 let strings_of_t : string list t -> string list = string_list_of_str_vecsxp
-
 let string_of_t : string t -> string = fun t -> access_str_vecsxp t 0
   (* We access only the first element, because static typing is supposed to
      ensure that the str vecsxp contains only one element. *)
-
 external string : string -> string t = "r_strsxp_of_string"
 
-external access_int_vecsxp : vec_int sxp -> int -> int = "r_access_int_vecsxp"
-
-let int_list_of_int_vecsxp = list_of_vecsxp access_int_vecsxp
-
+let sexp_list_of_sexp_vecsxp = list_of_vecsxp access_sexp_vecsxp

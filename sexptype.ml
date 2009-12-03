@@ -1,27 +1,30 @@
-(* Argument types for the polymorphic 'a sexp type. *)
-type nil                        (* For NILSXP *)
-type 'a sym                     (* For SYMSXP *)
-type 'a lisplist                (* For LISTSXP, and LANGSXP *)
-type simple                     (* For LISTSXP *)
-type pairlist = simple lisplist (* For LISTSXP *)
-type clos                       (* For CLOSXP *)
-type env                        (* For ENVSXP *)
-type prom                       (* For PROMSXP *)
-type call                       (* For LANGSXP *)
-type lang = call lisplist       (* For LANGSXP *)
-type builtin                    (* For BUILTINSXP *)
-type 'a vec                     (* For all the VECSXPs *)
-type vec_char = char vec        (* For CHARSXP *)
-type vec_int = int vec          (* For INTSXP *)
-type vec_str = string vec       (* For STRSXP *)
-  (* Or shouldn't it be int32 vec ? *)
-
 (* Types of wrapped R SEXP values. sxp is a polymorphic type
    wrapping up the monomorphic type sexp *)
 type sexp
-type 'a sxp = sexp
-type 'a vecsxp = 'a vec sxp
 
+(* Argument types for the polymorphic 'a sxp type. *)
+type 'a sxp = sexp
+type nil                         (* For NILSXP *)
+type 'a sym                      (* For SYMSXP *)
+type 'a lisplist                 (* For LISTSXP, and LANGSXP *)
+type simple                      (* For LISTSXP *)
+type pairlist = simple lisplist  (* For LISTSXP *)
+type clos                        (* For CLOSXP *)
+type env                         (* For ENVSXP *)
+type prom                        (* For PROMSXP *)
+type call                        (* For LANGSXP *)
+type lang = call lisplist        (* For LANGSXP *)
+type builtin                     (* For BUILTINSXP *)
+(* Phantom type vec, and phantom subtype vecsxp. *)
+type 'a vec                      (* For all the VECSXPs *)
+type 'a vecsxp = 'a vec sxp
+type vec_char = char vec         (* For CHARSXP *)
+type vec_int  = int vec          (* For INTSXP *)
+    (* Or shouldn't it be int32 vec ? *)
+type vec_str  = string vec       (* For STRSXP *)
+type vec_sexp = sexp vec
+
+(* Algebraic type reflecting R's dynamic typing. *)
 type sexptype =
   | NilSxp
   | SymSxp

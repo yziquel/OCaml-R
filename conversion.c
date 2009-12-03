@@ -19,28 +19,12 @@ CAMLprim value r_charsxp_of_string (value s) {
   CAMLreturn(Val_sexp(charsxp));
 }
 
-CAMLprim value r_access_str_vecsxp (value strsxp, value offset) {
-  CAMLparam2(strsxp, offset);
-  /* Same comments as for r_accesas_int_vecsxp and for
-     r_internal_string_of_charsxp. */
-  CAMLreturn(caml_copy_string(CHAR(STRING_ELT(
-    (char **) Vecsexp_val(strsxp), (Int_val(offset))))));
-}
-
 CAMLprim value r_strsxp_of_string (value s) {
   CAMLparam1(s);
   SEXP strsxp;
   PROTECT(strsxp = mkString(String_val(s)));
   UNPROTECT(1);
   CAMLreturn(Val_sexp(strsxp));
-}
-
-CAMLprim value r_access_int_vecsxp (value intsxp, value offset) {
-  CAMLparam2(intsxp, offset);
-  /* The R macro is #define INTEGER(x) ((int *) DATAPTR(x)).
-     Should use Val_int, or int32s? More generally, the typing
-     is here somewhat confusing (or confused)... Is offset an int? */
-  CAMLreturn(Val_int(INTEGER((int *) Vecsexp_val(intsxp))[Int_val(offset)]));
 }
 
 /* r_langsxp_of_list creates a lisp-like list out of an

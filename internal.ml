@@ -66,7 +66,7 @@ module CTypes = struct
     | STRSXP of string list
     | DOTSXP
     | ANYSXP
-    | VECSXP
+    | VECSXP of t list
     | EXPRSXP
     | BCODESXP
     | EXTPTRSXP
@@ -120,7 +120,7 @@ module CTypes = struct
     | StrSxp     -> Val { content = STRSXP (string_list_of_str_vecsxp s)}
     | DotSxp     -> Val { content = DOTSXP }
     | AnySxp     -> Val { content = ANYSXP }
-    | VecSxp     -> Val { content = VECSXP }
+    | VecSxp     -> Val { content = VECSXP (List.map rec_build (sexp_list_of_sexp_vecsxp s))}
     | ExprSxp    -> Val { content = EXPRSXP }
     | BcodeSxp   -> Val { content = BCODESXP }
     | ExtptrSxp  -> Val { content = EXTPTRSXP }
@@ -149,6 +149,7 @@ module PrettyTypes = struct
     | STRING of string
     | STRINGS of string list
     | INT of int list
+    | VECSXP of t list
     | Unknown
 
   and closure     = { formals: t; (* body: t; *) clos_env: t }
@@ -242,7 +243,7 @@ module PrettyTypes = struct
     | StrSxp     -> STRINGS (string_list_of_str_vecsxp s)
     | DotSxp     -> Unknown
     | AnySxp     -> Unknown
-    | VecSxp     -> Unknown
+    | VecSxp     -> VECSXP (List.map rec_build (sexp_list_of_sexp_vecsxp s))
     | ExprSxp    -> Unknown
     | BcodeSxp   -> Unknown
     | ExtptrSxp  -> Unknown
