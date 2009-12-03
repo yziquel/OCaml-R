@@ -103,9 +103,12 @@ CAMLprim value r_reveng_begin_context_bytecode (value * argv, int argn) {
 }
 
 void Rf_endcontext (RCNTXT * cptr);
-CAMLprim value r_reveng_end_context (value ctxt) {
-  CAMLparam1(ctxt);
-  Rf_endcontext((context) Field(ctxt, 0));
+CAMLprim value r_reveng_end_context (value cntxt) {
+  CAMLparam1(cntxt);
+  Rf_endcontext((context) Field(cntxt, 0));
+  free((context) Field(cntxt, 0));  /* As Goswin Brederlow suggested, it may be a good idea to
+                                       allocate the context on the C heap, wrap it up in an OCaml
+                                       value with finalisers which call free() themselves. */
   CAMLreturn(Val_unit);
 } 
 

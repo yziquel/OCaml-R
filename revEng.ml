@@ -19,9 +19,7 @@ let rec ml_apply_closure call closure arglist rho supplied_env =
   let formals   = inspect_closxp_formals closure in
   let body      = inspect_closxp_body    closure in
   let saved_rho = inspect_closxp_env     closure in
-  print_endline "Touchstone 1";
   let cntxt     = begin_context (* CTXT_RETURN = *) 12 call saved_rho rho arglist closure in
-  print_endline "Touchstone 1-end";
   let actuals   = match_args formals arglist call in
   let new_rho   = new_environment formals actuals saved_rho in
   let actuals_cursor = ref actuals in
@@ -40,7 +38,7 @@ let rec ml_apply_closure call closure arglist rho supplied_env =
         (list_of_lisplist actuals))
       with Not_found -> define_var tag v new_rho
       end (list_of_lisplist (inspect_envsxp_frame supplied_env)) end;
-  (*end_context cntxt;*)
+  end_context cntxt;
   null_creator () 
 
 let rec ml_unsafe_eval call rho =
