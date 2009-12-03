@@ -615,7 +615,7 @@ CAMLprim value r_init_ocaml_node (value unit) {
 CAMLprim value r_sexp_allocate (value unit) {
   /* We should be using allocSExp from memory.c instead. This would take
      care of all the stupid stuff up there concerning UnmarkedNode,
-     garbage collection and tutti quanti. */
+     garbage collection et tutti quanti. */
   CAMLparam1(unit);
   CAMLreturn(Val_sexp((SEXP) Calloc(1, SEXPREC)));
 }

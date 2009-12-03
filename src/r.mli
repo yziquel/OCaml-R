@@ -292,7 +292,7 @@ module Internal : sig
       | INT of int list
       | Unknown
 
-    and closure     = { formals: t; (* body: t;*) clos_env: t }
+    and closure     = { formals: t; body: t; clos_env: t }
     and environment = { frame: t; (* enclos: t; *) hashtab: t }
     and promise     = { value: t; expr: t; prom_env: t }
 
@@ -311,9 +311,6 @@ module RevEngineering : sig
   val sexp_allocate : unit -> Raw.sexp
   val init_ocaml_node : unit -> unit
   val write_promise : Raw.prom Raw.sxp -> Raw.sexp -> unit
-
-  val fun_of_call : Raw.lang Raw.sxp -> Raw.sexp
-  val args_of_call : Raw.lang Raw.sxp -> Raw.pairlist Raw.sxp
 
   val mkPROMISE : Raw.sexp -> Raw.prom Raw.sxp
   val promiseArgs : Raw.pairlist Raw.sxp -> Raw.pairlist Raw.sxp
