@@ -46,8 +46,11 @@ let rec ml_apply_closure call closure arglist rho supplied_env =
   let sysparent = begin match inspect_context_callflag (global_context ()) with
                   | (* CTXT_GENERIC = *) 20 -> inspect_context_sysparent (global_context ())
                   | _ -> rho end in
-  let cntxt = begin_context (* CTXT_RETURN = *) 12 call new_rho sysparent arglist closure in 
-  null_creator () 
+  let cntxt = begin_context (* CTXT_RETURN = *) 12 call new_rho sysparent arglist closure in
+  (* We will have to reimplement the SETJMP in the source code. *)
+  let tmp = ml_eval body new_rho in
+  end_context cntxt;
+  tmp
 
 let rec ml_unsafe_eval call rho =
   print_endline "Entering ml_unsafe_eval.";
