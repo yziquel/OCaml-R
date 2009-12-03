@@ -10,7 +10,7 @@ external mkPROMISE : sexp -> sexp -> sexp = "r_reveng_mkPROMISE"
 external set_missing : sexp -> int -> unit = "r_reveng_SET_MISSING"
 external apply_closure : lang sxp -> clos sxp -> pairlist sxp -> sexp = "r_apply_closure"
 
-let rec ml_apply_closure call closure arglist =
+let rec ml_apply_closure call closure arglist supplied_env =
   let formals   = inspect_closxp_formals closure in
   let body      = inspect_closxp_body    closure in
   let saved_rho = inspect_closxp_env     closure in
@@ -25,7 +25,9 @@ let rec ml_apply_closure call closure arglist =
       set_missing !actuals_cursor 2
     end;
     actuals_cursor := inspect_listsxp_cdrval !actuals_cursor
-  end (list_of_lisplist formals)
+  end (list_of_lisplist formals);
+  begin match sexp_equality supplied_env (null_creator ()) with
+  | true -> () | false -> print_endline "supplied_env isn't NULL. Please develop." end
 
 let rec ml_unsafe_eval call =
   print_endline "Entering ml_unsafe_eval."; 

@@ -15,6 +15,11 @@ CAMLprim value r_missing_arg (value unit) {
   CAMLreturn(Val_sexp(R_MissingArg));
 }
 
+CAMLprim value r_base_env (value unit) {
+  CAMLparam1(unit);
+  CAMLreturn(Val_sexp(R_BaseEnv)); 
+}
+
 
 /* Comparison operator. */
 CAMLprim value r_sexp_equality (value s1, value s2) {
