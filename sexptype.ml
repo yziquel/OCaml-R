@@ -107,3 +107,7 @@ let string_of_sexptype = function
   | RawSxp     -> "RawSxp"
   | S4Sxp      -> "S4Sxp"
   | FunSxp     -> "FunSxp"
+
+let is_function x = match sexptype x with
+  | CloSxp | SpecialSxp | BuiltinSxp | FunSxp -> true
+  | _ -> false
