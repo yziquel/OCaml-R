@@ -78,7 +78,7 @@ and ml_unsafe_eval call rho =
   (* int depthsave = R_EvalDepth++; *)
   (* ... autres ... *) 
   match sexptype call with
-  | CloSxp -> null_creator ()
+  | CloSxp -> call
   | LangSxp ->
       let op = begin match sexptype (inspect_listsxp_carval call) with
                | SymSxp -> findfun (inspect_listsxp_carval call)

@@ -168,7 +168,9 @@ module PrettyTypes = struct
     and internal = inspect_symsxp_internal s in
     match (sexptype pname), (sexptype value), (sexptype internal) with
     | (NilSxp,  _, NilSxp) when sexp_equality s value -> SYMBOL None
-    | (CharSxp, BuiltinSxp, NilSxp) | (CharSxp, SpecialSxp, NilSxp) ->
+    | (CharSxp, BuiltinSxp, NilSxp)
+    | (CharSxp, SpecialSxp, NilSxp)
+    | (CharSxp, EnvSxp,     NilSxp) ->
         let symbol_name = string_of_charsxp pname in
         SYMBOL (Some (symbol_name, (builder value)))
     | (CharSxp, SymSxp, NilSxp) ->
@@ -206,7 +208,7 @@ module PrettyTypes = struct
     function s -> match sexptype s with
     | NilSxp     -> NULL
     | SymSxp     -> begin try phi symbol_of_symsxp (Obj.magic s) with
-                    | Esoteric s -> Unknown end
+                    | Esoteric _ -> Unknown end
     | ListSxp    -> begin try phi list_of_listsxp s with
                     | Esoteric _ -> Unknown end
     | CloSxp     -> CLOSURE {
