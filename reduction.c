@@ -23,8 +23,8 @@ CAMLprim value r_eval_sxp (value sexp_list) {
   SEXP e;        // Placeholder for the result of beta-reduction.
   int error = 0; // Error catcher boolean.
 
-  /* Should this be wrapped with a PROTECT() and
-     an UNPROTECT(1), or not? */
+  /* Should this be wrapped with a PROTECT() and an UNPROTECT(1), or
+     not? */
   PROTECT(e = R_tryEval(Sexp_val(sexp_list), R_GlobalEnv, &error));
   UNPROTECT(1);
 
@@ -39,6 +39,8 @@ CAMLprim value r_apply_closure ( value call, value op, value arglist) {
   CAMLreturn(Val_sexp(Rf_applyClosure(Sexp_val(call), Sexp_val(op),
     Sexp_val(arglist), R_GlobalEnv, R_BaseEnv)));
 }
+
+
 
 /**********************************************************************
  *                                                                    *

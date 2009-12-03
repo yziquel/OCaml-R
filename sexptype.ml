@@ -26,7 +26,7 @@ type sexptype =
   | NilSxp
   | SymSxp
   | ListSxp
-  | ClosSxp
+  | CloSxp
   | EnvSxp
   | PromSxp
   | LangSxp
@@ -54,7 +54,7 @@ let sexptype s = match (sexptype_of_sexp s) with
   | 0  -> NilSxp
   | 1  -> SymSxp
   | 2  -> ListSxp
-  | 3  -> ClosSxp
+  | 3  -> CloSxp
   | 4  -> EnvSxp
   | 5  -> PromSxp
   | 6  -> LangSxp
@@ -81,3 +81,29 @@ let sexptype s = match (sexptype_of_sexp s) with
   | 99 -> FunSxp
   | _ -> failwith "R value with type not specified in Rinternals.h"
 
+let string_of_sexptype = function
+  | NilSxp     -> "NilSxp"
+  | SymSxp     -> "SymSxp"
+  | ListSxp    -> "ListSxp"
+  | CloSxp     -> "CloSxp"
+  | EnvSxp     -> "EnvSxp"
+  | PromSxp    -> "PromSxp"
+  | LangSxp    -> "LangSxp"
+  | SpecialSxp -> "SpecialSxp"
+  | BuiltinSxp -> "BuiltinSxp"
+  | CharSxp    -> "CharSxp"
+  | LglSxp     -> "LglSxp"
+  | IntSxp     -> "IntSxp"
+  | RealSxp    -> "RealSxp"
+  | CplxSxp    -> "CplxSxp"
+  | StrSxp     -> "StrSxp"
+  | DotSxp     -> "DotSxp"
+  | AnySxp     -> "AnySxp"
+  | VecSxp     -> "VecSxp"
+  | ExprSxp    -> "ExprSxp"
+  | BcodeSxp   -> "BcodeSxp"
+  | ExtptrSxp  -> "ExtptrSxp"
+  | WeakrefSxp -> "WeakrefSxp"
+  | RawSxp     -> "RawSxp"
+  | S4Sxp      -> "S4Sxp"
+  | FunSxp     -> "FunSxp"

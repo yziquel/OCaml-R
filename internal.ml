@@ -94,7 +94,7 @@ module CTypes = struct
         carval     = rec_build (inspect_listsxp_carval s);
         cdrval     = rec_build (inspect_listsxp_cdrval s);
         tagval     = rec_build (inspect_listsxp_tagval s)}}
-    | ClosSxp    -> Val { content = CLOSXP {
+    | CloSxp     -> Val { content = CLOSXP {
         formals    = rec_build (inspect_closxp_formals s);
         body       = rec_build (inspect_closxp_body    s);
         clos_env   = rec_build (inspect_closxp_env     s)}}
@@ -208,7 +208,7 @@ module PrettyTypes = struct
                     | Esoteric s -> Unknown end
     | ListSxp    -> begin try phi list_of_listsxp s with
                     | Esoteric _ -> Unknown end
-    | ClosSxp    -> CLOSURE {
+    | CloSxp     -> CLOSURE {
         formals  = rec_build (inspect_closxp_formals s);
      (* body     = rec_build (inspect_closxp_body    s); *)
         clos_env = rec_build (inspect_closxp_env     s)}

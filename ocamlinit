@@ -3,13 +3,11 @@
 #load "r.cma";;
 #load "oCamlR.cma";;
 
-open R;;
-
-let show x = (Pretty.t_of_sexp x);;
+let show x = (R.Pretty.t_of_sexp x);;
 open R.PrettyTypes;;
 
-let x1 = parse_sexp "str(lm)";;
-let x2 = parse_sexp "rnorm(20, mean = 2, sd = 1)";;
+let x1 = R.parse_sexp "str(lm)";;
+let x2 = R.parse_sexp "rnorm(20, mean = 2, sd = 1)";;
 
 let str = R.force (R.symbol "str");;
 let lm = R.force (R.symbol "lm");;

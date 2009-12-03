@@ -44,6 +44,7 @@ void prerr_endline (char* s) {
 #include "conversion.c"
 #include "reduction.c"
 #include "parser.c"
+#include "revEng.c"
 
 
 
