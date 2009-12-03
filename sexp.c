@@ -20,6 +20,11 @@ CAMLprim value r_base_env (value unit) {
   CAMLreturn(Val_sexp(R_BaseEnv)); 
 }
 
+CAMLprim value r_global_env (value unit) {
+  CAMLparam1(unit);
+  CAMLreturn(Val_sexp(R_GlobalEnv));
+}
+
 
 /* Comparison operator. */
 CAMLprim value r_sexp_equality (value s1, value s2) {
