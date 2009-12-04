@@ -13,28 +13,28 @@ all: build
 build: r.cma r.cmxa oCamlR.cma oCamlR.cmxa
 
 r.cma: dllr_stubs.so r.cmo
-	ocamlc -a -dllpath /usr/lib/R/lib -dllib dllr_stubs.so -dllib libR.so -o r.cma r.cmo
+	ocamlc -verbose -a -dllpath /usr/lib/R/lib -dllib dllr_stubs.so -dllib libR.so -o r.cma r.cmo
 
 r.cmxa: dllr_stubs.so r.cmx
-	ocamlopt -a -ccopt -L/usr/lib/R/lib -cclib -lr_stubs -cclib -lR -o r.cmxa r.cmx
+	ocamlopt -verbose -a -ccopt -L/usr/lib/R/lib -cclib -lr_stubs -cclib -lR -o r.cmxa r.cmx
 
 oCamlR.cma: oCamlR.cmo
-	ocamlc -a -o oCamlR.cma oCamlR.cmo
+	ocamlc -verbose -a -o oCamlR.cma oCamlR.cmo
 
 oCamlR.cmxa: oCamlR.cmx
-	ocamlopt -a -o oCamlR.cmxa oCamlR.cmx
+	ocamlopt -verbose -a -o oCamlR.cmxa oCamlR.cmx
 
 r.cmo: r.ml
-	ocamlfind ocamlc -package unix -c r.ml
+	ocamlfind ocamlc -verbose -package unix -c r.ml
 
 r.cmx: r.ml
-	ocamlfind ocamlopt -package unix -c r.ml
+	ocamlfind ocamlopt -verbose -package unix -c r.ml
 
 oCamlR.cmo:
-	ocamlfind ocamlc -c oCamlR.ml
+	ocamlfind ocamlc -verbose -c oCamlR.ml
 
 oCamlR.cmx:
-	ocamlfind ocamlopt -c oCamlR.ml
+	ocamlfind ocamlopt -verbose -c oCamlR.ml
 
 r.ml: standard.ml
 	cat                 \
@@ -60,13 +60,13 @@ standard.ml: standard.R
 	R --silent --vanilla --slave < standard.R > standard.ml
 
 r_stubs.o: r_stubs.c
-	ocamlopt -ccopt -Wall $(COMPFLAGS) -ccopt -fPIC -c $<
+	ocamlopt -verbose -ccopt -Wall $(COMPFLAGS) -ccopt -fPIC -c $<
 
 libr_stubs.a: r_stubs.o
 	ar rcs libr_stubs.a r_stubs.o
 
 dllr_stubs.so: libr_stubs.a r_stubs.o
-	ocamlmklib -o r_stubs r_stubs.o
+	ocamlmklib -verbose -o r_stubs r_stubs.o
 
 clean:
 	rm -f standard.ml r.ml

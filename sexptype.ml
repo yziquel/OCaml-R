@@ -22,6 +22,7 @@ type vec_char = char vec         (* For CHARSXP *)
 type vec_lgl  = bool vec         (* For LGLSXP *)
 type vec_int  = int  vec         (* For INTSXP *)
     (* Or shouldn't it be int32 vec ? *)
+type vec_real = float vec        (* For REALSXP *)
 type vec_str  = string vec       (* For STRSXP *)
 type vec_sexp = sexp vec
 

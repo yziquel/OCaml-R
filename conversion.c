@@ -9,7 +9,7 @@
 
 CAMLprim value r_cons (value car, value tail) {
   CAMLparam2(car, tail);
-  CAMLlocal1(result)
+  CAMLlocal1(result);
   SEXP s = CONS(Sexp_val(car), Sexp_val(tail));
   result = Val_sexp(s);
   CAMLreturn(result);

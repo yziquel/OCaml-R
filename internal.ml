@@ -61,7 +61,7 @@ module CTypes = struct
     | CHARSXP of string
     | LGLSXP of bool list
     | INTSXP of int list
-    | REALSXP
+    | REALSXP of float list
     | CPLXSXP
     | STRSXP of string list
     | DOTSXP
@@ -115,7 +115,7 @@ module CTypes = struct
     | CharSxp    -> Val { content = CHARSXP (string_of_charsxp s) }
     | LglSxp     -> Val { content = LGLSXP (bool_list_of_lgl_vecsxp s)}
     | IntSxp     -> Val { content = INTSXP (int_list_of_int_vecsxp s)}
-    | RealSxp    -> Val { content = REALSXP }
+    | RealSxp    -> Val { content = REALSXP (float_list_of_real_vecsxp s)}
     | CplxSxp    -> Val { content = CPLXSXP }
     | StrSxp     -> Val { content = STRSXP (string_list_of_str_vecsxp s)}
     | DotSxp     -> Val { content = DOTSXP }
@@ -148,9 +148,10 @@ module PrettyTypes = struct
     | BUILTIN
     | STRING of string
     | STRINGS of string list
-    | INT of int list
+    | INTS of int list
     | VECSXP of t list
-    | BOOL of bool list
+    | BOOLS of bool list
+    | FLOATS of float list
     | Unknown
 
   and closure     = { formals: t; (* body: t; *) clos_env: t }
@@ -237,9 +238,9 @@ module PrettyTypes = struct
     | SpecialSxp -> SPECIAL
     | BuiltinSxp -> BUILTIN
     | CharSxp    -> STRING  (string_of_charsxp s)
-    | LglSxp     -> BOOL    (bool_list_of_lgl_vecsxp s)
-    | IntSxp     -> INT     (int_list_of_int_vecsxp s)
-    | RealSxp    -> Unknown
+    | LglSxp     -> BOOLS   (bool_list_of_lgl_vecsxp s)
+    | IntSxp     -> INTS    (int_list_of_int_vecsxp s)
+    | RealSxp    -> FLOATS  (float_list_of_real_vecsxp s)
     | CplxSxp    -> Unknown
     | StrSxp     -> STRINGS (string_list_of_str_vecsxp s)
     | DotSxp     -> Unknown

@@ -203,7 +203,7 @@ CAMLprim value inspect_closxp_formals (value sexp) {
   CAMLparam1(sexp);
   CAMLlocal1(result);
   result = Val_sexp(FORMALS(Sexp_val(sexp)));
-  CAMLreturn(resut);
+  CAMLreturn(result);
 }
 
 
@@ -315,6 +315,20 @@ CAMLprim value r_access_int_vecsxp (value intsxp, value offset) {
      is here somewhat confusing (or confused)... Is offset an int? */
 
   result = Val_int(INTEGER((int *) Vecsexp_val(intsxp))[Int_val(offset)]);;
+  CAMLreturn(result);
+}
+
+
+/**  Returns an element of a vector of real numbers.
+  *
+  *  r_access_real_vecsxp takes a vector of integers as argument,
+  *  and an offset, and returns the element at this offset.
+  */
+
+CAMLprim value r_access_real_vecsxp (value realsxp, value offset) {
+  CAMLparam2(realsxp, offset);
+  CAMLlocal1(result);
+  result = caml_copy_double(REAL((double *) Vecsexp_val(realsxp))[Int_val(offset)]);
   CAMLreturn(result);
 }
 

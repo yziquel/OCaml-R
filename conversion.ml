@@ -33,8 +33,9 @@ let list_of_vecsxp (access: 'a vecsxp -> int -> 'a) (s: 'a vecsxp) : 'a list =
     (access s (lngth - n))::(aux (n - 1) s)
   in aux lngth s
 
-let bool_list_of_lgl_vecsxp = list_of_vecsxp access_lgl_vecsxp
-let int_list_of_int_vecsxp  = list_of_vecsxp access_int_vecsxp
+let bool_list_of_lgl_vecsxp   = list_of_vecsxp access_lgl_vecsxp
+let int_list_of_int_vecsxp    = list_of_vecsxp access_int_vecsxp
+let float_list_of_real_vecsxp = list_of_vecsxp access_real_vecsxp
 
 let string_list_of_str_vecsxp = list_of_vecsxp access_str_vecsxp
 let strings_of_t : string list t -> string list = string_list_of_str_vecsxp
