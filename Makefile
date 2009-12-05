@@ -50,6 +50,7 @@ r.ml: standard.ml
 	  lazy.ml           \
 	  symbols.ml        \
 	  conversion.ml     \
+	  s3.ml             \
 	  internal.ml       \
 	  parser.ml         \
 	  reduction.ml      \

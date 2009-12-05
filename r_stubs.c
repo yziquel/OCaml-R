@@ -42,6 +42,7 @@ void prerr_endline (char* s) {
 #include "write_internal.c"
 #include "symbols.c"
 #include "conversion.c"
+#include "s3.c"
 #include "reduction.c"
 #include "parser.c"
 #include "revEng.c"
