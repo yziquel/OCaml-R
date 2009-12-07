@@ -4,4 +4,8 @@
   *  attribute of the given SEXP.
   *)
 
-external s3_class : sexp -> string = "r_s3_class"
+external s3_class : sexp -> sexp = "r_s3_class"
+
+external aux_get_attrib : sexp -> sexp -> sexp = "r_get_attrib"
+
+let get_attrib s name = aux_get_attrib s (install name)
