@@ -30,10 +30,19 @@ external string_of_charsxp : vec_char sxp -> string = "r_internal_string_of_char
 let list_of_vecsxp (access: 'a vecsxp -> int -> 'a) (s: 'a vecsxp) : 'a list =
   let lngth = length_of_vecsxp s in
   let rec aux n s = match n with | 0 -> [] | _ ->
-    (access s (lngth - n))::(aux (n - 1) s)
+    let x = access s (lngth - n) in x::(aux (n - 1) s)
   in aux lngth s
 
+let vecsxp_of_list (alloc : int -> 'a vecsxp) (assign : 'a vecsxp -> int -> 'a -> unit) (l: 'a list) : 'a vecsxp =
+  let s = alloc (List.length l) in
+  let rec aux offset = function | [] -> () | hd::tl ->
+    let () = assign s offset hd in aux (1 + offset) tl
+  in aux 0 l; s
+
 let bool_list_of_lgl_vecsxp   = list_of_vecsxp access_lgl_vecsxp
+let lgl_vecsxp_of_bool_list   = vecsxp_of_list alloc_lgl_vector assign_lgl_vecsxp
+let bool b = lgl_vecsxp_of_bool_list [b]
+
 let int_list_of_int_vecsxp    = list_of_vecsxp access_int_vecsxp
 let float_list_of_real_vecsxp = list_of_vecsxp access_real_vecsxp
 

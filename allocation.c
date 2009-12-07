@@ -24,3 +24,16 @@ CAMLprim value r_alloc_list (value i) {
   CAMLreturn(result);
 }
 
+
+/**  Allocates a logical vector.
+  *
+  *  r_alloc_lgl_vector takes an integer i as argument, and returns
+  *  an R vector of logical values of size i.
+  */
+
+CAMLprim value r_alloc_lgl_vector (value i) {
+  CAMLparam1(i);
+  CAMLlocal1(result);
+  result = Val_sexp(allocVector(LGLSXP, Int_val(i)));
+  CAMLreturn(result);
+}

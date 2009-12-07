@@ -6,6 +6,7 @@ archive(byte) = "r.cma"
 archive(native) = "r.cmxa"
 
 package "interpreter" (
+  version = "0.2"
   description = "Embedded R interpreter"
   requires = "R"
   archive(byte) = "oCamlR.cma"

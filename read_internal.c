@@ -50,7 +50,7 @@ CAMLprim value inspect_vecsxp_length (value vecsexp) {
 /* Concerning various types of SEXPs: */
 
 
-/**  Returns the offset at the primitive can be found.
+/**  Returns the offset at which the primitive can be found.
   *
   *  inspect_primsxp_offset take a SEXP denoting a function primitive
   *  as argument, and returns its offset in the table of primitives.
