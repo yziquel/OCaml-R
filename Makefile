@@ -36,7 +36,7 @@ oCamlR.cmo:
 oCamlR.cmx:
 	ocamlfind ocamlopt -verbose -c oCamlR.ml
 
-r.ml: standard.ml
+r.ml: standard.ml base.ml
 	cat                 \
 	  r_Env.ml          \
 	  standard.ml       \
@@ -55,10 +55,18 @@ r.ml: standard.ml
 	  parser.ml         \
 	  reduction.ml      \
 	  revEng.ml         \
+	  base.ml           \
 	> r.ml
 
 standard.ml: standard.R
 	R --silent --vanilla --slave < standard.R > standard.ml
+
+base.ml:
+	cat                 \
+	  base/incipit.ml   \
+          base/dataFrame.ml \
+	  base/excipit.ml   \
+	> base.ml
 
 r_stubs.o: r_stubs.c
 	ocamlopt -verbose -ccopt -Wall $(COMPFLAGS) -ccopt -fPIC -c $<
@@ -70,7 +78,7 @@ dllr_stubs.so: libr_stubs.a r_stubs.o
 	ocamlmklib -verbose -o r_stubs r_stubs.o
 
 clean:
-	rm -f standard.ml r.ml
+	rm -f standard.ml base.ml r.ml
 	rm -f *.o *.so *.a *.cmi *.cmo *.cmx *.cma *.cmxa
 
 test: build
