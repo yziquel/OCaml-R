@@ -14,13 +14,19 @@ module S3 = struct
 
   class type t = object
 
-    val underlying : 'a tt
+    val underlying    : sexp
+    method underlying : sexp
+    method attribute  : string -> sexp
+    method classes    : string list
 
   end
 
   class from_R r : t = object
 
     val underlying = r
+    method underlying = underlying
+    method attribute s = get_attrib underlying s
+    method classes = strings_of_t (get_attrib underlying "class")
 
   end
 
