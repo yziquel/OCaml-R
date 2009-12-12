@@ -44,6 +44,9 @@ let lgl_vecsxp_of_bool_list   = vecsxp_of_list alloc_lgl_vector assign_lgl_vecsx
 let bool b = lgl_vecsxp_of_bool_list [b]
 
 let int_list_of_int_vecsxp    = list_of_vecsxp access_int_vecsxp
+let int_vecsxp_of_int_list    = vecsxp_of_list alloc_int_vector assign_int_vecsxp
+let int i = int_vecsxp_of_int_list [i]
+
 let float_list_of_real_vecsxp = list_of_vecsxp access_real_vecsxp
 
 let string_list_of_str_vecsxp = list_of_vecsxp access_str_vecsxp

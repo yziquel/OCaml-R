@@ -15,3 +15,15 @@ let write_listsxp_element l tag elmnt =
 
 external assign_lgl_vecsxp  : vec_lgl  sxp -> int -> bool -> unit = "r_assign_lgl_vecsxp"
 
+
+(**  Sets the element of a vector of integers.
+  *
+  *  r_assign_int_vecsxp takes a vector of integers as first argument,
+  *  an offset as second argument, and an integer as third argument,
+  *  and sets the vector's offset element to the integer's value.
+  *
+  *  Question: should we rather map R's integers to int32s?
+  *)
+
+external assign_int_vecsxp  : vec_int  sxp -> int -> int -> unit = "r_assign_int_vecsxp"
+

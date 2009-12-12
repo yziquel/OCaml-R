@@ -37,3 +37,17 @@ CAMLprim value r_alloc_lgl_vector (value i) {
   result = Val_sexp(allocVector(LGLSXP, Int_val(i)));
   CAMLreturn(result);
 }
+
+
+/**  Allocates a vector of integers.
+  *
+  *  r_alloc_int_vector takes an integer i as argument, and returns
+  *  an R vector of integer values of size i.
+  */
+
+CAMLprim value r_alloc_int_vector (value i) {
+  CAMLparam1(i);
+  CAMLlocal1(result);
+  result = Val_sexp(allocVector(INTSXP, Int_val(i)));
+  CAMLreturn(result);
+}

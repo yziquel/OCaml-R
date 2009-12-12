@@ -31,3 +31,18 @@ CAMLprim value r_assign_lgl_vecsxp (value lglsxp, value offset, value b) {
   CAMLreturn(Val_unit);
 }
 
+
+/**  Sets the element of a vector of integers.
+  *
+  *  r_assign_int_vecsxp takes a vector of integers as first argument,
+  *  an offset as second argument, and an integer as third argument,
+  *  and sets the vector's offset element to the integer's value.
+  *
+  *  Question: should we rather map R's integers to int32s?
+  */
+
+CAMLprim value r_assign_int_vecsxp (value intsxp, value offset, value i) {
+  CAMLparam3(intsxp, offset, i);
+  INTEGER((int *) Vecsexp_val(intsxp))[Int_val(offset)] = Int_val(i);
+  CAMLreturn(Val_unit);
+}

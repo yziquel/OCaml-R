@@ -20,9 +20,18 @@ external alloc_list : int -> 'a lisplist sxp = "r_alloc_list"
 
 (**  Allocates a logical vector.
   *
-  *  r_alloc_lgl_vector takes an integer i as argument, and returns
+  *  alloc_lgl_vector takes an integer i as argument, and returns
   *  an R vector of logical values of size i.
   *)
 
 external alloc_lgl_vector : int -> vec_lgl sxp = "r_alloc_lgl_vector"
+
+
+(**  Allocates a vector of integers.
+  *
+  *  alloc_int_vector takes an integer i as argument, and returns
+  *  an R vector of integer values of size i.
+  *)
+
+external alloc_int_vector : int -> vec_int sxp = "r_alloc_int_vector"
 

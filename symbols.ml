@@ -7,7 +7,7 @@ external install : 'a symbol -> 'a sym sxp = "r_install"
 
 external findvar : 'a symbol t -> 'a promise = "r_findvar"
 
-external findfun : ('a -> 'b) symbol t -> ('a -> 'b) t = "r_findfun"
+external findfun : 'a symbol t -> 'a t = "r_findfun"
 
 let symbol : 'a symbol -> 'a t = fun s ->
   let var = force (findvar (install s)) in
