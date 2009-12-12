@@ -144,7 +144,7 @@ module PrettyTypes = struct
     | ENV of environment
     | PROMISE of promise
     | CALL of t * pairlist
-    | SPECIAL
+    | SPECIAL of int
     | BUILTIN
     | STRING of string
     | STRINGS of string list
@@ -233,7 +233,7 @@ module PrettyTypes = struct
                     | NilSxp -> CALL ((build rec_build carval), l)
                     | _ -> Unknown end
         | _ -> Unknown end
-    | SpecialSxp -> SPECIAL
+    | SpecialSxp -> SPECIAL (inspect_primsxp_offset s)
     | BuiltinSxp -> BUILTIN
     | CharSxp    -> STRING  (string_of_charsxp s)
     | LglSxp     -> BOOLS   (bool_list_of_lgl_vecsxp s)

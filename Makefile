@@ -64,6 +64,7 @@ standard.ml: standard.R
 base.ml:
 	cat                 \
 	  base/incipit.ml   \
+	  base/List.ml      \
           base/dataFrame.ml \
 	  base/excipit.ml   \
 	> base.ml
