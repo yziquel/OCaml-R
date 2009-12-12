@@ -4,6 +4,15 @@
    in details the contents of SEXPs and VECSEXPs. *)
 
 
+(**  Returns the attributes of a SEXP or VECSEXP
+  *
+  *  inspect_attributes takes a SEXP or a VECSEXP as
+  *  arguments and returns its attributes, as a SEXP.
+  *)
+
+external inspect_attributes : sexp -> sexp = "inspect_attributes"
+
+
 (**  Returns the length of a VECSEXP.
   *
   *  length_of_vecsxp takes a VECSEXP as argument and

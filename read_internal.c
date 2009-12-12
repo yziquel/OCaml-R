@@ -24,6 +24,20 @@
    CHARSXP cache. */
 
 
+/**  Returns the attributes of a SEXP or VECSEXP
+  *
+  *  inspect_attributes takes a SEXP or a VECSEXP as
+  *  arguments and returns its attributes, as a SEXP.
+  */
+
+CAMLprim value inspect_attributes (value sexp) {
+  CAMLparam1(sexp);
+  CAMLlocal1(result);
+  result = Val_sexp(ATTRIB(Sexp_val(sexp));
+  CAMLreturn(result);
+}
+
+
 /**  Returns the length of a VECSEXP.
   *
   *  inspect_vecsxp_length takes a VECSEXP as argument and

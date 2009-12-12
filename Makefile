@@ -87,3 +87,10 @@ test: build
 install:
 	cp META *.a *.cm[ai] *.cmxa /usr/lib/ocaml/R/
 	cp dllr_stubs.so /usr/lib/ocaml/stublibs/
+
+install: remove
+	ocamlfind install R META *.a *.cm[ai] *.cmxa dllr_stubs.so
+
+remove:
+	ocamlfind remove R
+
