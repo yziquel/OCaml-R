@@ -33,7 +33,7 @@
 CAMLprim value inspect_attributes (value sexp) {
   CAMLparam1(sexp);
   CAMLlocal1(result);
-  result = Val_sexp(ATTRIB(Sexp_val(sexp));
+  result = Val_sexp(ATTRIB(Sexp_val(sexp)));
   CAMLreturn(result);
 }
 
