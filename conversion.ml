@@ -50,10 +50,12 @@ let int i = int_vecsxp_of_int_list [i]
 let float_list_of_real_vecsxp = list_of_vecsxp access_real_vecsxp
 
 let string_list_of_str_vecsxp = list_of_vecsxp access_str_vecsxp
+let str_vecsxp_of_string_list = vecsxp_of_list alloc_str_vector assign_str_vecsxp
 let strings_of_t : string list t -> string list = string_list_of_str_vecsxp
 let string_of_t : string t -> string = fun t -> access_str_vecsxp t 0
   (* We access only the first element, because static typing is supposed to
      ensure that the str vecsxp contains only one element. *)
 external string : string -> string t = "r_strsxp_of_string"
+let strings = str_vecsxp_of_string_list
 
 let sexp_list_of_sexp_vecsxp = list_of_vecsxp access_sexp_vecsxp

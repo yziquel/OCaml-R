@@ -77,7 +77,7 @@ module CTypes = struct
 
   and sxp_sym  = { pname: t; sym_value: t; internal: t }
   and sxp_list = { carval: t; cdrval: t; tagval: t }
-  and sxp_env  = { frame: t; enclos: t; hashtab: t }
+  and sxp_env  = { frame: t; (*enclos: t; hashtab: t*) }
   and sxp_clos = { formals: t; body: t; clos_env: t }
   and sxp_prom = { prom_value: t; expr: t; prom_env: t }
 
@@ -100,8 +100,8 @@ module CTypes = struct
         clos_env   = rec_build (inspect_closxp_env     s)}}
     | EnvSxp     -> Val { content = ENVSXP {
         frame      = rec_build (inspect_envsxp_frame   s);
-        enclos     = rec_build (inspect_envsxp_enclos  s);
-        hashtab    = rec_build (inspect_envsxp_hashtab s)}}
+     (* enclos     = rec_build (inspect_envsxp_enclos  s); *)
+     (* hashtab    = rec_build (inspect_envsxp_hashtab s) *) }}
     | PromSxp    -> Val { content = PROMSXP {
         prom_value = rec_build (inspect_promsxp_value s);
         expr       = rec_build (inspect_promsxp_expr  s);
@@ -154,7 +154,7 @@ module PrettyTypes = struct
     | FLOATS of float list
     | Unknown
 
-  and closure     = { formals: t; (* body: t; *) clos_env: t }
+  and closure     = { formals: t; body: t; clos_env: t }
   and environment = { frame: t; (* enclos: t; hashtab: t *) }
   and promise     = { value: t; expr: t; prom_env: t }
 
@@ -214,7 +214,7 @@ module PrettyTypes = struct
                     | Esoteric _ -> Unknown end
     | CloSxp     -> CLOSURE {
         formals  = rec_build (inspect_closxp_formals s);
-     (* body     = rec_build (inspect_closxp_body    s); *)
+        body     = rec_build (inspect_closxp_body    s);
         clos_env = rec_build (inspect_closxp_env     s)}
     | EnvSxp     -> ENV {
         frame   = rec_build (inspect_envsxp_frame   s);

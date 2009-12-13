@@ -46,3 +46,20 @@ CAMLprim value r_assign_int_vecsxp (value intsxp, value offset, value i) {
   INTEGER((int *) Vecsexp_val(intsxp))[Int_val(offset)] = Int_val(i);
   CAMLreturn(Val_unit);
 }
+
+
+/**  Sets the element of a vector of string.
+  *
+  *  r_assign_str_vecsxp takes a vector of strings as first argument,
+  *  an offset as second argument, and a string as third argument,
+  *  and sets the vector's offset element to the string's value.
+  */
+
+CAMLprim value r_assign_str_vecsxp (value strsxp, value offset, value s) {
+  CAMLparam3(strsxp, offset, s);
+  SEXP charsxp;
+  PROTECT(charsxp = mkChar(String_val(s)));
+  UNPROTECT(1);
+  STRING_PTR((int *) Vecsexp_val(strsxp))[Int_val(offset)] = charsxp;
+  CAMLreturn(Val_unit);
+}

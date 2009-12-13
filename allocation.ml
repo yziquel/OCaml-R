@@ -35,3 +35,12 @@ external alloc_lgl_vector : int -> vec_lgl sxp = "r_alloc_lgl_vector"
 
 external alloc_int_vector : int -> vec_int sxp = "r_alloc_int_vector"
 
+
+(**  Allocates a vector of strings.
+  *
+  *  r_alloc_str_vector takes an integer i as argument, and returns
+  *  an R vector of i strings.
+  *)
+
+external alloc_str_vector : int -> vec_str sxp = "r_alloc_str_vector"
+

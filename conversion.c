@@ -91,6 +91,13 @@ CAMLprim value r_charsxp_of_string (value s) {
   CAMLreturn(Val_sexp(charsxp));
 }
 
+
+/**  Creates A STRSXP out of a string.
+  *
+  *  r_strsxp_of_string takes an Objective Caml string s as
+  *  argument, and returns a STRSXP of this string.
+  */
+
 CAMLprim value r_strsxp_of_string (value s) {
   CAMLparam1(s);
   SEXP strsxp;

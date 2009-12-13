@@ -51,3 +51,17 @@ CAMLprim value r_alloc_int_vector (value i) {
   result = Val_sexp(allocVector(INTSXP, Int_val(i)));
   CAMLreturn(result);
 }
+
+
+/**  Allocates a vector of strings.
+  *
+  *  r_alloc_str_vector takes an integer i as argument, and returns
+  *  an R vector of i strings.
+  */
+
+CAMLprim value r_alloc_str_vector (value i) {
+  CAMLparam1(i);
+  CAMLlocal1(result);
+  result = Val_sexp(allocVector(STRSXP, Int_val(i)));
+  CAMLreturn(result);
+}

@@ -18,7 +18,7 @@ external assign_lgl_vecsxp  : vec_lgl  sxp -> int -> bool -> unit = "r_assign_lg
 
 (**  Sets the element of a vector of integers.
   *
-  *  r_assign_int_vecsxp takes a vector of integers as first argument,
+  *  assign_int_vecsxp takes a vector of integers as first argument,
   *  an offset as second argument, and an integer as third argument,
   *  and sets the vector's offset element to the integer's value.
   *
@@ -27,3 +27,12 @@ external assign_lgl_vecsxp  : vec_lgl  sxp -> int -> bool -> unit = "r_assign_lg
 
 external assign_int_vecsxp  : vec_int  sxp -> int -> int -> unit = "r_assign_int_vecsxp"
 
+
+(**  Sets the element of a vector of string.
+  *
+  *  assign_str_vecsxp takes a vector of strings as first argument,
+  *  an offset as second argument, and a string as third argument,
+  *  and sets the vector's offset element to the string's value.
+  *)
+
+external assign_str_vecsxp  : vec_str  sxp -> int -> string -> unit = "r_assign_str_vecsxp"
