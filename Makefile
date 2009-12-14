@@ -24,10 +24,13 @@ oCamlR.cma: oCamlR.cmo
 oCamlR.cmxa: oCamlR.cmx
 	ocamlopt -verbose -a -o oCamlR.cmxa oCamlR.cmx
 
-r.cmo: r.ml
+r.cmi: r.mli
+	ocamlfind ocamlc -verbose -c r.mli
+
+r.cmo: r.ml r.cmi
 	ocamlfind ocamlc -verbose -package unix -c r.ml
 
-r.cmx: r.ml
+r.cmx: r.ml r.cmi
 	ocamlfind ocamlopt -verbose -package unix -c r.ml
 
 oCamlR.cmo:
@@ -37,36 +40,47 @@ oCamlR.cmx:
 	ocamlfind ocamlopt -verbose -c oCamlR.ml
 
 r.ml: standard.ml base.ml
-	cat                 \
-	  r_Env.ml          \
-	  standard.ml       \
-	  initialisation.ml \
-	  sexptype.ml       \
-	  sexprec.ml        \
-	  data.ml           \
-	  allocation.ml     \
-	  read_internal.ml  \
-	  write_internal.ml \
-	  lazy.ml           \
-	  symbols.ml        \
-	  conversion.ml     \
-	  s3.ml             \
-	  internal.ml       \
-	  parser.ml         \
-	  reduction.ml      \
-	  revEng.ml         \
-	  base.ml           \
+	cat                  \
+	  r_Env.ml           \
+	  standard.ml        \
+	  initialisation.ml  \
+	  sexptype.ml        \
+	  sexprec.ml         \
+	  data.ml            \
+	  allocation.ml      \
+	  read_internal.ml   \
+	  write_internal.ml  \
+	  lazy.ml            \
+	  symbols.ml         \
+	  conversion.ml      \
+	  s3.ml              \
+	  internal.ml        \
+	  parser.ml          \
+	  reduction.ml       \
+	  revEng.ml          \
+	  base.ml            \
 	> r.ml
+
+r.mli:
+	cat                  \
+	  r_Env.mli          \
+	  standard.mli       \
+	  initialisation.mli \
+	  sexptype.mli       \
+	  data.mli           \
+	  symbols.mli        \
+	  conversion.mli     \
+	> r.mli
 
 standard.ml: standard.R
 	R --silent --vanilla --slave < standard.R > standard.ml
 
 base.ml:
-	cat                 \
-	  base/incipit.ml   \
-	  base/List.ml      \
-          base/dataFrame.ml \
-	  base/excipit.ml   \
+	cat                  \
+	  base/incipit.ml    \
+	  base/List.ml       \
+          base/dataFrame.ml  \
+	  base/excipit.ml    \
 	> base.ml
 
 r_stubs.o: r_stubs.c
@@ -79,7 +93,7 @@ dllr_stubs.so: libr_stubs.a r_stubs.o
 	ocamlmklib -verbose -o r_stubs r_stubs.o
 
 clean:
-	rm -f standard.ml base.ml r.ml
+	rm -f standard.ml base.ml r.ml r.mli
 	rm -f *.o *.so *.a *.cmi *.cmo *.cmx *.cma *.cmxa
 
 test: build
