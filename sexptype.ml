@@ -5,7 +5,7 @@ type sexp
 (* Argument types for the polymorphic 'a sxp type. *)
 type 'a sxp = sexp
 type nil                         (* For NILSXP *)
-type 'a sym                      (* For SYMSXP *)
+type sym                      (* For SYMSXP *)
 type 'a lisplist                 (* For LISTSXP, and LANGSXP *)
 type simple                      (* For LISTSXP *)
 type pairlist = simple lisplist  (* For LISTSXP *)
@@ -25,6 +25,8 @@ type vec_int  = int  vec         (* For INTSXP *)
 type vec_real = float vec        (* For REALSXP *)
 type vec_str  = string vec       (* For STRSXP *)
 type vec_sexp = sexp vec
+
+let sexp : 'a sxp -> sexp = Obj.magic
 
 (* Algebraic type reflecting R's dynamic typing. *)
 type sexptype =

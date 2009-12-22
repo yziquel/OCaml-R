@@ -61,7 +61,7 @@ r.ml: standard.ml base.ml
 	  base.ml            \
 	> r.ml
 
-r.mli:
+r.mli: base.mli
 	cat                  \
 	  r_Env.mli          \
 	  standard.mli       \
@@ -70,6 +70,8 @@ r.mli:
 	  data.mli           \
 	  symbols.mli        \
 	  conversion.mli     \
+	  reduction.mli      \
+	  base.mli           \
 	> r.mli
 
 standard.ml: standard.R
@@ -78,10 +80,17 @@ standard.ml: standard.R
 base.ml:
 	cat                  \
 	  base/incipit.ml    \
-	  base/List.ml       \
+	  base/list.ml       \
           base/dataFrame.ml  \
 	  base/excipit.ml    \
 	> base.ml
+
+base.mli:
+	cat                  \
+	  base/incipit.mli   \
+	  base/dataFrame.mli \
+	  base/excipit.mli   \
+	> base.mli
 
 r_stubs.o: r_stubs.c
 	ocamlopt -verbose -ccopt -Wall $(COMPFLAGS) -ccopt -fPIC -c $<
@@ -93,7 +102,7 @@ dllr_stubs.so: libr_stubs.a r_stubs.o
 	ocamlmklib -verbose -o r_stubs r_stubs.o
 
 clean:
-	rm -f standard.ml base.ml r.ml r.mli
+	rm -f standard.ml base.ml base.mli r.ml r.mli
 	rm -f *.o *.so *.a *.cmi *.cmo *.cmx *.cma *.cmxa
 
 test: build

@@ -165,7 +165,7 @@ module PrettyTypes = struct
   exception Sexp_to_inspect of sexp
   exception Esoteric of sexp
 
-  let symbol_of_symsxp builder (s : 'a sym sxp) =
+  let symbol_of_symsxp builder (s : sym sxp) =
     let pname    = inspect_symsxp_pname    s
     and value    = inspect_symsxp_value    s
     and internal = inspect_symsxp_internal s in

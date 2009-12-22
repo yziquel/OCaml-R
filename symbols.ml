@@ -1,15 +1,13 @@
-type 'a symbol = string
-
 (* There's a lot of stuff concerning symbols and environments in the
    envir.c file of the R source code. *)
 
-external install : 'a symbol -> 'a sym sxp = "r_install"
+external install : string -> sym sxp = "r_install"
 
-external findvar : 'a symbol t -> 'a promise = "r_findvar"
+external findvar : sym sxp -> prom sxp = "r_findvar"
 
-external findfun : 'a symbol t -> 'a t = "r_findfun"
+external findfun : sym sxp -> prom sxp = "r_findfun"
 
-let symbol : 'a symbol -> 'a t = fun s ->
+let symbol : string -> sexp = fun s ->
   let var = force (findvar (install s)) in
 
   (* If we try to retrieve a function, we should use findfun. If we

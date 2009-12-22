@@ -1,1 +1,1 @@
-type 'a t = sexp
+type 'a t

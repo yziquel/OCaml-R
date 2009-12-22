@@ -40,7 +40,7 @@ external inspect_primsxp_offset  : builtin sxp -> int = "inspect_primsxp_offset"
   *  SEXP containing its name.
   *)
 
-external inspect_symsxp_pname    : 'a sym sxp -> sexp = "inspect_symsxp_pname"
+external inspect_symsxp_pname    : sym sxp -> sexp = "inspect_symsxp_pname"
 
 
 (**  Returns the value of a symbol.
@@ -49,7 +49,7 @@ external inspect_symsxp_pname    : 'a sym sxp -> sexp = "inspect_symsxp_pname"
   *  SEXP containing its value.
   *)
 
-external inspect_symsxp_value    : 'a sym sxp -> sexp = "inspect_symsxp_value"
+external inspect_symsxp_value    : sym sxp -> sexp = "inspect_symsxp_value"
 
 
 (**  Returns the internal sexp of a symbol.
@@ -58,7 +58,7 @@ external inspect_symsxp_value    : 'a sym sxp -> sexp = "inspect_symsxp_value"
   *  SEXP containing its internal value.
   *)
 
-external inspect_symsxp_internal : 'a sym sxp -> sexp = "inspect_symsxp_internal"
+external inspect_symsxp_internal : sym sxp -> sexp = "inspect_symsxp_internal"
 
 
 (**  Returns the head element of a pairlist.
