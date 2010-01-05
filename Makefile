@@ -10,13 +10,16 @@ FLAVOUR=INTERNAL
 
 all: build
 
-build: r.cma r.cmxa oCamlR.cma oCamlR.cmxa
+build: r.cma r.cmxa r.cmxs oCamlR.cma oCamlR.cmxa
 
 r.cma: dllr_stubs.so r.cmo
 	ocamlc -verbose -a -dllpath /usr/lib/R/lib -dllib dllr_stubs.so -dllib libR.so -o r.cma r.cmo
 
 r.cmxa: dllr_stubs.so r.cmx
 	ocamlopt -verbose -a -ccopt -L/usr/lib/R/lib -cclib -lr_stubs -cclib -lR -o r.cmxa r.cmx
+
+r.cmxs: r.cmxa
+	ocamlopt -shared -linkall -ccopt -L/usr/lib/R/lib -ccopt -L. -o $@ $<
 
 oCamlR.cma: oCamlR.cmo
 	ocamlc -verbose -a -o oCamlR.cma oCamlR.cmo
