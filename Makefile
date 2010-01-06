@@ -60,7 +60,6 @@ r.ml: standard.ml base.ml
 	  internal.ml        \
 	  parser.ml          \
 	  reduction.ml       \
-	  revEng.ml          \
 	  base.ml            \
 	> r.ml
 
