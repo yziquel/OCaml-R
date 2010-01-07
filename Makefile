@@ -65,6 +65,7 @@ r.ml: standard.ml base.ml
 
 r.mli: base.mli
 	cat                  \
+	  incipit.mli        \
 	  r_Env.mli          \
 	  standard.mli       \
 	  initialisation.mli \
