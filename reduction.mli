@@ -1,5 +1,5 @@
 val eval_string : string -> sexp
-(**  [eval_string] take a string containing R code, and feeds it to the R
+(**  [eval_string] take a string containing R code, and feeds it to the
   *  R interpreter. You get the resulting value back.
   *)
 
@@ -14,7 +14,5 @@ val opt : ('a -> 'b sxp) -> string -> 'a option -> (string option * sexp) option
   *)
 
 val eval : sexp -> (string option * sexp) option list -> sexp
-(**  Evaluates an R function given a list of arguments.
-  *
-  *  Usage: {[eval f args]}.
-  *)
+(**  Evaluates an R function given a list of arguments. *)
+

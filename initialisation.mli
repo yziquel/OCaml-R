@@ -1,6 +1,6 @@
 (**  {b Initialisation}
   *
-  *  We provide two mechanisms to activate an R interpreter from OCaml-R.
+  *  We provide two mechanisms to activate an R interpreter from OCaml-R:
   *
   *  The first mechanism consists of low-level bindings to the initialisation
   *  and termination functions of the libR.so shared library. While this is
@@ -9,9 +9,9 @@
   *  for a dependent bunch of R packages.
   *
   *  The second mechanism is a static, functorial approach: You just have to
-  *  create a module with the [Intepreter] functor to initialise the R interpreter.
+  *  create a module with the [Interpreter] functor to initialise the R interpreter.
   *  You provide initialisation details through a module of module type [Environment],
-  *  and [Intepreter] will set it up correctly.
+  *  and [Interpreter] will set it up correctly.
   *
   *  This functorial facility is available from the OCamlR module: This OCamlR module
   *  has the sole purpose of initialising the R interpreter with the [Standard]

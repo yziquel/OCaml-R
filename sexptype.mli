@@ -18,6 +18,7 @@ val sexp : 'a sxp -> sexp
 (**  Function forgetting the underlying R dynamic typing. *)
 
 type sexptype =
+(**  Algebraic datatype reflecting R's dynamic typing. *)
   | NilSxp
   | SymSxp
   | ListSxp
@@ -43,7 +44,6 @@ type sexptype =
   | RawSxp
   | S4Sxp
   | FunSxp
-(**  Algebraic datatype reflecting R's dynamic typing. *)
 
 val sexptype : sexp -> sexptype
 (**  Returns the R dynamic typing of a wrapped R value. *)
