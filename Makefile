@@ -106,7 +106,7 @@ dllr_stubs.so: libr_stubs.a r_stubs.o
 
 clean:
 	rm -f standard.ml base.ml base.mli r.ml r.mli
-	rm -f *.o *.so *.a *.cmi *.cmo *.cmx *.cma *.cmxa
+	rm -f *.o *.so *.a *.cmi *.cmo *.cmx *.cma *.cmxa *.cmxs
 
 test: build
 	ocaml -init ocamlinit

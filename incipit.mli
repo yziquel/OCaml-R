@@ -1,4 +1,4 @@
-(**  This is the [R] module of the OCaml-R package. It encapsulates the
+(**  Binding for R Interpreter. It encapsulates the
   *  functionalities of the {b libR.so} shared library provided by the R
   *  software. This enables us to {b embed the R interpreter} into Objective
   *  Caml, to execute R code from Objective Caml and to exchange data

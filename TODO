@@ -1,0 +1,10 @@
+Todo:
+
+-1- Close the interpreter when the application exits. As of now, things are dirty in this respect.
+
+-2- Documentation is to be completed.
+
+-3- Garbage collection to be done properly with OCaml / R.
+
+-4- Try to make a way to execute R code that can mingle with Lwt. May need to reimplement the
+    evaluation loop and to use hidden symbols of libR.so.
