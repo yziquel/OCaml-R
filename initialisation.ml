@@ -3,6 +3,8 @@
 external init_r : string array -> int -> int = "init_r"
 external terminate : unit -> unit = "end_r"
 
+external init_error_hook : unit -> unit = "r_init_error_hook"
+
 exception Initialisation_failed
 
 let init ?(name    = try Sys.argv.(0) with _ -> "OCaml-R")
@@ -12,7 +14,9 @@ let init ?(name    = try Sys.argv.(0) with _ -> "OCaml-R")
   List.iter (function name, value -> Unix.putenv name value) env;
   let r_sigs = match sigs with true -> 0 | false -> 1 in
   match init_r (Array.of_list (name::argv)) r_sigs with
-  | 1 -> () | _ -> raise Initialisation_failed
+  | 1 -> let () = Callback.register_exception "OCaml-R generic error"
+           (R_Error ((null_creator ()), "")) in init_error_hook ()
+  | _ -> raise Initialisation_failed
 
 module type Interpreter = sig end
 

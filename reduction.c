@@ -1,3 +1,48 @@
+/* TODO: declare static what should be declared static... */
+
+
+
+/**********************************************************************
+ *                                                                    *
+ *                 Error handling from R to OCaml                     *
+ *                                                                    *
+ **********************************************************************/
+
+
+/* Transmitting errors from R to Objective Caml is a rather painful
+   topic. Essentially because it is undocumented, but also not
+   supported by the R API. And not even "public". So we have to resort
+   to writing our own headers to cope with this. For discussion, see
+   posting https://stat.ethz.ch/pipermail/r-help/2008-August/171493.html */
+
+void R_SetErrorHook(void (*hook)(SEXP, char *));
+
+/* This header allows us to access a function that sets hooks for error
+   handling. Moreover, each time an error occurs, the hook is removed. So
+   you have to re-hook the hook from code within the hook itself...
+   Moreover, behaviour when coping recursively with errors is unknown. */
+
+/* The global variables where we cache our error status. */
+
+SEXP error_call = NULL;
+char * error_message = NULL;
+
+/* The hook in charge of caching the error status. */
+
+void r_error_hook(SEXP call, char * message);
+void r_error_hook(SEXP call, char * message) {
+  error_call = call;
+  error_message = message;
+  R_SetErrorHook(&r_error_hook);
+}
+
+CAMLprim value r_init_error_hook (value ml_unit) {
+  CAMLparam1(ml_unit);
+  R_SetErrorHook(&r_error_hook);
+  CAMLreturn(Val_unit);
+}
+
+
 /**********************************************************************
  *                                                                    *
  *                   Beta reduction of R calls.                       *
@@ -9,16 +54,18 @@ CAMLprim value r_eval_sxp (value sexp_list) {
 
   /* sexp_list is an OCaml value containing a SEXP of sexptype LANGSXP.
      This is a LISP-style pairlist of SEXP values. r_eval_sxp executes
-     the whole string, and sends back the resulting SEXP wrapped up in
-     an OCaml value. There's also an error handling mechanism.
-     r_eval_sxp handles values of type LANGSXP and PROMSXP. So we have two
+     the whole pairlist, and sends back the resulting SEXP wrapped up in
+     an OCaml value. There's also an error handling mechanism. */
+
+  /* r_eval_sxp handles values of type LANGSXP and PROMSXP. So we have two
      functions on the OCaml side associated to this stub, the first on
      with type lang sexp -> raw sexp, the other one with type
-     prom sexp -> raw sexp. This also means that their is a dynamic type
+     prom sexp -> raw sexp. This also means that there is a dynamic type
      checking being done in the scope of the R_tryEval function, and it
      would be nice to shortcut it with statically typed equivalents. */
 
   CAMLparam1(sexp_list);
+  CAMLlocal3(result, ml_error_call, ml_error_message);
 
   SEXP e;        // Placeholder for the result of beta-reduction.
   int error = 0; // Error catcher boolean.
@@ -29,9 +76,25 @@ CAMLprim value r_eval_sxp (value sexp_list) {
   UNPROTECT(1);
 
   /* Will have to implement error handling in OCaml. */
-  if (error) caml_failwith("OCaml-R error in r_eval_sxp C stub.");
+  if (error) {
+    //caml_failwith("OCaml-R error in r_eval_sxp C stub.");
+    result = caml_alloc(2, 0);
+    ml_error_call = Val_sexp(error_call);
+    ml_error_message = caml_copy_string(error_message);
+    Store_field(result, 0, ml_error_call);
+    Store_field(result, 1, ml_error_message);
+    error_call = NULL;      //should check for a memory leak here...
+    error_message = NULL;   //should check for a memory leak here...
 
-  CAMLreturn(Val_sexp(e));
+    /* The exception callback mechanism is described on the webpage
+       http://www.pps.jussieu.fr/Livres/ora/DA-OCAML/book-ora118.html
+       We should check to see if we could the string-name lookup to
+       avoid unnecessary delays in exception handling. */
+    raise_with_arg(*caml_named_value("OCaml-R generic error"), result);
+  }
+
+  result = Val_sexp(e);
+  CAMLreturn(result);
 }
 
 CAMLprim value r_apply_closure (value call, value op, value arglist) {

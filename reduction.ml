@@ -1,3 +1,7 @@
+(* The following exception needs to be registered
+   in a callback when the R interpreter is initialised. *)
+exception R_Error of lang sxp * string
+
 external eval_langsxp : lang sxp -> sexp = "r_eval_sxp"
 
 let eval_string s = eval_langsxp (parse_sexp s)
