@@ -33,7 +33,7 @@ CAMLprim value Val_sexp (SEXP sexp) {
   CAMLreturn(result);
 }
 
-#define Sexp_val(sexp) ((SEXP) Field(sexp, 0)
+#define Sexp_val(sexp) ((SEXP) Field(sexp, 0))
 
 #define Val_vecsexp(x) Val_sexp(x)
 #define Vecsexp_val(x) ((VECSEXP) Sexp_val(x))

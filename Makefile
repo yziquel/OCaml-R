@@ -46,7 +46,6 @@ r.ml: standard.ml base.ml
 	cat                  \
 	  r_Env.ml           \
 	  standard.ml        \
-	  initialisation.ml  \
 	  sexptype.ml        \
 	  sexprec.ml         \
 	  data.ml            \
@@ -60,6 +59,7 @@ r.ml: standard.ml base.ml
 	  internal.ml        \
 	  parser.ml          \
 	  reduction.ml       \
+	  initialisation.ml  \
 	  base.ml            \
 	> r.ml
 
@@ -68,12 +68,12 @@ r.mli: base.mli
 	  incipit.mli        \
 	  r_Env.mli          \
 	  standard.mli       \
-	  initialisation.mli \
 	  sexptype.mli       \
 	  data.mli           \
 	  symbols.mli        \
 	  conversion.mli     \
 	  reduction.mli      \
+	  initialisation.mli \
 	  base.mli           \
 	> r.mli
 
