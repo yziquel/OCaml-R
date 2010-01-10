@@ -1,9 +1,9 @@
 (* Functions to initialise and terminate the R interpreter. *)
 
-external init_r : string array -> int -> int = "init_r"
-external terminate : unit -> unit = "end_r"
+external init_r : string array -> int -> int = "init_r" "noalloc"
+external terminate : unit -> unit = "end_r" "noalloc"
 
-external init_error_hook : unit -> unit = "r_init_error_hook"
+external init_error_hook : unit -> unit = "r_init_error_hook" "noalloc"
 
 exception Initialisation_failed
 
@@ -18,15 +18,19 @@ let init ?(name    = try Sys.argv.(0) with _ -> "OCaml-R")
            (R_Error ((null_creator ()), "")) in init_error_hook ()
   | _ -> raise Initialisation_failed
 
-module type Interpreter = sig end
+module type Interpreter = sig
+
+  val loaded: unit
+
+end
 
 module Interpreter (Env : Environment) : Interpreter = struct
 
-  let () = init ~name: Env.name
-                ~argv: Env.options
-                ~env:  Env.env
-                ~sigs: Env.signal_handlers
-                ()
+  let loaded = init ~name: Env.name
+                    ~argv: Env.options
+                    ~env:  Env.env
+                    ~sigs: Env.signal_handlers
+                    ()
 
 end
 

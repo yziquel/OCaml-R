@@ -8,6 +8,9 @@ type 'a sxp
 type env
 (**  Phantom type representing the ENVSXP dynamic R sexptype. *)
 
+type lang
+(**  Phantom type representing the LANGSXP dynamic R sexptype. *)
+
 type 'a vec
 (**  Polymorphic phantom type representing R array sexptypes. *)
 

@@ -24,22 +24,21 @@ void R_SetErrorHook(void (*hook)(SEXP, char *));
 
 /* The global variables where we cache our error status. */
 
-SEXP error_call = NULL;
-char * error_message = NULL;
+static SEXP error_call = NULL;
+static char * error_message = NULL;
 
 /* The hook in charge of caching the error status. */
 
-void r_error_hook(SEXP call, char * message);
-void r_error_hook(SEXP call, char * message) {
+static void r_error_hook(SEXP call, char * message);
+static void r_error_hook(SEXP call, char * message) {
   error_call = call;
   error_message = message;
   R_SetErrorHook(&r_error_hook);
 }
 
 CAMLprim value r_init_error_hook (value ml_unit) {
-  CAMLparam1(ml_unit);
   R_SetErrorHook(&r_error_hook);
-  CAMLreturn(Val_unit);
+  return Val_unit;
 }
 
 
@@ -64,44 +63,47 @@ CAMLprim value r_eval_sxp (value sexp_list) {
      checking being done in the scope of the R_tryEval function, and it
      would be nice to shortcut it with statically typed equivalents. */
 
-  CAMLparam1(sexp_list);
-  CAMLlocal3(result, ml_error_call, ml_error_message);
+  CAMLparam0();
+  CAMLlocal2(ml_error_call, ml_error_message);
 
   SEXP e;        // Placeholder for the result of beta-reduction.
   int error = 0; // Error catcher boolean.
 
   /* Should this be wrapped with a PROTECT() and an UNPROTECT(1), or
      not? */
+  enter_blocking_section();
   PROTECT(e = R_tryEval(Sexp_val(sexp_list), R_GlobalEnv, &error));
   UNPROTECT(1);
+  leave_blocking_section();
 
-  /* Will have to implement error handling in OCaml. */
+  /* Implements error handling from R to Objective Caml. */
   if (error) {
-    //caml_failwith("OCaml-R error in r_eval_sxp C stub.");
-    result = caml_alloc(2, 0);
+
     ml_error_call = Val_sexp(error_call);
-    ml_error_message = caml_copy_string(error_message);
-    Store_field(result, 0, ml_error_call);
-    Store_field(result, 1, ml_error_message);
     error_call = NULL;      //should check for a memory leak here...
+
+    ml_error_message = caml_copy_string(error_message);
     error_message = NULL;   //should check for a memory leak here...
+
+    value error_result = caml_alloc_small(2, 0);
+    Store_field(error_result, 0, ml_error_call);
+    Store_field(error_result, 1, ml_error_message);
 
     /* The exception callback mechanism is described on the webpage
        http://www.pps.jussieu.fr/Livres/ora/DA-OCAML/book-ora118.html
        We should check to see if we could the string-name lookup to
        avoid unnecessary delays in exception handling. */
-    raise_with_arg(*caml_named_value("OCaml-R generic error"), result);
+    raise_with_arg(*caml_named_value("OCaml-R generic error"), error_result);
   }
 
-  result = Val_sexp(e);
-  CAMLreturn(result);
+  CAMLreturn(Val_sexp(e));
 }
 
-CAMLprim value r_apply_closure (value call, value op, value arglist) {
-  CAMLparam3(call, op, arglist);
-  CAMLreturn(Val_sexp(Rf_applyClosure(Sexp_val(call), Sexp_val(op),
-    Sexp_val(arglist), R_GlobalEnv, R_BaseEnv)));
-}
+//CAMLprim value r_apply_closure (value call, value op, value arglist) {
+//  CAMLparam3(call, op, arglist);
+//  CAMLreturn(Val_sexp(Rf_applyClosure(Sexp_val(call), Sexp_val(op),
+//    Sexp_val(arglist), R_GlobalEnv, R_BaseEnv)));
+//}
 
 
 

@@ -56,7 +56,7 @@ type sexptype =
   | S4Sxp
   | FunSxp
 
-external sexptype_of_sexp : sexp -> int = "r_sexptype_of_sexp"
+external sexptype_of_sexp : sexp -> int = "r_sexptype_of_sexp" "noalloc"
 let sexptype s = match (sexptype_of_sexp s) with
   | 0  -> NilSxp
   | 1  -> SymSxp
