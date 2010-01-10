@@ -1,4 +1,4 @@
-//#define OCAMLR_DEBUG   /* Toggle this on or off to enable debugging. */
+//#define OCAMLR_DEBUG /* Toggle this on or off to enable debugging. */
 
 #define _GNU_SOURCE    /* Required by asprinft (see 'man asprintf'), as it is a
                           GNU extension. Seems a bit overkill. Should try to
@@ -13,6 +13,7 @@
 #include <caml/memory.h>
 #include <caml/fail.h>
 #include <caml/callback.h>
+#include <caml/signals.h>
 #include <R.h>
 #include <Rdefines.h>
 #include <Rinternals.h>

@@ -32,4 +32,3 @@ CAMLprim value r_sexp_equality (value s1, value s2) {
 CAMLprim value r_sexptype_of_sexp (value sexp) {
   return Val_int(TYPEOF(Sexp_val(sexp)));
 }
-

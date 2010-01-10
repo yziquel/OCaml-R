@@ -23,7 +23,11 @@
   *  to invoke the {b #require "R.interpreter"} directive to set up the interpreter.
   *)
 
-module type Interpreter = sig end
+module type Interpreter = sig
+
+  val loaded: unit
+
+end
 (**  Module type of an R interpreter. *)
 
 module Interpreter (Env : Environment) : Interpreter
