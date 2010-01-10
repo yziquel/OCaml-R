@@ -13,7 +13,7 @@ val strings_of_t : string list t -> string list
   *  strings.
   *)
 
-val string : string -> string vecsxp
+val string : string -> string t
 (**  Converts an Objective Caml string to an R string, that is a
   *  mono-element array of strings.
   *)
