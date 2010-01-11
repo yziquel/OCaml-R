@@ -15,4 +15,3 @@ val opt : ('a -> 'b t) -> string -> 'a option -> (string option * sexp) option
 
 val eval : sexp -> (string option * sexp) option list -> sexp
 (**  Evaluates an R function given a list of arguments. *)
-

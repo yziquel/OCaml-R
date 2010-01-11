@@ -72,6 +72,7 @@ r.mli: base.mli
 	  data.mli           \
 	  symbols.mli        \
 	  conversion.mli     \
+	  s3.ml              \
 	  reduction.mli      \
 	  initialisation.mli \
 	  base.mli           \
@@ -84,13 +85,14 @@ base.ml:
 	cat                  \
 	  base/incipit.ml    \
 	  base/list.ml       \
-          base/dataFrame.ml  \
+	  base/dataFrame.ml  \
 	  base/excipit.ml    \
 	> base.ml
 
 base.mli:
 	cat                  \
 	  base/incipit.mli   \
+	  base/list.mli      \
 	  base/dataFrame.mli \
 	  base/excipit.mli   \
 	> base.mli
