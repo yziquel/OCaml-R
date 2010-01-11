@@ -64,20 +64,25 @@ CAMLprim value r_eval_sxp (value sexp_list) {
      would be nice to shortcut it with statically typed equivalents. */
 
   CAMLparam0();
-  CAMLlocal2(ml_error_call, ml_error_message);
 
   SEXP e;        // Placeholder for the result of beta-reduction.
   int error = 0; // Error catcher boolean.
 
   /* Should this be wrapped with a PROTECT() and an UNPROTECT(1), or
      not? */
+  SEXP our_call = Sexp_val(sexp_list);
   caml_enter_blocking_section();
-  PROTECT(e = R_tryEval(Sexp_val(sexp_list), R_GlobalEnv, &error));
+  PROTECT(e = R_tryEval(our_call, R_GlobalEnv, &error));
   UNPROTECT(1);
   caml_leave_blocking_section();
 
   /* Implements error handling from R to Objective Caml. */
   if (error) {
+
+    value ml_error_call = Val_unit;
+    value ml_error_message = Val_unit;
+
+    Begin_roots2(ml_error_call, ml_error_message);
 
     ml_error_call = Val_sexp(error_call);
     error_call = NULL;      //should check for a memory leak here...
@@ -91,9 +96,11 @@ CAMLprim value r_eval_sxp (value sexp_list) {
 
     /* The exception callback mechanism is described on the webpage
        http://www.pps.jussieu.fr/Livres/ora/DA-OCAML/book-ora118.html
-       We should check to see if we could the string-name lookup to
-       avoid unnecessary delays in exception handling. */
-    raise_with_arg(*caml_named_value("OCaml-R generic error"), error_result);
+       We should check to see if we could avoid the string-name lookup
+       to avoid unnecessary delays in exception handling. */
+    caml_raise_with_arg(*caml_named_value("OCaml-R generic error"), error_result);
+
+    End_roots();
   }
 
   CAMLreturn(Val_sexp(e));

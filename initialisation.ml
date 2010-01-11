@@ -18,19 +18,17 @@ let init ?(name    = try Sys.argv.(0) with _ -> "OCaml-R")
            (Runtime_error ((null_creator ()), "")) in init_error_hook ()
   | _ -> raise Initialisation_failed
 
-module type Interpreter = sig
-
-  val loaded: unit
-
-end
+module type Interpreter = sig end
 
 module Interpreter (Env : Environment) : Interpreter = struct
 
-  let loaded = init ~name: Env.name
-                    ~argv: Env.options
-                    ~env:  Env.env
-                    ~sigs: Env.signal_handlers
-                    ()
+  let () = init ~name: Env.name
+                ~argv: Env.options
+                ~env:  Env.env
+                ~sigs: Env.signal_handlers
+                ()
+
+  let () = at_exit terminate
 
 end
 
