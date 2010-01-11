@@ -15,7 +15,7 @@ let init ?(name    = try Sys.argv.(0) with _ -> "OCaml-R")
   let r_sigs = match sigs with true -> 0 | false -> 1 in
   match init_r (Array.of_list (name::argv)) r_sigs with
   | 1 -> let () = Callback.register_exception "OCaml-R generic error"
-           (R_Error ((null_creator ()), "")) in init_error_hook ()
+           (Runtime_error ((null_creator ()), "")) in init_error_hook ()
   | _ -> raise Initialisation_failed
 
 module type Interpreter = sig

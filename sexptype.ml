@@ -26,8 +26,6 @@ type vec_real = float vec        (* For REALSXP *)
 type vec_str  = string vec       (* For STRSXP *)
 type vec_sexp = sexp vec
 
-let sexp : 'a sxp -> sexp = Obj.magic
-
 (* Algebraic type reflecting R's dynamic typing. *)
 type sexptype =
   | NilSxp

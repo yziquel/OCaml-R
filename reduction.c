@@ -71,10 +71,10 @@ CAMLprim value r_eval_sxp (value sexp_list) {
 
   /* Should this be wrapped with a PROTECT() and an UNPROTECT(1), or
      not? */
-  enter_blocking_section();
+  caml_enter_blocking_section();
   PROTECT(e = R_tryEval(Sexp_val(sexp_list), R_GlobalEnv, &error));
   UNPROTECT(1);
-  leave_blocking_section();
+  caml_leave_blocking_section();
 
   /* Implements error handling from R to Objective Caml. */
   if (error) {

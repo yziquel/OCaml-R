@@ -17,9 +17,6 @@ type 'a vec
 type 'a vecsxp = 'a vec sxp
 (**  Type abreviation for R array values. *)
 
-val sexp : 'a sxp -> sexp
-(**  Function forgetting the underlying R dynamic typing. *)
-
 type sexptype =
 (**  Algebraic datatype reflecting R's dynamic typing. *)
   | NilSxp

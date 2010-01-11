@@ -1,6 +1,6 @@
 (* The following exception needs to be registered
    in a callback when the R interpreter is initialised. *)
-exception R_Error of lang sxp * string
+exception Runtime_error of lang sxp * string
 
 external eval_langsxp : lang sxp -> sexp = "r_eval_sxp"
 
@@ -11,10 +11,10 @@ let rec prepare_args = function
   | None::l     -> prepare_args l
   | []          -> []
 
-let arg f ?name x = Some (name, (sexp (f x)))
+let arg f ?name x = Some (name, (Obj.magic (f x)))
 let opt f name x = match x with
   | None -> None
-  | Some xx -> Some ((Some name), (sexp (f xx)))
+  | Some x -> Some ((Some name), (Obj.magic (f x)))
 
 let eval phi (args: (string option * sexp) option list) =
   eval_langsxp (langsxp phi (prepare_args args))
