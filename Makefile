@@ -28,13 +28,13 @@ oCamlR.cmxa: oCamlR.cmx
 	ocamlopt -verbose -a -o oCamlR.cmxa oCamlR.cmx
 
 r.cmi: r.mli
-	ocamlfind ocamlc -verbose -c r.mli
+	ocamlfind ocamlc -package calendar -verbose -c r.mli
 
 r.cmo: r.ml r.cmi
-	ocamlfind ocamlc -verbose -package unix -c r.ml
+	ocamlfind ocamlc -package calendar -verbose -package unix -c r.ml
 
 r.cmx: r.ml r.cmi
-	ocamlfind ocamlopt -verbose -package unix -c r.ml
+	ocamlfind ocamlopt -package calendar -verbose -package unix -c r.ml
 
 oCamlR.cmo:
 	ocamlfind ocamlc -verbose -c oCamlR.ml
