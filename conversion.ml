@@ -48,6 +48,10 @@ let int_vecsxp_of_int_list    = vecsxp_of_list alloc_int_vector assign_int_vecsx
 let int i = int_vecsxp_of_int_list [i]
 
 let float_list_of_real_vecsxp = list_of_vecsxp access_real_vecsxp
+let floats_of_t : float list t -> float list = float_list_of_real_vecsxp
+let float_of_t : float t -> float = fun t -> access_real_vecsxp t 0
+  (* We access only the first element, because static typing is supposed to
+     ensure that the real vecsxp contains only one element. *)
 
 let string_list_of_str_vecsxp = list_of_vecsxp access_str_vecsxp
 let str_vecsxp_of_string_list = vecsxp_of_list alloc_str_vector assign_str_vecsxp

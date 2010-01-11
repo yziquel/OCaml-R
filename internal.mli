@@ -1,3 +1,9 @@
+module Specification : sig
+
+  type symbol = (string * (sexp option)) option option
+
+end
+
 module Pretty : sig
 
   type t =

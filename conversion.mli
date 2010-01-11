@@ -3,9 +3,14 @@ val bool : bool -> bool t
   *  that is a mono-element array of booleans.
   *) 
 
-val float_list_of_real_vecsxp : sexp -> float list
+val floats_of_t : float list t -> float list
 (**  Converts an R array of real numbers into a list of Objective
   *  Caml floats.
+  *)
+
+val float_of_t : float t -> float
+(**  Converts an R array of floats with one element into an Objective
+  *  Caml float.
   *)
 
 val strings_of_t : string list t -> string list

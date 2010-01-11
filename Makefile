@@ -55,8 +55,8 @@ r.ml: standard.ml base.ml
 	  lazy.ml            \
 	  symbols.ml         \
 	  conversion.ml      \
+	  internal.ml        \   
 	  s3.ml              \
-	  internal.ml        \
 	  parser.ml          \
 	  reduction.ml       \
 	  initialisation.ml  \
@@ -72,8 +72,8 @@ r.mli: base.mli
 	  data.mli           \
 	  symbols.mli        \
 	  conversion.mli     \
-	  s3.mli             \
 	  internal.mli       \
+	  s3.mli             \
 	  reduction.mli      \
 	  initialisation.mli \
 	  base.mli           \
