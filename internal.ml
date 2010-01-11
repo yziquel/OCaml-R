@@ -20,7 +20,7 @@ module Specification = struct
         end end
     | (CharSxp, _, NilSxp) ->
         let symbol_name = string_of_charsxp pname in
-        Some (Some (symbol_name, (Some value))
+        Some (Some (symbol_name, (Some value)))
     | _ -> assert false
 
 end
