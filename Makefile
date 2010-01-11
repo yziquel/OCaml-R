@@ -72,7 +72,7 @@ r.mli: base.mli
 	  data.mli           \
 	  symbols.mli        \
 	  conversion.mli     \
-	  s3.ml              \
+	  s3.mli             \
 	  reduction.mli      \
 	  initialisation.mli \
 	  base.mli           \
