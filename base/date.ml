@@ -6,7 +6,7 @@ module Date = struct
   end
 
   class from_R r : t = object
-    inherit S3.from_R
+    inherit S3.from_R r
     method as_float = float_of_t underlying
   end
 
