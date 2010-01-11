@@ -4,7 +4,7 @@ module S3 : sig
 
     method underlying : sexp
     method attribute  : string -> sexp
-    method attributes : sexp
+    method attributes : (sexp * sexp) list
     method classes    : string list
 
   end

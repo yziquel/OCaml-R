@@ -18,7 +18,7 @@ module S3 = struct
     val underlying    : sexp
     method underlying : sexp
     method attribute  : string -> sexp
-    method attributes : sexp
+    method attributes : (sexp * sexp) list
     method classes    : string list
 
   end
@@ -28,7 +28,7 @@ module S3 = struct
     val underlying = r
     method underlying = underlying
     method attribute s = get_attrib underlying s
-    method attributes = get_attributes underlying
+    method attributes = list_of_lisplist (get_attributes underlying)
     method classes = strings_of_t (get_attrib underlying "class")
 
   end
