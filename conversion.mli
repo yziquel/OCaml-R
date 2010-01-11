@@ -1,4 +1,4 @@
-val bool : bool -> bool vecsxp
+val bool : bool -> bool t
 (**  Converts an Objective Caml boolean value to an R boolean value,
   *  that is a mono-element array of booleans.
   *) 
@@ -18,7 +18,7 @@ val string : string -> string t
   *  mono-element array of strings.
   *)
 
-val strings : string list -> string vecsxp
+val strings : string list -> string list t
 (**  Converts an Objective Caml list of strings into an R array of
   *  strings.
   *)
