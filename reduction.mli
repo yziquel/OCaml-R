@@ -1,3 +1,5 @@
+exception Runtime_error of lang sxp * string
+
 val eval_string : string -> sexp
 (**  [eval_string] take a string containing R code, and feeds it to the
   *  R interpreter. You get the resulting value back.
