@@ -87,6 +87,7 @@ base.ml:
 	  base/incipit.ml    \
 	  base/list.ml       \
 	  base/dataFrame.ml  \
+	  base/date.ml       \
 	  base/excipit.ml    \
 	> base.ml
 
@@ -95,6 +96,7 @@ base.mli:
 	  base/incipit.mli   \
 	  base/list.mli      \
 	  base/dataFrame.mli \
+	  base/date.mli      \
 	  base/excipit.mli   \
 	> base.mli
 
