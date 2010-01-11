@@ -38,3 +38,17 @@ CAMLprim value r_get_attrib (value sexp, value symbolname) {
   result = Val_sexp(getAttrib(Sexp_val(sexp), Sexp_val(symbolname)));
   CAMLreturn(result);
 }
+
+
+/**  Get the attribute list of a given SEXP.
+  *
+  *  r_get_attributes takes a SEXP as first argument, and returns
+  *  the attributes of the given SEXP.
+  */
+
+CAMLprim value r_get_attributes (value sexp) {
+  CAMLparam1(sexp);
+  CAMLlocal1(result);
+  result = Val_sexp(ATTRIB(Sexp_val(sexp)));
+  CAMLreturn(result);
+}
