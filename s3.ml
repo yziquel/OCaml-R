@@ -26,7 +26,7 @@ module S3 = struct
     method underlying = underlying
     method attribute s = get_attrib underlying s
     method attributes = List.map
-      begin function (a, x) -> (Specification.symbol a), x end
+      begin function (a, x) -> (Specification.of_symbol a), x end
       (list_of_lisplist (get_attributes underlying))
     method classes = strings_of_t (get_attrib underlying "class")
   end
