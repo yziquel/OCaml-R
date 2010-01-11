@@ -7,6 +7,7 @@ module S3 : sig
     method classes    : string list
   end
 
+  class from_R : sexp -> t
   val t_from_R : sexp -> t
 
 end
