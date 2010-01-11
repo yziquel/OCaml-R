@@ -1,7 +1,7 @@
 name = "R"
 version = "0.2"
 description = "R bindings for OCaml"
-requires = "unix"
+requires = "unix, calendar"
 archive(byte) = "r.cma"
 archive(native) = "r.cmxa"
 
