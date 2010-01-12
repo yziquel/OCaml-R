@@ -41,17 +41,30 @@ let vecsxp_of_list (alloc : int -> 'a vecsxp) (assign : 'a vecsxp -> int -> 'a -
 
 let bool_list_of_lgl_vecsxp   = list_of_vecsxp access_lgl_vecsxp
 let lgl_vecsxp_of_bool_list   = vecsxp_of_list alloc_lgl_vector assign_lgl_vecsxp
+let bools_of_t : bool list t -> bool list = bool_list_of_lgl_vecsxp
+let bool_of_t : bool t -> bool = fun t -> access_lgl_vecsxp t 0
+  (* We access only the first element, because static typing is supposed to
+     ensure that the lgl vecsxp contains only one element. *)
 let bool b = lgl_vecsxp_of_bool_list [b]
+let bools = lgl_vecsxp_of_bool_list
 
 let int_list_of_int_vecsxp    = list_of_vecsxp access_int_vecsxp
 let int_vecsxp_of_int_list    = vecsxp_of_list alloc_int_vector assign_int_vecsxp
+let ints_of_t : int list t -> int list = int_list_of_int_vecsxp
+let int_of_t : int t -> int = fun t -> access_int_vecsxp t 0
+  (* We access only the first element, because static typing is supposed to
+     ensure that the int vecsxp contains only one element. *)
 let int i = int_vecsxp_of_int_list [i]
+let ints = int_vecsxp_of_int_list
 
 let float_list_of_real_vecsxp = list_of_vecsxp access_real_vecsxp
+let real_vecsxp_of_float_list = vecsxp_of_list alloc_real_vector assign_real_vecsxp
 let floats_of_t : float list t -> float list = float_list_of_real_vecsxp
 let float_of_t : float t -> float = fun t -> access_real_vecsxp t 0
   (* We access only the first element, because static typing is supposed to
      ensure that the real vecsxp contains only one element. *)
+let float x = real_vecsxp_of_float_list [x]
+let floats = real_vecsxp_of_float_list
 
 let string_list_of_str_vecsxp = list_of_vecsxp access_str_vecsxp
 let str_vecsxp_of_string_list = vecsxp_of_list alloc_str_vector assign_str_vecsxp
@@ -63,3 +76,4 @@ external string : string -> string t = "r_strsxp_of_string"
 let strings = str_vecsxp_of_string_list
 
 let sexp_list_of_sexp_vecsxp = list_of_vecsxp access_sexp_vecsxp
+let sexps_of_t : sexp list t -> sexp list = sexp_list_of_sexp_vecsxp

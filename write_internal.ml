@@ -28,6 +28,16 @@ external assign_lgl_vecsxp  : vec_lgl  sxp -> int -> bool -> unit = "r_assign_lg
 external assign_int_vecsxp  : vec_int  sxp -> int -> int -> unit = "r_assign_int_vecsxp"
 
 
+(**  Sets the element of a vector of real numbers.
+  *
+  *  assign_real_vecsxp takes a vector of real numbers as first argument,
+  *  an offset as second argument, and a real number as third argument,
+  *  and sets the vector's offset element to the real number's value.
+  *)
+
+external assign_real_vecsxp : vec_real sxp -> int -> float -> unit = "r_assign_real_vecsxp"
+
+
 (**  Sets the element of a vector of string.
   *
   *  assign_str_vecsxp takes a vector of strings as first argument,

@@ -53,6 +53,20 @@ CAMLprim value r_alloc_int_vector (value i) {
 }
 
 
+/**  Allocates a vector of real numbers.
+  *
+  *  r_alloc_real_vector takes an integer i as argument, and returns
+  *  an R vector of i strings.
+  */
+
+CAMLprim value r_alloc_real_vector (value i) {
+  CAMLparam1(i);
+  CAMLlocal1(result);
+  result = Val_sexp(allocVector(REALSXP, Int_val(i)));
+  CAMLreturn(result);
+}
+
+
 /**  Allocates a vector of strings.
   *
   *  r_alloc_str_vector takes an integer i as argument, and returns

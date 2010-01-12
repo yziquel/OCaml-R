@@ -48,6 +48,20 @@ CAMLprim value r_assign_int_vecsxp (value intsxp, value offset, value i) {
 }
 
 
+/**  Sets the element of a vector of real numbers.
+  *
+  *  r_assign_real_vecsxp takes a vector of real numbers as first argument,
+  *  an offset as second argument, and a real number as third argument,
+  *  and sets the vector's offset element to the real number's value.
+  */
+
+CAMLprim value r_assign_real_vecsxp (value realsxp, value offset, value x) {
+  CAMLparam3(realsxp, offset, x);
+  REAL((double *) Vecsexp_val(realsxp))[Int_val(offset)] = Double_val(x);
+  CAMLreturn(Val_unit);
+}
+
+
 /**  Sets the element of a vector of string.
   *
   *  r_assign_str_vecsxp takes a vector of strings as first argument,
