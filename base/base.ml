@@ -1,6 +1,6 @@
 module Stub = struct
 
-  let sample = symbol "sample"
+  let sample = lazy (symbol "sample")
 
 end
 
@@ -13,8 +13,9 @@ let sample (x : 'a list t) size ?replace ?(prob: float list option) () : 'a list
      behaviour does not fit the R.arg behaviour, nor does it
      fit the R.opt behaviour (since the argument should be
      named. This type of argument has to be worked out... *)
-  eval Stub.sample [
+  eval (Lazy.force Stub.sample) [
     (arg (fun x -> x)           x)      ;
     (arg int                    size)   ;
     (opt bool         "replace" replace);
-    (opt floats       "prob"    prob)   ] 
+    (opt floats       "prob"    prob)   ]
+
