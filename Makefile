@@ -85,6 +85,7 @@ standard.ml: standard.R
 base.ml:
 	cat                  \
 	  base/incipit.ml    \
+	  base/base.ml       \
 	  base/list.ml       \
 	  base/dataFrame.ml  \
 	  base/date.ml       \
@@ -94,6 +95,7 @@ base.ml:
 base.mli:
 	cat                  \
 	  base/incipit.mli   \
+	  base/base.mli      \
 	  base/list.mli      \
 	  base/dataFrame.mli \
 	  base/date.mli      \
