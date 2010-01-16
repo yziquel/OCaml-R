@@ -5,6 +5,13 @@ requires = "unix, calendar"
 archive(byte) = "r.cma"
 archive(native) = "r.cmxa"
 
+package "math" (
+  version = "0.2"
+  description = "R mathematical library"
+  archive(byte) = "rmath.cma"
+  archive(native) = "rmath.cmxa"
+)
+
 package "interpreter" (
   version = "0.2"
   description = "Embedded R interpreter"
