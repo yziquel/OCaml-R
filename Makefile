@@ -8,7 +8,10 @@ LINKFLAGS_BYTE=$(INCLUDES) -ccopt -L$(RLIBDIR)  -cclib -lR
 
 FLAVOUR=INTERNAL
 
-all: build
+all: build build-math
+
+build-math:
+	make -C math
 
 build: r.cma r.cmxa r.cmxs oCamlR.cmo oCamlR.cmx
 
