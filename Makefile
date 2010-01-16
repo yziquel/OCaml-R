@@ -115,6 +115,7 @@ dllr_stubs.so: libr_stubs.a r_stubs.o
 	ocamlmklib -verbose -o r_stubs r_stubs.o
 
 clean:
+	make -C math clean
 	rm -f standard.ml base.ml base.mli r.ml r.mli
 	rm -f *.o *.so *.a *.cmi *.cmo *.cmx *.cma *.cmxa *.cmxs
 
