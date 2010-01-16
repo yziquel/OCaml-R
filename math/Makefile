@@ -1,4 +1,5 @@
-INCLUDES=       -I +ocamldoc -I `ocamlc -where`/caml
+RINCLUDES=-I . -I /usr/share/R/include
+INCLUDES=       -I +ocamldoc -I `ocamlc -where`/caml $(RINCLUDES)
 
 COMPFLAGS=$(INCLUDES)
 LINKFLAGS=$(INCLUDES) -cclib -lRmath
@@ -6,16 +7,13 @@ LINKFLAGS_BYTE=$(INCLUDES) -cclib -lRmath
 
 all: build
 
-build: rmath.cma rmath.cmxa rmath.cmxs
+build: rmath.cma rmath.cmxa
 
 rmath.cma: dllrmath_stubs.so rmath.cmo
 	ocamlc -verbose -a -dllib dllrmath_stubs.so -dllib libRmath.so -o rmath.cma rmath.cmo
 
 rmath.cmxa: dllrmath_stubs.so rmath.cmx
 	ocamlopt -verbose -a -cclib -lrmath_stubs -cclib -lRmath -o rmath.cmxa rmath.cmx
-
-rmath.cmxs: rmath.cmxa
-	ocamlopt -shared -linkall -o $@ $<
 
 rmath.cmi: rmath.mli
 	ocamlfind ocamlc -verbose -c rmath.mli
