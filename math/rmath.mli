@@ -26,18 +26,36 @@
 (** Access to the R math library. *)
 
 (** {2 Utilities} *)
+
 val pow : float -> float -> float
+(**  [pow x y] is the exponentiation of base [x] and power [y]. *)
+
 val pow_di : float -> int -> float
+(**  [pow x n] is the exponentiation of base [x] and integer power [n]. *)
 
 (** {2 Random number generators} *)
 
 val norm_rand : unit -> float
+(**  Random variates from the standard normal distribution.
+  *  Bug: currently systematically returns [-8.77332116900134373]. *)
+
 val unif_rand : unit -> float
+(**  Random variates from the uniform distribution, using
+  *  Marsaglia MultiCarry methodology for random number generation.
+  *  Bug: currently systematically returns [1.16415321854039843e-10]. *)
+
 val exp_rand : unit -> float
+(**  Random variates from the standard exponential distribution.
+  *  Bug: currently systematically returns [22.1807097781510656]. *)
 
 (** {2 Normal distribution} *)
 
 val dnorm : ?mean:float -> ?sd:float -> ?log:bool -> float -> float
+(**  [dnorm ~mean:mu ~sd:sigma ~log:give_log x] computes the density
+  *  of the normal distribution.
+  *  @param mean Mean of the normal distribution.
+  *  @param sd Standard deviation of the normal distribution.
+  *  @log If true, returns the logarithm of the density. *)
 
 val pnorm :
   ?mean:float ->
