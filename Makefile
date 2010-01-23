@@ -8,10 +8,13 @@ LINKFLAGS_BYTE=$(INCLUDES) -ccopt -L$(RLIBDIR)  -cclib -lR
 
 FLAVOUR=INTERNAL
 
-all: build build-math
+all: build build-math build-rbase
 
 build-math:
 	make -C math
+
+build-rbase: build
+	make -C r-base
 
 build: r.cma r.cmxa r.cmxs oCamlR.cmo oCamlR.cmx
 
@@ -88,7 +91,6 @@ standard.ml: standard.R
 base.ml:
 	cat                  \
 	  base/incipit.ml    \
-	  base/base.ml       \
 	  base/list.ml       \
 	  base/dataFrame.ml  \
 	  base/date.ml       \
@@ -98,7 +100,6 @@ base.ml:
 base.mli:
 	cat                  \
 	  base/incipit.mli   \
-	  base/base.mli      \
 	  base/list.mli      \
 	  base/dataFrame.mli \
 	  base/date.mli      \

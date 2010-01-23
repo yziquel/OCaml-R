@@ -19,3 +19,11 @@ package "interpreter" (
   archive(byte) = "oCamlR.cmo"
   archive(native) = "oCamlR.cmx"
 )
+
+package "base" (
+  version = "0.2"
+  description = "R base library"
+  requires = "R.interpreter"
+  archive(byte) = "rbase.cma"
+  archive(native) = "rbase.cmxa"
+)
