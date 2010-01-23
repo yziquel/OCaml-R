@@ -1,8 +1,10 @@
 exception Runtime_error of lang sxp * string
 
-val eval_string : string -> sexp
+val eval_string : string -> 'a t
 (**  [eval_string] take a string containing R code, and feeds it to the
-  *  R interpreter. You get the resulting value back.
+  *  R interpreter. You get the resulting value back. The typing of this
+  *  function is deliberately unsafe in order to allow the user to type
+  *  it precisely.
   *)
 
 val arg : ('a -> 'b t) -> ?name:string -> 'a -> (string option * sexp) option
@@ -15,5 +17,10 @@ val opt : ('a -> 'b t) -> string -> 'a option -> (string option * sexp) option
   *  to Objective Caml functions.
   *)
 
-val eval : sexp -> (string option * sexp) option list -> sexp
-(**  Evaluates an R function given a list of arguments. *)
+val eval : sexp -> (string option * sexp) option list -> 'a t
+(**  [eval f args] evaluates an the R function [f] with respect to a list of
+  *  arguments. Argument [None] is ignored, and [Some (name, sexp)] is the
+  *  argument whose optional name is [name] and whose value is [sexp]. The
+  *  typing of this function is deliberately unsafe in order to allow the
+  *  user to type it precisely. *)
+

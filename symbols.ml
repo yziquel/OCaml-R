@@ -7,7 +7,11 @@ external findvar : sym sxp -> prom sxp = "r_findvar"
 
 external findfun : sym sxp -> prom sxp = "r_findfun"
 
-let symbol : string -> sexp = fun s ->
+let symbol ?(generic = false) s : sexp =
+
+  let findfunction = match generic with
+    | false -> findvar | true -> findfun in
+
   let var = force (findvar (install s)) in
 
   (* If we try to retrieve a function, we should use findfun. If we

@@ -8,15 +8,12 @@ LINKFLAGS_BYTE=$(INCLUDES) -ccopt -L$(RLIBDIR)  -cclib -lR
 
 FLAVOUR=INTERNAL
 
-all: build build-math build-rbase
+all: build build-math
 
 build-math:
 	make -C math
 
-build-rbase: build
-	make -C r-base
-
-build: r.cma r.cmxa r.cmxs oCamlR.cmo oCamlR.cmx
+build: r.cma r.cmxa r.cmxs oCamlR.cmo oCamlR.cmx rbase.cma rbase.cmxa
 
 r.cma: dllr_stubs.so r.cmo
 	ocamlc -verbose -a -dllpath /usr/lib/R/lib -dllib dllr_stubs.so -dllib libR.so -o r.cma r.cmo
@@ -27,11 +24,11 @@ r.cmxa: dllr_stubs.so r.cmx
 r.cmxs: r.cmxa
 	ocamlopt -shared -linkall -ccopt -L/usr/lib/R/lib -ccopt -L. -o $@ $<
 
-oCamlR.cma: oCamlR.cmo
-	ocamlc -verbose -a -o oCamlR.cma oCamlR.cmo
+rbase.cma: rbase.cmo
+	ocamlc -verbose -a -o rbase.cma rbase.cmo
 
-oCamlR.cmxa: oCamlR.cmx
-	ocamlopt -verbose -a -o oCamlR.cmxa oCamlR.cmx
+rbase.cmxa: rbase.cmx
+	ocamlopt -verbose -a -o rbase.cmxa rbase.cmx
 
 r.cmi: r.mli
 	ocamlfind ocamlc -package calendar -verbose -c r.mli
@@ -48,63 +45,88 @@ oCamlR.cmo:
 oCamlR.cmx:
 	ocamlfind ocamlopt -verbose -c oCamlR.ml
 
+rbase.cmi: rbase.mli
+	ocamlfind ocamlc -package calendar -verbose -c rbase.mli
+
+rbase.cmo: rbase.ml rbase.cmi
+	ocamlfind ocamlc -package calendar -verbose -c rbase.ml
+
+rbase.cmx: rbase.ml rbase.cmi
+	ocamlfind ocamlopt -package calendar -verbose -c rbase.ml
+
 r.ml: standard.ml base.ml
-	cat                  \
-	  r_Env.ml           \
-	  standard.ml        \
-	  sexptype.ml        \
-	  sexprec.ml         \
-	  data.ml            \
-	  allocation.ml      \
-	  read_internal.ml   \
-	  write_internal.ml  \
-	  lazy.ml            \
-	  symbols.ml         \
-	  conversion.ml      \
-	  internal.ml        \
-	  s3.ml              \
-	  parser.ml          \
-	  reduction.ml       \
-	  initialisation.ml  \
-	  base.ml            \
+	cat                     \
+	  r_Env.ml              \
+	  standard.ml           \
+	  sexptype.ml           \
+	  sexprec.ml            \
+	  data.ml               \
+	  allocation.ml         \
+	  read_internal.ml      \
+	  write_internal.ml     \
+	  lazy.ml               \
+	  symbols.ml            \
+	  conversion.ml         \
+	  internal.ml           \
+	  s3.ml                 \
+	  parser.ml             \
+	  reduction.ml          \
+	  initialisation.ml     \
+	  base.ml               \
 	> r.ml
 
 r.mli: base.mli
-	cat                  \
-	  incipit.mli        \
-	  r_Env.mli          \
-	  standard.mli       \
-	  sexptype.mli       \
-	  data.mli           \
-	  symbols.mli        \
-	  conversion.mli     \
-	  internal.mli       \
-	  s3.mli             \
-	  reduction.mli      \
-	  initialisation.mli \
-	  base.mli           \
+	cat                     \
+	  incipit.mli           \
+	  r_Env.mli             \
+	  standard.mli          \
+	  sexptype.mli          \
+	  data.mli              \
+	  symbols.mli           \
+	  conversion.mli        \
+	  internal.mli          \
+	  s3.mli                \
+	  reduction.mli         \
+	  initialisation.mli    \
+	  base.mli              \
 	> r.mli
 
 standard.ml: standard.R
 	R --silent --vanilla --slave < standard.R > standard.ml
 
 base.ml:
-	cat                  \
-	  base/incipit.ml    \
-	  base/list.ml       \
-	  base/dataFrame.ml  \
-	  base/date.ml       \
-	  base/excipit.ml    \
+	cat                     \
+	  base/incipit.ml       \
+	  base/listing.ml       \
+	  base/dataFrame.ml     \
+	  base/date.ml          \
+	  base/excipit.ml       \
 	> base.ml
 
 base.mli:
-	cat                  \
-	  base/incipit.mli   \
-	  base/list.mli      \
-	  base/dataFrame.mli \
-	  base/date.mli      \
-	  base/excipit.mli   \
+	cat                     \
+	  base/incipit.mli      \
+	  base/listing.mli      \
+	  base/dataFrame.mli    \
+	  base/date.mli         \
+	  base/excipit.mli      \
 	> base.mli
+
+rbase.ml:
+	cat                     \
+	  r-base/main.ml        \
+	  r-base/listing.ml     \
+	  r-base/dataFrame.ml   \
+	  r-base/date.ml        \
+	> rbase.ml
+
+rbase.mli:
+	cat                     \
+	  r-base/main.mli       \
+	  r-base/listing.mli    \
+	  r-base/dataFrame.mli  \
+	  r-base/date.mli       \
+	> rbase.mli
 
 r_stubs.o: r_stubs.c
 	ocamlopt -verbose -ccopt -Wall $(COMPFLAGS) -ccopt -fPIC -c $<
@@ -117,7 +139,7 @@ dllr_stubs.so: libr_stubs.a r_stubs.o
 
 clean:
 	make -C math clean
-	rm -f standard.ml base.ml base.mli r.ml r.mli
+	rm -f standard.ml base.ml base.mli r.ml r.mli rbase.ml rbase.mli
 	rm -f *.o *.so *.a *.cmi *.cmo *.cmx *.cma *.cmxa *.cmxs
 
 test: build

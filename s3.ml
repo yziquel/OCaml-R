@@ -11,27 +11,19 @@ let get_attrib s name = aux_get_attrib s (install name)
 
 external get_attributes : sexp -> sexp = "r_get_attributes"
 
-module S3 = struct
+class type ['a] s3 = object
+  val underlying    : 'a t
+  method attribute  : 'b. string -> 'b t
+  method attributes : (Specification.symbol * sexp) list
+  method classes    : string list
+end
 
-  class type t = object
-    val underlying    : sexp
-    method underlying : sexp
-    method attribute  : string -> sexp
-    method attributes : (Specification.symbol * sexp) list
-    method classes    : string list
-  end
-
-  class from_R r : t = object
-    val underlying = r
-    method underlying = underlying
-    method attribute s = get_attrib underlying s
-    method attributes = List.map
-      begin function (a, x) -> (Specification.of_symbol a), x end
-      (list_of_lisplist (get_attributes underlying))
-    method classes = strings_of_t (get_attrib underlying "class")
-  end
-
-  let t_from_R r : t = new from_R r
-
+class ['a] s3_from_R r : ['a] s3 = object
+  val underlying = r
+  method attribute s = get_attrib underlying s
+  method attributes = List.map
+    begin function (a, x) -> (Specification.of_symbol a), x end
+    (list_of_lisplist (get_attributes underlying))
+  method classes = strings_of_t (get_attrib underlying "class")
 end
 

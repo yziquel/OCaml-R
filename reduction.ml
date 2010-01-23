@@ -2,7 +2,7 @@
    in a callback when the R interpreter is initialised. *)
 exception Runtime_error of lang sxp * string
 
-external eval_langsxp : lang sxp -> sexp = "r_eval_sxp"
+external eval_langsxp : lang sxp -> 'a t = "r_eval_sxp"
 
 let eval_string s = eval_langsxp (parse_sexp s)
 

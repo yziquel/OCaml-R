@@ -1,14 +1,7 @@
-module DataFrame : sig
-
-  class type t = object
-    inherit List.t
-    method column : int -> sexp
-    method element : int -> int -> sexp
-    method row_names : string list
-  end
-
-  class from_R : sexp -> t
-  val t_from_R : sexp -> t
-
+class type dataframe = object
+  inherit listing
+  method column : int -> 'a t
+  method element : int -> int -> 'a t
+  method row_names : string list
 end
 
