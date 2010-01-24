@@ -14,6 +14,7 @@
 #include <caml/fail.h>
 #include <caml/callback.h>
 #include <caml/signals.h>
+#include <caml/custom.h>
 #include <R.h>
 #include <Rdefines.h>
 #include <Rinternals.h>
@@ -44,6 +45,7 @@ void prerr_endline (char* s) {
 #include "symbols.c"
 #include "conversion.c"
 #include "s3.c"
+#include "s4.c"
 #include "reduction.c"
 #include "parser.c"
 

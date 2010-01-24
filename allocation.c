@@ -1,5 +1,11 @@
 /* Memory allocation is done via functions exported from memory.c. */
 
+/* TODO: PROTECT and UNPROTECT make sense if there is a risk that the
+   object gets garbage-collected within the function. As such, many
+   PROTECT and UNPROTECT macros are unnecessary. To protect the R value
+   while we're back into OCaml code, we should use PreserveObject and
+   ReleaseObject, but that should be done in Val_sexp. */
+
 
 /**  Allocates a pairlist.
   *
@@ -20,7 +26,10 @@ CAMLprim value r_alloc_list (value i) {
   CAMLlocal1(result);
   /* allocList is a macro wrapping up a call to the
      Rf_allocList symbol from libR.so. */
-  result = Val_sexp(allocList(Int_val(i)));
+  SEXP s;
+  PROTECT(s = allocList(Int_val(i)));
+  result = Val_sexp(s);
+  UNPROTECT(1);
   CAMLreturn(result);
 }
 
@@ -34,7 +43,10 @@ CAMLprim value r_alloc_list (value i) {
 CAMLprim value r_alloc_lgl_vector (value i) {
   CAMLparam1(i);
   CAMLlocal1(result);
-  result = Val_sexp(allocVector(LGLSXP, Int_val(i)));
+  SEXP s;
+  PROTECT(s = allocVector(LGLSXP, Int_val(i)));
+  result = Val_sexp(s);
+  UNPROTECT(1);
   CAMLreturn(result);
 }
 
@@ -48,7 +60,10 @@ CAMLprim value r_alloc_lgl_vector (value i) {
 CAMLprim value r_alloc_int_vector (value i) {
   CAMLparam1(i);
   CAMLlocal1(result);
-  result = Val_sexp(allocVector(INTSXP, Int_val(i)));
+  SEXP s;
+  PROTECT(s = allocVector(INTSXP, Int_val(i)));
+  result = Val_sexp(s);
+  UNPROTECT(1);
   CAMLreturn(result);
 }
 
@@ -62,7 +77,10 @@ CAMLprim value r_alloc_int_vector (value i) {
 CAMLprim value r_alloc_real_vector (value i) {
   CAMLparam1(i);
   CAMLlocal1(result);
-  result = Val_sexp(allocVector(REALSXP, Int_val(i)));
+  SEXP s;
+  PROTECT(s = allocVector(REALSXP, Int_val(i)));
+  result = Val_sexp(s);
+  UNPROTECT(1);
   CAMLreturn(result);
 }
 
@@ -76,6 +94,9 @@ CAMLprim value r_alloc_real_vector (value i) {
 CAMLprim value r_alloc_str_vector (value i) {
   CAMLparam1(i);
   CAMLlocal1(result);
-  result = Val_sexp(allocVector(STRSXP, Int_val(i)));
+  SEXP s;
+  PROTECT(s = allocVector(STRSXP, Int_val(i)));
+  result = Val_sexp(s);
+  UNPROTECT(1);
   CAMLreturn(result);
 }

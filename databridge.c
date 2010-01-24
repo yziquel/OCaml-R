@@ -22,16 +22,33 @@
 
    We should investigate this construct. */
 
+/* TODO: We are now using custom blocks for pointer to R SEXPs. We use values of
+   0, 1 in caml_alloc_custom to calibrate the GC. This is obviously insufficient,
+   as a SEXP might hold a huge amount of data, specifically in R. We should
+   therefore think of writing a BigVal_sexp(SEXP sexp, mlsize_t mem, mlsize_t max)
+   function, allowing us to taylor the behaviour of the GC, depending on data size. */
+
+static void r_valsexp_finalisation (value valsexp) {
+  R_ReleaseObject(*((SEXP *) Data_custom_val(valsexp)));
+}
+
+static struct custom_operations r_sexp_ops = {
+  "org.homelinux.yziquel.OCaml-R",
+  r_valsexp_finalisation,
+  custom_compare_default,
+  custom_hash_default,
+  custom_serialize_default,
+  custom_deserialize_default
+};
 
 CAMLprim value Val_sexp (SEXP sexp) {
-  value result = caml_alloc_small(1, Abstract_tag);
-  Field(result, 0) = (value) sexp;
-    /* Do not use Val_long in the above statement,
-       as it will drop the top bit. See mlvalues.h. */
+  R_PreserveObject(sexp);  // registers the SEXP as an R GC root.
+  value result = caml_alloc_custom(&r_sexp_ops, sizeof(SEXP), 0, 1);
+  (*((SEXP *) Data_custom_val(result))) = sexp;
   return result;
 }
 
-#define Sexp_val(sexp) ((SEXP) Field(sexp, 0))
+#define Sexp_val(sexp) (*((SEXP *) Data_custom_val(sexp)))
 
 #define Val_vecsexp(x) Val_sexp(x)
 #define Vecsexp_val(x) ((VECSEXP) Sexp_val(x))

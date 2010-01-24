@@ -43,10 +43,10 @@ CAMLprim value r_findfun (value symbol) {
  *                                                                    *
  **********************************************************************/
 
-CAMLprim value r_set_var (value name, value sexp) {
-  CAMLparam2(name,sexp);
-  char* c_name = String_val(name);
-  SEXP e = (SEXP) Long_val(Field(sexp,0));
-  setVar(install(c_name), e, R_GlobalEnv);
-  CAMLreturn(Val_unit);
-}
+//CAMLprim value r_set_var (value name, value sexp) {
+//  CAMLparam2(name,sexp);
+//  char* c_name = String_val(name);
+//  SEXP e = (SEXP) Long_val(Field(sexp,0));
+//  setVar(install(c_name), e, R_GlobalEnv);
+//  CAMLreturn(Val_unit);
+//}

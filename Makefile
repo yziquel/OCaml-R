@@ -69,6 +69,7 @@ r.ml: standard.ml base.ml
 	  conversion.ml         \
 	  internal.ml           \
 	  s3.ml                 \
+	  s4.ml                 \
 	  parser.ml             \
 	  reduction.ml          \
 	  initialisation.ml     \
@@ -86,6 +87,7 @@ r.mli: base.mli
 	  conversion.mli        \
 	  internal.mli          \
 	  s3.mli                \
+	  s4.mli                \
 	  reduction.mli         \
 	  initialisation.mli    \
 	  base.mli              \
