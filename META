@@ -27,3 +27,11 @@ package "base" (
   archive(byte) = "rbase.cma"
   archive(native) = "rbase.cmxa"
 )
+
+package "stats" (
+  version = "0.2"
+  description = "R statistics library"
+  requires = "R.interpreter"
+  archive(byte) = "rstats.cma"
+  archive(native) = "rstats.cmxa"
+)

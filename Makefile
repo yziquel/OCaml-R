@@ -13,7 +13,7 @@ all: build build-math
 build-math:
 	make -C math
 
-build: r.cma r.cmxa r.cmxs oCamlR.cmo oCamlR.cmx rbase.cma rbase.cmxa
+build: r.cma r.cmxa r.cmxs oCamlR.cmo oCamlR.cmx rbase.cma rbase.cmxa rstats.cma rstats.cmxa
 
 r.cma: dllr_stubs.so r.cmo
 	ocamlc -verbose -a -dllpath /usr/lib/R/lib -dllib dllr_stubs.so -dllib libR.so -o r.cma r.cmo
@@ -29,6 +29,12 @@ rbase.cma: rbase.cmo
 
 rbase.cmxa: rbase.cmx
 	ocamlopt -verbose -a -o rbase.cmxa rbase.cmx
+
+rstats.cma: rstats.cmo
+	ocamlc -verbose -a -o rstats.cma rstats.cmo
+
+rstats.cmxa: rstats.cmx
+	ocamlopt -verbose -a -o rstats.cmxa rstats.cmx
 
 r.cmi: r.mli
 	ocamlfind ocamlc -package calendar -verbose -c r.mli
@@ -53,6 +59,15 @@ rbase.cmo: rbase.ml rbase.cmi
 
 rbase.cmx: rbase.ml rbase.cmi
 	ocamlfind ocamlopt -package calendar -verbose -c rbase.ml
+
+rstats.cmi: rstats.mli
+	ocamlfind ocamlc -verbose -c rstats.mli
+
+rstats.cmo: rstats.ml rstats.cmi
+	ocamlfind ocamlc -verbose -c rstats.ml
+
+rstats.cmx: rstats.ml rstats.cmi
+	ocamlfind ocamlopt -verbose -c rstats.ml
 
 r.ml: standard.ml base.ml
 	cat                     \
@@ -130,6 +145,16 @@ rbase.mli:
 	  r-base/date.mli       \
 	> rbase.mli
 
+rstats.ml:
+	cat                     \
+	  r-stats/main.ml       \
+	> rstats.ml
+
+rstats.mli:
+	cat                     \
+	  r-stats/main.mli      \
+	> rstats.mli
+
 r_stubs.o: r_stubs.c
 	ocamlopt -verbose -ccopt -Wall $(COMPFLAGS) -ccopt -fPIC -c $<
 
@@ -141,7 +166,7 @@ dllr_stubs.so: libr_stubs.a r_stubs.o
 
 clean:
 	make -C math clean
-	rm -f standard.ml base.ml base.mli r.ml r.mli rbase.ml rbase.mli
+	rm -f standard.ml base.ml base.mli r.ml r.mli rbase.ml rbase.mli rstats.ml rstats.mli
 	rm -f *.o *.so *.a *.cmi *.cmo *.cmx *.cma *.cmxa *.cmxs
 
 test: build
