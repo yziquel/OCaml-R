@@ -22,15 +22,9 @@
   */
 
 CAMLprim value r_alloc_list (value i) {
-  CAMLparam1(i);
-  CAMLlocal1(result);
   /* allocList is a macro wrapping up a call to the
      Rf_allocList symbol from libR.so. */
-  SEXP s;
-  PROTECT(s = allocList(Int_val(i)));
-  result = Val_sexp(s);
-  UNPROTECT(1);
-  CAMLreturn(result);
+  return(Val_sexp(allocList(Int_val(i))));
 }
 
 
@@ -41,13 +35,7 @@ CAMLprim value r_alloc_list (value i) {
   */
 
 CAMLprim value r_alloc_lgl_vector (value i) {
-  CAMLparam1(i);
-  CAMLlocal1(result);
-  SEXP s;
-  PROTECT(s = allocVector(LGLSXP, Int_val(i)));
-  result = Val_sexp(s);
-  UNPROTECT(1);
-  CAMLreturn(result);
+  return(Val_sexp(allocVector(LGLSXP, Int_val(i))));
 }
 
 
@@ -58,13 +46,7 @@ CAMLprim value r_alloc_lgl_vector (value i) {
   */
 
 CAMLprim value r_alloc_int_vector (value i) {
-  CAMLparam1(i);
-  CAMLlocal1(result);
-  SEXP s;
-  PROTECT(s = allocVector(INTSXP, Int_val(i)));
-  result = Val_sexp(s);
-  UNPROTECT(1);
-  CAMLreturn(result);
+  return(Val_sexp(allocVector(INTSXP, Int_val(i))));
 }
 
 
@@ -75,13 +57,7 @@ CAMLprim value r_alloc_int_vector (value i) {
   */
 
 CAMLprim value r_alloc_real_vector (value i) {
-  CAMLparam1(i);
-  CAMLlocal1(result);
-  SEXP s;
-  PROTECT(s = allocVector(REALSXP, Int_val(i)));
-  result = Val_sexp(s);
-  UNPROTECT(1);
-  CAMLreturn(result);
+  return(Val_sexp(allocVector(REALSXP, Int_val(i))));
 }
 
 
@@ -92,11 +68,5 @@ CAMLprim value r_alloc_real_vector (value i) {
   */
 
 CAMLprim value r_alloc_str_vector (value i) {
-  CAMLparam1(i);
-  CAMLlocal1(result);
-  SEXP s;
-  PROTECT(s = allocVector(STRSXP, Int_val(i)));
-  result = Val_sexp(s);
-  UNPROTECT(1);
-  CAMLreturn(result);
+  return(Val_sexp(allocVector(STRSXP, Int_val(i))));
 }

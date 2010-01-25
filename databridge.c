@@ -28,6 +28,13 @@
    therefore think of writing a BigVal_sexp(SEXP sexp, mlsize_t mem, mlsize_t max)
    function, allowing us to taylor the behaviour of the GC, depending on data size. */
 
+/* TODO: Unfortunately, the scheme used to protect and unprotect values in R with
+   ReleaseObject and PreserveObject is highly inefficient. The time to release an
+   object is linear in the amount of object preserved. This is a huge runtime penalty
+   to interface OCaml's garbage collector with R's garbage collector. Therefore, the
+   only way forward is to create our own garbage collector for the interface within
+   a global generic vector. Easy, or not? */
+
 static void r_valsexp_finalisation (value valsexp) {
   R_ReleaseObject(*((SEXP *) Data_custom_val(valsexp)));
 }
