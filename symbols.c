@@ -17,15 +17,13 @@ CAMLprim value r_install (value symbol) {
   /* Remark: explanation of the install function at
      https://stat.ethz.ch/pipermail/r-devel/2009-August/054494.html */
 
-  CAMLparam1(symbol);
-  CAMLreturn(Val_sexp(install(String_val(symbol))));
+  return(Val_sexp(install(String_val(symbol))));
 }
 
 CAMLprim value r_findvar (value symbol) {
   /* The findVar function is defined in envir.c. It looks up a symbol
      in an environment. */
-  CAMLparam1(symbol);
-  CAMLreturn(Val_sexp(findVar(Sexp_val(symbol), R_GlobalEnv)));
+  return(Val_sexp(findVar(Sexp_val(symbol), R_GlobalEnv)));
 }
 
 CAMLprim value r_findfun (value symbol) {
@@ -33,8 +31,7 @@ CAMLprim value r_findfun (value symbol) {
      for function types built into the R source code. The major difference
      is that findvar yields a promise, whether findfun yiels directly
      an R function sexptype. */
-  CAMLparam1(symbol);
-  CAMLreturn(Val_sexp(findFun(Sexp_val(symbol), R_GlobalEnv)));
+  return(Val_sexp(findFun(Sexp_val(symbol), R_GlobalEnv)));
 }
 
 /**********************************************************************

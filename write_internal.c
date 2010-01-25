@@ -1,13 +1,11 @@
 CAMLprim value r_write_lisplist_carval (value lisplist, value elmnt) {
-  CAMLparam2(lisplist, elmnt);
   Sexp_val(lisplist)->u.listsxp.carval = Sexp_val(elmnt);
-  CAMLreturn(Val_unit);
+  return Val_unit;
 }
 
 CAMLprim value r_write_lisplist_tagval (value lisplist, value tag) {
-  CAMLparam2(lisplist, tag);
   Sexp_val(lisplist)->u.listsxp.tagval = Sexp_val(tag);
-  CAMLreturn(Val_unit);
+  return Val_unit;
 }
 
 //CAMLprim value r_write_lisplist_element (value lisplist, value tag, value elmnt) {
@@ -26,9 +24,8 @@ CAMLprim value r_write_lisplist_tagval (value lisplist, value tag) {
   */
 
 CAMLprim value r_assign_lgl_vecsxp (value lglsxp, value offset, value b) {
-  CAMLparam3(lglsxp, offset, b);
   LOGICAL((int *) Vecsexp_val(lglsxp))[Int_val(offset)] = Bool_val(b);
-  CAMLreturn(Val_unit);
+  return Val_unit;
 }
 
 
@@ -42,9 +39,8 @@ CAMLprim value r_assign_lgl_vecsxp (value lglsxp, value offset, value b) {
   */
 
 CAMLprim value r_assign_int_vecsxp (value intsxp, value offset, value i) {
-  CAMLparam3(intsxp, offset, i);
   INTEGER((int *) Vecsexp_val(intsxp))[Int_val(offset)] = Int_val(i);
-  CAMLreturn(Val_unit);
+  return Val_unit;
 }
 
 
@@ -56,9 +52,8 @@ CAMLprim value r_assign_int_vecsxp (value intsxp, value offset, value i) {
   */
 
 CAMLprim value r_assign_real_vecsxp (value realsxp, value offset, value x) {
-  CAMLparam3(realsxp, offset, x);
   REAL((double *) Vecsexp_val(realsxp))[Int_val(offset)] = Double_val(x);
-  CAMLreturn(Val_unit);
+  return Val_unit;
 }
 
 
@@ -70,10 +65,6 @@ CAMLprim value r_assign_real_vecsxp (value realsxp, value offset, value x) {
   */
 
 CAMLprim value r_assign_str_vecsxp (value strsxp, value offset, value s) {
-  CAMLparam3(strsxp, offset, s);
-  SEXP charsxp;
-  PROTECT(charsxp = mkChar(String_val(s)));
-  UNPROTECT(1);
-  STRING_PTR((int *) Vecsexp_val(strsxp))[Int_val(offset)] = charsxp;
-  CAMLreturn(Val_unit);
+  STRING_PTR((int *) Vecsexp_val(strsxp))[Int_val(offset)] = mkChar(String_val(s));
+  return Val_unit;
 }

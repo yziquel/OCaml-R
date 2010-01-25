@@ -54,10 +54,8 @@ void prerr_endline (char* s) {
 /* Code to audit. */
 
 CAMLprim value r_print_value (value sexp) {
-  CAMLparam1(sexp);
-  SEXP e = Sexp_val(sexp);
-  PrintValue(e);
-  CAMLreturn(Val_unit);
+  PrintValue(Sexp_val(sexp));
+  return Val_unit;
 }
 
 /* Commented out because of 'warning: assignment makes pointer from integer without a cast' */

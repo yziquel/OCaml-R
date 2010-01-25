@@ -1,5 +1,7 @@
 /* TODO: declare static what should be declared static... */
 
+/* TODO: fix memory leaks... */
+
 
 
 /**********************************************************************
@@ -68,12 +70,9 @@ CAMLprim value r_eval_sxp (value sexp_list) {
   SEXP e;        // Placeholder for the result of beta-reduction.
   int error = 0; // Error catcher boolean.
 
-  /* Should this be wrapped with a PROTECT() and an UNPROTECT(1), or
-     not? */
   SEXP our_call = Sexp_val(sexp_list);
   caml_enter_blocking_section();
-  PROTECT(e = R_tryEval(our_call, R_GlobalEnv, &error));
-  UNPROTECT(1);
+  e = R_tryEval(our_call, R_GlobalEnv, &error);
   caml_leave_blocking_section();
 
   /* Implements error handling from R to Objective Caml. */
@@ -86,9 +85,11 @@ CAMLprim value r_eval_sxp (value sexp_list) {
 
     ml_error_call = Val_sexp(error_call);
     error_call = NULL;      //should check for a memory leak here...
+                            //depends on GC status of prior error_call.
 
     ml_error_message = caml_copy_string(error_message);
     error_message = NULL;   //should check for a memory leak here...
+                            //it seems to me that a string is leaked here.
 
     value error_result = caml_alloc_small(2, 0);
     Store_field(error_result, 0, ml_error_call);

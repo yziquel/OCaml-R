@@ -14,10 +14,7 @@
   */
 
 CAMLprim value r_s3_class (value sexp) {
-  CAMLparam1(sexp);
-  CAMLlocal1(result);
-  result = Val_sexp(getAttrib(Sexp_val(sexp), R_ClassSymbol));
-  CAMLreturn(result);
+  return(Val_sexp(getAttrib(Sexp_val(sexp), R_ClassSymbol)));
 }
 
 
@@ -33,10 +30,7 @@ CAMLprim value r_s3_class (value sexp) {
   */
 
 CAMLprim value r_get_attrib (value sexp, value symbolname) {
-  CAMLparam1(sexp);
-  CAMLlocal1(result);
-  result = Val_sexp(getAttrib(Sexp_val(sexp), Sexp_val(symbolname)));
-  CAMLreturn(result);
+  return(Val_sexp(getAttrib(Sexp_val(sexp), Sexp_val(symbolname))));
 }
 
 
@@ -47,8 +41,5 @@ CAMLprim value r_get_attrib (value sexp, value symbolname) {
   */
 
 CAMLprim value r_get_attributes (value sexp) {
-  CAMLparam1(sexp);
-  CAMLlocal1(result);
-  result = Val_sexp(ATTRIB(Sexp_val(sexp)));
-  CAMLreturn(result);
+  return(Val_sexp(ATTRIB(Sexp_val(sexp))));
 }
