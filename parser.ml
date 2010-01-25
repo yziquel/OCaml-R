@@ -20,9 +20,8 @@ let parse_string ?max statement =
   let error_code, sexp = raw_parse_string statement
     begin match max with None -> -1 | Some n -> n end in
   match parse_status_of_int error_code with
-  | Parse_OK -> sexp
+  | Parse_OK -> lang_sxps_of_t sexp
   | _ as status -> raise (Parsing_failure (status, statement))
 
-(* This is wrong!!! but we need it to compile... for now. *)
-let parse statement = parse_string ~max:1 statement
+let parse statement = List.hd (parse_string ~max:1 statement)
 

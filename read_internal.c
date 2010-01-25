@@ -372,6 +372,8 @@ CAMLprim value r_access_str_vecsxp (value strsxp, value offset) {
   *  and an offset, and returns the element at this offset.
   */
 
+/* This function could also be called r_access_expr_vecsxp. */
+
 CAMLprim value r_access_sexp_vecsxp (value sexpsxp, value offset) {
   CAMLparam2(sexpsxp, offset);
   CAMLlocal1(result);

@@ -77,3 +77,7 @@ let strings = str_vecsxp_of_string_list
 
 let sexp_list_of_sexp_vecsxp = list_of_vecsxp access_sexp_vecsxp
 let sexps_of_t : sexp list t -> sexp list = sexp_list_of_sexp_vecsxp
+
+let lang_sxp_list_of_expr_vecsxp = list_of_vecsxp access_expr_vecsxp
+let lang_sxps_of_t : lang sxp list t -> lang sxp list = lang_sxp_list_of_expr_vecsxp
+

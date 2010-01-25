@@ -221,3 +221,12 @@ external access_str_vecsxp  : vec_str  sxp -> int -> string       = "r_access_st
   *)
 
 external access_sexp_vecsxp : vec_sexp sxp -> int -> sexp         = "r_access_sexp_vecsxp"
+
+
+(**  Returns an element of an expression vector.
+  *
+  *  access_expr_vecsxp takes an expression vector as argument,
+  *  and an offset, and returns the language element at this offset.
+  *)
+
+external access_expr_vecsxp : vec_expr sxp -> int -> lang sxp     = "r_access_sexp_vecsxp"

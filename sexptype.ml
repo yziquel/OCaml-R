@@ -25,6 +25,7 @@ type vec_int  = int  vec         (* For INTSXP *)
 type vec_real = float vec        (* For REALSXP *)
 type vec_str  = string vec       (* For STRSXP *)
 type vec_sexp = sexp vec
+type vec_expr = lang sxp vec     (* For EXPRSXP *)
 
 (* Algebraic type reflecting R's dynamic typing. *)
 type sexptype =

@@ -12,7 +12,7 @@ let symbol ?(generic = false) s : sexp =
   let findfunction = match generic with
     | false -> findvar | true -> findfun in
 
-  let var = force (findvar (install s)) in
+  let var = force (findfunction (install s)) in
 
   (* If we try to retrieve a function, we should use findfun. If we
      use findvar, we indeed get a closure, but a closure for a generic
