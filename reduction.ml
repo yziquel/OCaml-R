@@ -4,7 +4,7 @@ exception Runtime_error of lang sxp * string
 
 external eval_langsxp : lang sxp -> 'a t = "r_eval_sxp"
 
-let eval_string s = eval_langsxp (parse_sexp s)
+let eval_string s = eval_langsxp (parse s)
 
 let rec prepare_args = function
   | (Some x)::l -> x::(prepare_args l)

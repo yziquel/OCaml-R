@@ -26,7 +26,7 @@ CAMLprim value r_parse_string (value expression, value n_to_eval) {
   CAMLlocal1(parse_result);
   ParseStatus status;
   SEXP text;
-  PROTECT(text = mkString(String_val(s)));
+  PROTECT(text = mkString(String_val(expression)));
 
   /* Concerning the last and fourth argument of R_ParseVector:
      http://tolstoy.newcastle.edu.au/R/e2/devel/07/01/1835.html */

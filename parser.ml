@@ -13,6 +13,7 @@ let parse_status_of_int = function
   | 2 -> Parse_Incomplete
   | 3 -> Parse_Error
   | 4 -> Parse_EOF
+  | _ -> assert false
 
 external raw_parse_string : string -> int -> int * sexp = "r_parse_string"
 let parse_string ?max statement =
@@ -21,4 +22,7 @@ let parse_string ?max statement =
   match parse_status_of_int error_code with
   | Parse_OK -> sexp
   | _ as status -> raise (Parsing_failure (status, statement))
+
+(* This is wrong!!! but we need it to compile... for now. *)
+let parse statement = parse_string ~max:1 statement
 

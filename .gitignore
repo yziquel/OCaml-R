@@ -4,3 +4,7 @@ r.ml
 r.mli
 base.ml
 base.mli
+rbase.ml
+rbase.mli
+rstats.ml
+rstats.mli
