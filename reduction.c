@@ -51,7 +51,7 @@ CAMLprim value ocamlr_init_error_hook (value ml_unit) {
  **********************************************************************/
 
 
-CAMLprim value r_eval_sxp (value sexp_list) {
+CAMLprim value ocamlr_eval_sxp (value sexp_list) {
 
   /* sexp_list is an OCaml value containing a SEXP of sexptype LANGSXP.
      This is a LISP-style pairlist of SEXP values. r_eval_sxp executes
