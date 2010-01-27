@@ -24,246 +24,220 @@
    CHARSXP cache. */
 
 
-/**  Returns the attributes of a SEXP or VECSEXP
+/**  Returns the attributes of an R value.
   *
-  *  inspect_attributes takes a SEXP or a VECSEXP as
-  *  arguments and returns its attributes, as a SEXP.
+  *  @param sexp An R value.
+  *  @return The attributes of this value, as a pairlist.
   */
-
-CAMLprim value inspect_attributes (value sexp) {
+CAMLprim value ocamlr_inspect_attributes (value sexp) {
   return(Val_sexp(ATTRIB(Sexp_val(sexp))));
 }
 
 
 /**  Returns the length of a VECSEXP.
   *
-  *  inspect_vecsxp_length takes a VECSEXP as argument and
-  *  returns its length, i.e., the number of elements.
+  *  @param vecsexp An R vector value.
+  *  @return Its length, i.e. the number of elements.
   */
-
-CAMLprim value inspect_vecsxp_length (value vecsexp) {
+CAMLprim value ocamlr_inspect_vecsxp_length (value vecsexp) {
   return(Val_int(LENGTH(Vecsexp_val(vecsexp))));
 }
-
-
-/*CAMLprim value inspect_vecsxp_truelength (value vecsexp) {
-  CAMLparam1(vecsexp);
-  CAMLlocal1(result);
-  result = Val_int(TRUELENGTH(Vecsexp_val(vecsexp)));
-  CAMLreturn(result);
-}*/
 
 
 
 /* Concerning various types of SEXPs: */
 
 
-/**  Returns the offset at which the primitive can be found.
+/**  Returns the offset of an R primitive function.
   *
-  *  inspect_primsxp_offset take a SEXP denoting a function primitive
-  *  as argument, and returns its offset in the table of primitives.
+  *  @note: This function bypasses the provided API, and requires the
+  *         use of the #define USE_RINTERNALS directive.
   *
-  *  Note: This function bypasses the provided API, and requires the
-  *  use of the #define USE_RINTERNALS directive.
+  *  @param sexp An R value which is a primitive function.
+  *  @return Its offset in the R table of primitives.
   */
-
-CAMLprim value inspect_primsxp_offset (value sexp) {
+CAMLprim value ocamlr_inspect_primsxp_offset (value sexp) {
   return(Val_int(Sexp_val(sexp)->u.primsxp.offset));
 }
 
 
-/**  Returns the name of a symbol.
+/**  Returns the name of an R symbol.
   *
-  *  inspect_symsxp_pname take a SYMSXP as argument, and returns the
-  *  SEXP containing its name.
+  *  @param sexp An R value of sexptype SYMSXP.
+  *  @return The name of the R symbol.
   */
-
-CAMLprim value inspect_symsxp_pname (value sexp) {
+CAMLprim value ocamlr_inspect_symsxp_pname (value sexp) {
   return(Val_sexp(PRINTNAME(Sexp_val(sexp))));
 }
 
 
 /**  Returns the value of a symbol.
   *
-  *  inspect_symsxp_value takes a SYMXSP as argument, and returns the
-  *  SEXP containing its value.
+  *  @param sexp An R value of sexptype SYMSXP.
+  *  @return The value of the R symbol.
   */
-
-CAMLprim value inspect_symsxp_value (value sexp) {
+CAMLprim value ocamlr_inspect_symsxp_value (value sexp) {
   return(Val_sexp(SYMVALUE(Sexp_val(sexp))));
 }
 
 
 /**  Returns the internal sexp of a symbol.
   *
-  *  inspect_symsxp_internal takes a SYMSXP as argument, and returns the
-  *  SEXP containing its internal value.
+  *  @param sexp An R value of sexptype SYMSXP.
+  *  @return The internal value of a symbol.
   */
-
-CAMLprim value inspect_symsxp_internal (value sexp) {
+CAMLprim value ocamlr_inspect_symsxp_internal (value sexp) {
   return(Val_sexp(INTERNAL(Sexp_val(sexp))));
 }
 
 
 /**  Returns the head element of a pairlist.
   *
-  *  inspect_listsxp_carval takes a pairlist as argument, and
-  *  returns the SEXP containing its head element.
+  *  @param sexp An R pairlist.
+  *  @return The head element of the R pairlist.
   */
-
-CAMLprim value inspect_listsxp_carval (value sexp) {
+CAMLprim value ocamlr_inspect_listsxp_carval (value sexp) {
   return(Val_sexp(CAR(Sexp_val(sexp))));
 }
 
 
 /**  Returns the tail pairlist of a pairlist.
   *
-  *  inspect_listsxp_cdrval takes a pairlist as argument,
-  *  and returns its tail pairlist.
+  *  @param sexp An R pairlist.
+  *  @return The tail pairlist of the R pairlist.
   */
-
-CAMLprim value inspect_listsxp_cdrval (value sexp) {
+CAMLprim value ocamlr_inspect_listsxp_cdrval (value sexp) {
   return(Val_sexp(CDR(Sexp_val(sexp))));
 }
 
 
 /**  Returns the tag value of the head element of a pairlist.
   *
-  *  inspect_listsxp_tagval takes a pairlist as argument, and
-  *  returns the tag value of the head element of the pairlist.
+  *  @param sexp An R pairlist.
+  *  @return The tag of the head of the R pairlist.
   */
-
-CAMLprim value inspect_listsxp_tagval (value sexp) {
+CAMLprim value ocamlr_inspect_listsxp_tagval (value sexp) {
   return(Val_sexp(TAG(Sexp_val(sexp))));
 }
 
 
-/**  Returns the frame of an evironment.
+/**  Returns the frame of an environment.
   *
-  *  inspect_envsxp_frame takes an environment as argument,
-  *  and returns the frame of this environment.
+  *  @param sexp An R environment.
+  *  @return The frame of the R environment.
   */
-
-CAMLprim value inspect_envsxp_frame (value sexp) {
+CAMLprim value ocamlr_inspect_envsxp_frame (value sexp) {
   return(Val_sexp(FRAME(Sexp_val(sexp))));
 }
 
 
 /**  Returns the enclosing environment of an environment.
   *
-  *  inspect_envsxp_enclos takes an environment as argument,
-  *  and returns its enclosing environment.
+  *  @param sexp An R environment.
+  *  @return The enclosing environmnent of the R environment.
   */
-
-CAMLprim value inspect_envsxp_enclos (value sexp) {
+CAMLprim value ocamlr_inspect_envsxp_enclos (value sexp) {
   return(Val_sexp(ENCLOS(Sexp_val(sexp))));
 }
 
 
 /**  Returns the hash table of an environment.
   *
-  *  inspect_envsxp_hashtabl takes an environment as argument,
-  *  and returns its hash table.
+  *  @param sexp An R environment.
+  *  @return The hash table of the R environment.
   */
-
-CAMLprim value inspect_envsxp_hashtab (value sexp) {
+CAMLprim value ocamlr_inspect_envsxp_hashtab (value sexp) {
   return(Val_sexp(HASHTAB(Sexp_val(sexp))));
 }
 
 
 /**  Returns the list of formal arguments of a closure.
   *
-  *  inspect_closxp_formals takes a closure as argument,
-  *  and returns the list of its formal arguments.
+  *  @param sexp An R closure.
+  *  @return The list of formal arguments of the R closure.
   */
-
-CAMLprim value inspect_closxp_formals (value sexp) {
+CAMLprim value ocamlr_inspect_closxp_formals (value sexp) {
   return(Val_sexp(FORMALS(Sexp_val(sexp))));
 }
 
 
 /**  Returns the body of a closure.
   *
-  *  inspect_closxp_body takes a closure as argument,
-  *  and returns the body of this closure.
+  *  @param sexp An R closure.
+  *  @return The body of the R closure.
   */
-
-CAMLprim value inspect_closxp_body (value sexp) {
+CAMLprim value ocamlr_inspect_closxp_body (value sexp) {
   return(Val_sexp(BODY(Sexp_val(sexp))));
 }
 
 
 /**  Returns the environment of a closure.
   *
-  *  inspect_closxp_env takes a closure as argument,
-  *  and returns the environment of this closure.
+  *  @param sexp An R closure.
+  *  @return The environment of the R closure.
   */
-
-CAMLprim value inspect_closxp_env (value sexp) {
+CAMLprim value ocamlr_inspect_closxp_env (value sexp) {
   return(Val_sexp(CLOENV(Sexp_val(sexp))));
 }
 
 
 /**  Returns the value of a promise.
   *
-  *  inspect_promsxp_value takes a promise as argument,
-  *  and returns the value of this promise.
+  *  @note This function bypasses the provided API, and requires the
+  *        use of the #define USE_RINTERNALS directive.
   *
-  *  Note: This function bypasses the provided API, and requires the
-  *  use of the #define USE_RINTERNALS directive.
+  *  @param sexp An R promise.
+  *  @return The value of the R promise.
   */
-
-CAMLprim value inspect_promsxp_value (value sexp) {
+CAMLprim value ocamlr_inspect_promsxp_value (value sexp) {
   return(Val_sexp(Sexp_val(sexp)->u.promsxp.value));
 }
 
 
 /**  Returns the expression of a promise.
   *
-  *  inspect_promsxp_expr takes a promise as argument,
-  *  and returns the value of this promise.
+  *  @note This function bypasses the provided R API, and requires the
+  *        use of the #define USE_RINTERNALS directive.
   *
-  *  Note: This function bypasses the provided API, and requires the
-  *  use of the #define USE_RINTERNALS directive.
+  *  @param sexp An R promise.
+  *  @return The expression of the R promise.
   */
-
-CAMLprim value inspect_promsxp_expr (value sexp) {
+CAMLprim value ocamlr_inspect_promsxp_expr (value sexp) {
   return(Val_sexp(Sexp_val(sexp)->u.promsxp.expr));
 }
 
 
 /**  Returns the environment of a promise.
   *
-  *  inspect_promsxp_env takes a promise as argument,
-  *  and returns the environment of this promise.
+  *  @note This function bypasses the provided R API, and requires the
+  *        use of the #define USE_RINTERNALS directive.
   *
-  *  Note: This function bypasses the provided API, and requires the
-  *  use of the #define USE_RINTERNALS directive.
+  *  @param sexp An R promise.
+  *  @return The environment of the R promise.
   */
-
-CAMLprim value inspect_promsxp_env (value sexp) {
+CAMLprim value ocamlr_inspect_promsxp_env (value sexp) {
   return(Val_sexp(Sexp_val(sexp)->u.promsxp.env));
 }
 
 
 /**  Returns an element of a logical vector.
   *
-  *  r_access_lgl_vecsxp takes a logical vector as argument,
-  *  and an offset, and returns the element at this offset.
+  *  @param lglsxp An R logical vector, of sexptype LGLSXP.
+  *  @param offset An integer, offset in the R logical vector.
+  *  @return The boolean at this offset in the R logical vector.
   */
-
-CAMLprim value r_access_lgl_vecsxp (value lglsxp, value offset) {
+CAMLprim value ocamlr_access_lgl_vecsxp (value lglsxp, value offset) {
   return(Val_bool(LOGICAL((int *) Vecsexp_val(lglsxp))[Int_val(offset)]));
 }
 
 
 /**  Returns an element of a vector of integers.
   *
-  *  r_access_int_vecsxp takes a vector of integers as argument,
-  *  and an offset, and returns the element at this offset.
+  *  @param intsxp An R vector of integers, of sexptype INTSXP.
+  *  @param offset An integer, offset in the R vector of integers.
+  *  @return The integer at this offset in the R vector of integers.
   */
-
-CAMLprim value r_access_int_vecsxp (value intsxp, value offset) {
+CAMLprim value ocamlr_access_int_vecsxp (value intsxp, value offset) {
 
   /* The R macro is #define INTEGER(x) ((int *) DATAPTR(x)).
      Should use Val_int, or int32s? More generally, the typing
@@ -275,22 +249,22 @@ CAMLprim value r_access_int_vecsxp (value intsxp, value offset) {
 
 /**  Returns an element of a vector of real numbers.
   *
-  *  r_access_real_vecsxp takes a vector of integers as argument,
-  *  and an offset, and returns the element at this offset.
+  *  @param realsxp An R vector of real numbers.
+  *  @param offset An integer, offset in the R vector of real numbers.
+  *  @return The real number at this offset in the R vector of real numbers.
   */
-
-CAMLprim value r_access_real_vecsxp (value realsxp, value offset) {
+CAMLprim value ocamlr_access_real_vecsxp (value realsxp, value offset) {
   return(caml_copy_double(REAL((double *) Vecsexp_val(realsxp))[Int_val(offset)]));
 }
 
 
 /**  Returns an element of a vector of strings.
   *
-  *  r_access_str_vecsxp takes a vector of strings as argument,
-  *  and an offset, and returns the element at this offset.
+  *  @param strsxp An R vector of strings.
+  *  @param offset An integer, offset in the R vector of strings.
+  *  @return The string at this offset in the R vector of strings.
   */
-
-CAMLprim value r_access_str_vecsxp (value strsxp, value offset) {
+CAMLprim value ocamlr_access_str_vecsxp (value strsxp, value offset) {
 
   /* Same comments as for r_access_int_vecsxp and for
      r_internal_string_of_charsxp. */
@@ -307,7 +281,15 @@ CAMLprim value r_access_str_vecsxp (value strsxp, value offset) {
   */
 
 /* This function could also be called r_access_expr_vecsxp. */
-
-CAMLprim value r_access_sexp_vecsxp (value sexpsxp, value offset) {
+/**  Returns an element of a vector of SEXPs.
+  *
+  *  @note This function is also used to retrieve an element in
+  *        a vector of expressions, of sexptype EXPRSXP.
+  *
+  *  @param sexpsxp An R vector of SEXPs.
+  *  @param offset An integer, offset in the R vector of SEXPs.
+  *  @return The SEXP at this offset in the R vector of SEXPs.
+  */
+CAMLprim value ocamlr_access_sexp_vecsxp (value sexpsxp, value offset) {
   return(Val_sexp(VECTOR_ELT(Vecsexp_val(sexpsxp), Int_val(offset))));
 }
