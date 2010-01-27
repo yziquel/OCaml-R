@@ -1,4 +1,4 @@
-external force_promsxp : prom sxp -> sexp = "r_eval_sxp"
+external force_promsxp : prom sxp -> sexp = "ocamlr_eval_sxp"
 
 let force : 'a promise -> 'a t = force_promsxp
 

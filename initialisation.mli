@@ -1,9 +1,9 @@
-(**  {b Initialisation}
+(**  {2 Initialisation}
   *
   *  We provide two mechanisms to activate an R interpreter from OCaml-R:
   *
   *  The first mechanism consists of low-level bindings to the initialisation
-  *  and termination functions of the libR.so shared library. While this is
+  *  and termination functions of the [libR.so] shared library. While this is
   *  a rather flexible approach, it has the downside of not being a very static
   *  approach, specifically if your intention if to write Objective Caml bindings
   *  for a dependent bunch of R packages.
@@ -18,9 +18,9 @@
   *  [Environment] module. No need to worry about initialisation details.
   *
   *  To create bindings for a dependent bunch of R packages, you simply have to make
-  *  them depend on the findlib {b R.interpreter} package, which involves the OCamlR
+  *  them depend on the findlib [R.interpreter] package, which involves the OCamlR
   *  module. This is also convenient on the toplevel, where you simply have to have
-  *  to invoke the {b #require "R.interpreter"} directive to set up the interpreter.
+  *  to invoke the [#require "R.interpreter"] directive to set up the interpreter.
   *)
 
 module type Interpreter = sig end
@@ -28,5 +28,6 @@ module type Interpreter = sig end
 
 module Interpreter (Env : Environment) : Interpreter
 (**  Functor used to initialise statically an R interpreter, given initialisation
-  *  details provided by the provided [Environment] module.
+  *  details provided by the provided [Env] module.
   *)
+

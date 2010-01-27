@@ -1,16 +1,20 @@
 /* Stub code initialising and terminating the R interpreter. */
 
-CAMLprim value init_r (value argv, value sigs) {
-
-  /* -1- argv is an OCaml array of strings, which gives the command line
-     arguments used to invoke the R interpreter. Code segfaults if
-     the array does not contain a first element, which is the name of
-     the program, typically "R", or "OCaml-R". Other arguments typically
-     are "--vanilla", "--slave"...
-
-     -2- sigs is an OCaml int. When set to 0, R signal handlers are not
-     removed. When set to, say, 1, R signal handlers are removed. It is
-     very useful to remove signal handlers when embedding R. */
+/**  Initialises the R interpreter in the libR.so library.
+  *
+  *  @param argv An OCaml array of strings, which gives the command
+  *         line arguments used to invoke the R interpreter. Code
+  *         segfaults if the array does not contain a first element,
+  *         which is the name of the program, typically "R", or
+  *         "OCaml-R". Other arguments typically are "--vanilla",
+  *         "--slave"...
+  *  @param sigs An OCaml integer. When set to 0, R signal handlers
+  *         are not removed. When set, for example, to 1, R signal
+  *         handlers are removed. It is very useful to remove signal
+  *         handlers when embedding R. Requires R >= 2.3.1.
+  *  @return 1 if R is correctly initialised.
+  */
+CAMLprim value ocamlr_initEmbeddedR (value argv, value sigs) {
 
   int length = Wosize_val(argv);
   char* argv2[length];
@@ -30,7 +34,9 @@ CAMLprim value init_r (value argv, value sigs) {
   return Val_int(i);
 }
 
-CAMLprim value end_r (value unit) {
+
+/**  Terminates an R interpreter. */
+CAMLprim value ocamlr_endEmbeddedR (value unit) {
   /* This function terminates the R interpreter. It is not clear whether
      or not this function is garbage-collector-friendly. For details, see
      http://old.nabble.com/Reset-an-embedded-R.dll-td17236931.html */

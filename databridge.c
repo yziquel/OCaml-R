@@ -35,10 +35,26 @@
    only way forward is to create our own garbage collector for the interface within
    a global generic vector. Easy, or not? */
 
+/* TODO: When executing an R function call, we let go off the OCaml multithreading
+   master lock. Therefore, we should not have OCaml code going in Val_sexp, because
+   that would trigger allocation, and GC stuff, while at the same time, R code might
+   be executed, whose C code's underlying assumptions rely on not having garbage
+   collection between two statements. So on should ensure that Val_sexp is not called
+   in way that multithreads with R code. */
+
+
+/**  Finalisation function called when OCaml's GC deallocates wrapped R values.
+  *
+  *  @note This tells R's GC to release this value.
+  *  @param valsexp An OCaml value wrapping an R value.
+  */
 static void r_valsexp_finalisation (value valsexp) {
   R_ReleaseObject(*((SEXP *) Data_custom_val(valsexp)));
 }
 
+
+/**  Static structure used for custom blocks wrapping R values.
+  */
 static struct custom_operations r_sexp_ops = {
   "org.homelinux.yziquel.OCaml-R",
   r_valsexp_finalisation,
@@ -48,6 +64,16 @@ static struct custom_operations r_sexp_ops = {
   custom_deserialize_default
 };
 
+
+/**  Wraps up an R value into an OCaml block.
+  *
+  *  The R value is preserved from R garbage collection, then
+  *  wrapped in an OCaml custom block, with finalisation function
+  *  chaining OCaml's GC with R's GC.
+  *
+  *  @param sexp An R value.
+  *  @return An R value wrapped in a OCaml block.
+  */
 CAMLprim value Val_sexp (SEXP sexp) {
   R_PreserveObject(sexp);  // registers the SEXP as an R GC root.
   value result = caml_alloc_custom(&r_sexp_ops, sizeof(SEXP), 0, 1);
@@ -55,7 +81,26 @@ CAMLprim value Val_sexp (SEXP sexp) {
   return result;
 }
 
+
+/**  Macro accessing the underlying SEXP wrapped in an OCaml block.
+  *
+  *  @param sexp An OCaml block wrapping up an R value.
+  *  @return The underlying R value.
+  */
 #define Sexp_val(sexp) (*((SEXP *) Data_custom_val(sexp)))
 
+
+/**  Macro wrapping up a R vector SEXP into an OCaml custom block.
+  *
+  *  @param x An R vector SEXP.
+  *  @return An OCaml block wrapping up the R vector SEXP.
+  */
 #define Val_vecsexp(x) Val_sexp(x)
+
+
+/**  Macro accessing the underlying vector SEXP in an OCaml block.
+  *
+  *  @param x An OCaml block wrapping up an R vector value.
+  *  @return The underlying vector SEXP.
+  */
 #define Vecsexp_val(x) ((VECSEXP) Sexp_val(x))

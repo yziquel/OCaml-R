@@ -15,7 +15,7 @@ let parse_status_of_int = function
   | 4 -> Parse_EOF
   | _ -> assert false
 
-external raw_parse_string : string -> int -> int * sexp = "r_parse_string"
+external raw_parse_string : string -> int -> int * sexp = "ocamlr_parse_string"
 let parse_string ?max statement =
   let error_code, sexp = raw_parse_string statement
     begin match max with None -> -1 | Some n -> n end in

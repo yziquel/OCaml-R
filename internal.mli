@@ -1,11 +1,22 @@
+(**  {2 Inspection and specification of internals.} *)
+
+(**  Provides a module with strong data types and typing,
+  *  aiming to be an indirect specification of low-level
+  *  structure of SEXPs.
+  *)
 module Specification : sig
 
+  (** Semantic description of [SYMSXP] structures. *)
   type symbol = (string * (sexp option)) option option
 
 end
 
+(**  Provides facilities to inspect internal structure of
+  *  SEXPs. Useful in the toplevel when you encounter
+  *  unexpected R values. *)
 module Pretty : sig
 
+  (**  Semantic interpretation and description of SEXPs. *)
   type t =
     | Recursive of t Lazy.t
     | NULL
@@ -33,6 +44,7 @@ module Pretty : sig
 
   and pairlist = (t * t) list
 
+  (**  Analyses recursively the structure of a given SEXP. *)
   val t_of_sexp : sexp -> t
 
 end
