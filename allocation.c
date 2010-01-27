@@ -1,27 +1,15 @@
 /* Memory allocation is done via functions exported from memory.c. */
 
-/* TODO: PROTECT and UNPROTECT make sense if there is a risk that the
-   object gets garbage-collected within the function. As such, many
-   PROTECT and UNPROTECT macros are unnecessary. To protect the R value
-   while we're back into OCaml code, we should use PreserveObject and
-   ReleaseObject, but that should be done in Val_sexp. */
-
-
 /**  Allocates a pairlist.
   *
-  *  r_alloc_list takes an integer i as argument, and returns an R
-  *  pairlist, also called a LISTSXP, of size i.
-  *
-  *  Such a function is necessary in order to avoid the tail
-  *  recursion issue. While doing 'let x = f () in x::(aux y)' is
-  *  an acceptable way to make aux tail recurse in Objective Caml,
-  *  this relies on the way Objective Caml constructs list with
-  *  the :: constructor. This feature is not available when we use
-  *  stub code around the CONS macro for R. Allocating a list and
-  *  filling it in imperatively is a workaround.
+  *  @note With 'let x = f () in x::(aux y)', you have tail recursion
+  *        because of the way the :: constructor is used in OCaml. You
+  *        cannot have tail-recursion with R CONS and the same code.
+  *        Hence the need to pre-allocate with this function.
+  *  @param i Size of the pairlist to allocate.
+  *  @return A newly allocated pairlist.
   */
-
-CAMLprim value r_alloc_list (value i) {
+CAMLprim value ocamlr_alloc_list (value i) {
   /* allocList is a macro wrapping up a call to the
      Rf_allocList symbol from libR.so. */
   return(Val_sexp(allocList(Int_val(i))));
@@ -30,43 +18,39 @@ CAMLprim value r_alloc_list (value i) {
 
 /**  Allocates a logical vector.
   *
-  *  r_alloc_lgl_vector takes an integer i as argument, and returns
-  *  an R vector of logical values of size i.
+  *  @param i Size of the logical vector to allocate.
+  *  @return A newly allocated logical vector.
   */
-
-CAMLprim value r_alloc_lgl_vector (value i) {
+CAMLprim value ocamlr_alloc_lgl_vector (value i) {
   return(Val_sexp(allocVector(LGLSXP, Int_val(i))));
 }
 
 
 /**  Allocates a vector of integers.
   *
-  *  r_alloc_int_vector takes an integer i as argument, and returns
-  *  an R vector of integer values of size i.
+  *  @param i Size of the vector of integers to allocate.
+  *  @return A newly allocated vector of integers.
   */
-
-CAMLprim value r_alloc_int_vector (value i) {
+CAMLprim value ocamlr_alloc_int_vector (value i) {
   return(Val_sexp(allocVector(INTSXP, Int_val(i))));
 }
 
 
 /**  Allocates a vector of real numbers.
   *
-  *  r_alloc_real_vector takes an integer i as argument, and returns
-  *  an R vector of i strings.
+  *  @param i Size of the vector of real numbers to allocate.
+  *  @return A newly allocated vector of real numbers.
   */
-
-CAMLprim value r_alloc_real_vector (value i) {
+CAMLprim value ocamlr_alloc_real_vector (value i) {
   return(Val_sexp(allocVector(REALSXP, Int_val(i))));
 }
 
 
 /**  Allocates a vector of strings.
   *
-  *  r_alloc_str_vector takes an integer i as argument, and returns
-  *  an R vector of i strings.
+  *  @param i Size of the vector of strings to allocate.
+  *  @return A newly allocated vector of strings.
   */
-
-CAMLprim value r_alloc_str_vector (value i) {
+CAMLprim value ocamlr_alloc_str_vector (value i) {
   return(Val_sexp(allocVector(STRSXP, Int_val(i))));
 }

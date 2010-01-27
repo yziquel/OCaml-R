@@ -14,9 +14,9 @@ let lisplist_of_list (l: (sexp * sexp) list) =
     cursor := inspect_listsxp_cdrval !cursor
   end l; r_l
 
-external cons : sexp -> sexp -> sexp = "r_cons"
-external tag : sexp -> string -> unit = "r_tag"
-external set_langsxp : sexp -> unit = "r_set_langsxp"
+external cons : sexp -> sexp -> sexp = "ocamlr_cons"
+external tag : sexp -> string -> unit = "ocamlr_tag"
+external set_langsxp : sexp -> unit = "ocamlr_set_langsxp"
 
 let langsxp (f: sexp) (args: (string option * sexp) list) : lang sxp =
   let lcons hd tl = let x = cons hd tl in set_langsxp x; x in
@@ -25,7 +25,7 @@ let langsxp (f: sexp) (args: (string option * sexp) list) : lang sxp =
     | None -> x | Some name -> tag x name; x
   end args (null_creator ()) end
 
-external string_of_charsxp : vec_char sxp -> string = "r_internal_string_of_charsxp"
+external string_of_charsxp : vec_char sxp -> string = "ocamlr_internal_string_of_charsxp"
 
 let list_of_vecsxp (access: 'a vecsxp -> int -> 'a) (s: 'a vecsxp) : 'a list =
   let lngth = length_of_vecsxp s in
@@ -72,7 +72,7 @@ let strings_of_t : string list t -> string list = string_list_of_str_vecsxp
 let string_of_t : string t -> string = fun t -> access_str_vecsxp t 0
   (* We access only the first element, because static typing is supposed to
      ensure that the str vecsxp contains only one element. *)
-external string : string -> string t = "r_strsxp_of_string"
+external string : string -> string t = "ocamlr_strsxp_of_string"
 let strings = str_vecsxp_of_string_list
 
 let sexp_list_of_sexp_vecsxp = list_of_vecsxp access_sexp_vecsxp

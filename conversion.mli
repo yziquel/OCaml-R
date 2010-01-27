@@ -1,3 +1,5 @@
+(** {2 Conversion functions.} *)
+
 val bools_of_t : bool list t -> bool list
 (**  Converts an R array of logical values into a list of Objective
   *  Caml booleans.
@@ -82,3 +84,4 @@ val sexps_of_t : sexp list t -> sexp list
 (**  Converts an R array of SEXPs into an Objective Caml list of
   *  SEXPs.
   *)
+
