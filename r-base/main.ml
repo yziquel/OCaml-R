@@ -2,6 +2,8 @@ module Stub = struct
 
   let sample = R.symbol "sample"
 
+  let lapply = R.symbol "lapply"
+
 end
 
 let sample (x : 'a list R.t) size ?replace ?(prob: float list option) () : 'a list R.t =
@@ -15,3 +17,13 @@ let sample (x : 'a list R.t) size ?replace ?(prob: float list option) () : 'a li
     (R.opt R.bool         "replace" replace);
     (R.opt R.floats       "prob"    prob)   ]
 
+let lapply (x : 'a list R.t) (func : 'b R.t) : 'c list R.t =
+  (* It would be nice to solve once and for all the typing of
+     R.t values by using the 'private' keyword to access the
+     underlying R.sexp value by subtyping, and by using
+     polymorphic variants for the parametrised typing of R.t. *)
+  (* There is a ... in the args of lapply, for params passed
+     to the function 'func'. Might be intelligent to wrap it up. *)
+  R.eval Stub.lapply [
+    (R.arg (fun x -> x) x)    ;
+    (R.arg (fun x -> x) func) ]
