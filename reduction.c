@@ -38,7 +38,7 @@ static void r_error_hook(SEXP call, char * message) {
   R_SetErrorHook(&r_error_hook);
 }
 
-CAMLprim value r_init_error_hook (value ml_unit) {
+CAMLprim value ocamlr_init_error_hook (value ml_unit) {
   R_SetErrorHook(&r_error_hook);
   return Val_unit;
 }
