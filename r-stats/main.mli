@@ -1,3 +1,5 @@
+(** Runtime R statistics library. *)
+
 val cor : 'a R.t -> ?y:'b R.t -> ?use:'c R.t -> ?cor_method:'d R.t -> unit -> 'e R.t
 (**  Calculates correlations. *)
 
