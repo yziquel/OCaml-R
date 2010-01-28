@@ -10,10 +10,10 @@ all: build
 build: rmath.cma rmath.cmxa
 
 rmath.cma: dllrmath_stubs.so rmath.cmo
-	ocamlc -verbose -a -dllpath /usr/lib/R/lib -dllib dllrmath_stubs.so -dllib libRmath.so -dllib libR.so -o rmath.cma rmath.cmo
+	ocamlc -verbose -a -dllib dllrmath_stubs.so -dllib libRmath.so -o rmath.cma rmath.cmo
 
 rmath.cmxa: dllrmath_stubs.so rmath.cmx
-	ocamlopt -verbose -a -ccopt -L/usr/lib/R/lib -cclib -lrmath_stubs -cclib -lRmath -cclib -lR -o rmath.cmxa rmath.cmx
+	ocamlopt -verbose -a -cclib -lrmath_stubs -cclib -lRmath -o rmath.cmxa rmath.cmx
 
 rmath.cmi: rmath.mli
 	ocamlfind ocamlc -verbose -c rmath.mli
