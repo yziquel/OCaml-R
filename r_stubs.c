@@ -1,8 +1,6 @@
-//#define OCAMLR_DEBUG /* Toggle this on or off to enable debugging. */
-
-#define _GNU_SOURCE    /* Required by asprinft (see 'man asprintf'), as it is a
-                          GNU extension. Seems a bit overkill. Should try to
-                          remove this dependency on asprintf. */
+//#define _GNU_SOURCE    /* Required by asprinft (see 'man asprintf'), as it is a
+//                          GNU extension. Seems a bit overkill. Should try to
+//                          remove this dependency on asprintf. */
 
 #define USE_RINTERNALS /* This compilation directive allows us to have access to
                           the definition of R internal types. Compilation of the
@@ -23,19 +21,6 @@
 #include <R_ext/Parse.h>
 #include <stdio.h>
 
-
-#ifdef OCAMLR_DEBUG
-
-/* Debugging function. Prints on stderr. */
-
-void prerr_endline (char* s) {
-  fprintf (stderr, "%s\n", s);
-  fflush(stderr);
-}
-
-#endif
-
-
 #include "initialisation.c"
 #include "databridge.c"
 #include "sexp.c"
@@ -53,10 +38,10 @@ void prerr_endline (char* s) {
 
 /* Code to audit. */
 
-CAMLprim value r_print_value (value sexp) {
-  PrintValue(Sexp_val(sexp));
-  return Val_unit;
-}
+//CAMLprim value r_print_value (value sexp) {
+//  PrintValue(Sexp_val(sexp));
+//  return Val_unit;
+//}
 
 /* Commented out because of 'warning: assignment makes pointer from integer without a cast' */
 //CAMLprim value r_exec (value fun_name, value args) {

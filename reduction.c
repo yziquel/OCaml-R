@@ -26,20 +26,22 @@ void R_SetErrorHook(void (*hook)(SEXP, char *));
 
 /* The global variables where we cache our error status. */
 
-static SEXP error_call = NULL;
-static char * error_message = NULL;
+/* TODO: We have to think through the interaction between the
+   ocamlr_error_call variable and the R GC. */
+
+static SEXP ocamlr_error_call = NULL;
+static char * ocamlr_error_message = NULL;
 
 /* The hook in charge of caching the error status. */
 
-static void r_error_hook(SEXP call, char * message);
-static void r_error_hook(SEXP call, char * message) {
-  error_call = call;
-  error_message = message;
-  R_SetErrorHook(&r_error_hook);
+static void ocamlr_error_hook(SEXP call, char * message) {
+  ocamlr_error_call = call;
+  ocamlr_error_message = message;
+  R_SetErrorHook(&ocamlr_error_hook);
 }
 
 CAMLprim value ocamlr_init_error_hook (value ml_unit) {
-  R_SetErrorHook(&r_error_hook);
+  R_SetErrorHook(&ocamlr_error_hook);
   return Val_unit;
 }
 
@@ -83,13 +85,13 @@ CAMLprim value ocamlr_eval_sxp (value sexp_list) {
 
     Begin_roots2(ml_error_call, ml_error_message);
 
-    ml_error_call = Val_sexp(error_call);
-    error_call = NULL;      //should check for a memory leak here...
-                            //depends on GC status of prior error_call.
+    ml_error_call = Val_sexp(ocamlr_error_call);
+    ocamlr_error_call = NULL;      //should check for a memory leak here...
+                                   //depends on GC status of prior error_call.
 
-    ml_error_message = caml_copy_string(error_message);
-    error_message = NULL;   //should check for a memory leak here...
-                            //it seems to me that a string is leaked here.
+    ml_error_message = caml_copy_string(ocamlr_error_message);
+    ocamlr_error_message = NULL;   //should check for a memory leak here...
+                                   //it seems to me that a string is leaked here.
 
     value error_result = caml_alloc_small(2, 0);
     Store_field(error_result, 0, ml_error_call);
@@ -99,6 +101,7 @@ CAMLprim value ocamlr_eval_sxp (value sexp_list) {
        http://www.pps.jussieu.fr/Livres/ora/DA-OCAML/book-ora118.html
        We should check to see if we could avoid the string-name lookup
        to avoid unnecessary delays in exception handling. */
+
     caml_raise_with_arg(*caml_named_value("OCaml-R generic error"), error_result);
 
     End_roots();

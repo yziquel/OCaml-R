@@ -4,12 +4,12 @@
   *  attribute of the given SEXP.
   *)
 
-external s3_class : sexp -> sexp = "r_s3_class"
+external s3_class : sexp -> sexp = "ocamlr_s3_class"
 
-external aux_get_attrib : sexp -> sexp -> sexp = "r_get_attrib"
+external aux_get_attrib : sexp -> sexp -> sexp = "ocamlr_get_attrib"
 let get_attrib s name = aux_get_attrib s (install name)
 
-external get_attributes : sexp -> sexp = "r_get_attributes"
+external get_attributes : sexp -> sexp = "ocamlr_get_attributes"
 
 class type ['a] s3 = object
   val underlying    : 'a t

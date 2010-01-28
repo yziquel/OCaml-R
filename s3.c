@@ -13,7 +13,7 @@
   *  versions of OCaml-R, possibly bypassing the API.
   */
 
-CAMLprim value r_s3_class (value sexp) {
+CAMLprim value ocamlr_s3_class (value sexp) {
   return(Val_sexp(getAttrib(Sexp_val(sexp), R_ClassSymbol)));
 }
 
@@ -29,7 +29,7 @@ CAMLprim value r_s3_class (value sexp) {
   *  be bypassed.
   */
 
-CAMLprim value r_get_attrib (value sexp, value symbolname) {
+CAMLprim value ocamlr_get_attrib (value sexp, value symbolname) {
   return(Val_sexp(getAttrib(Sexp_val(sexp), Sexp_val(symbolname))));
 }
 
@@ -40,6 +40,6 @@ CAMLprim value r_get_attrib (value sexp, value symbolname) {
   *  the attributes of the given SEXP.
   */
 
-CAMLprim value r_get_attributes (value sexp) {
+CAMLprim value ocamlr_get_attributes (value sexp) {
   return(Val_sexp(ATTRIB(Sexp_val(sexp))));
 }

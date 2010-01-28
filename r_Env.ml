@@ -4,11 +4,11 @@ sig
   val name : string    (* This is the first argument of argv for R.
                           Mandatory, otherwise libR.so segfaults. *)
 
-  (** See R reference manual, refman.pdf, page 452, section intitled
-      'Startup - Initialization at Start of an R Session' for details
-      about the most important command line options.
-      More options are documented on the following webpage:
-      http://cran.r-project.org/doc/manuals/R-intro.html#Invoking-R *)
+  (* See R reference manual, refman.pdf, page 452, section intitled
+     'Startup - Initialization at Start of an R Session' for details
+     about the most important command line options.
+     More options are documented on the following webpage:
+     http://cran.r-project.org/doc/manuals/R-intro.html#Invoking-R *)
 
   val options : string list
 

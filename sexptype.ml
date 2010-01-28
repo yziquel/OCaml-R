@@ -1,3 +1,7 @@
+(* TODO: We will have to use polymorphic variants and private
+   type abreviations to leverage the typing system to its full
+   extent to type R statically. *)
+
 (* Types of wrapped R SEXP values. sxp is a polymorphic type
    wrapping up the monomorphic type sexp *)
 type sexp
@@ -5,7 +9,7 @@ type sexp
 (* Argument types for the polymorphic 'a sxp type. *)
 type 'a sxp = sexp
 type nil                         (* For NILSXP *)
-type sym                      (* For SYMSXP *)
+type sym                         (* For SYMSXP *)
 type 'a lisplist                 (* For LISTSXP, and LANGSXP *)
 type simple                      (* For LISTSXP *)
 type pairlist = simple lisplist  (* For LISTSXP *)
@@ -55,7 +59,7 @@ type sexptype =
   | S4Sxp
   | FunSxp
 
-external sexptype_of_sexp : sexp -> int = "r_sexptype_of_sexp" "noalloc"
+external sexptype_of_sexp : sexp -> int = "ocamlr_sexptype_of_sexp" "noalloc"
 let sexptype s = match (sexptype_of_sexp s) with
   | 0  -> NilSxp
   | 1  -> SymSxp

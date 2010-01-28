@@ -1,5 +1,5 @@
-external write_listsxp_carval : 'a lisplist sxp -> sexp -> unit = "r_write_lisplist_carval"
-external write_listsxp_tagval : 'a lisplist sxp -> sexp -> unit = "r_write_lisplist_tagval"
+external write_listsxp_carval : 'a lisplist sxp -> sexp -> unit = "ocamlr_write_lisplist_carval"
+external write_listsxp_tagval : 'a lisplist sxp -> sexp -> unit = "ocamlr_write_lisplist_tagval"
 
 let write_listsxp_element l tag elmnt =
   let () = write_listsxp_tagval l tag in
@@ -13,7 +13,7 @@ let write_listsxp_element l tag elmnt =
   *  and sets the vector's offset element to the boolean's value.
   *)
 
-external assign_lgl_vecsxp  : vec_lgl  sxp -> int -> bool -> unit = "r_assign_lgl_vecsxp"
+external assign_lgl_vecsxp  : vec_lgl  sxp -> int -> bool -> unit = "ocamlr_assign_lgl_vecsxp"
 
 
 (**  Sets the element of a vector of integers.
@@ -25,7 +25,7 @@ external assign_lgl_vecsxp  : vec_lgl  sxp -> int -> bool -> unit = "r_assign_lg
   *  Question: should we rather map R's integers to int32s?
   *)
 
-external assign_int_vecsxp  : vec_int  sxp -> int -> int -> unit = "r_assign_int_vecsxp"
+external assign_int_vecsxp  : vec_int  sxp -> int -> int -> unit = "ocamlr_assign_int_vecsxp"
 
 
 (**  Sets the element of a vector of real numbers.
@@ -35,7 +35,7 @@ external assign_int_vecsxp  : vec_int  sxp -> int -> int -> unit = "r_assign_int
   *  and sets the vector's offset element to the real number's value.
   *)
 
-external assign_real_vecsxp : vec_real sxp -> int -> float -> unit = "r_assign_real_vecsxp"
+external assign_real_vecsxp : vec_real sxp -> int -> float -> unit = "ocamlr_assign_real_vecsxp"
 
 
 (**  Sets the element of a vector of string.
@@ -45,4 +45,4 @@ external assign_real_vecsxp : vec_real sxp -> int -> float -> unit = "r_assign_r
   *  and sets the vector's offset element to the string's value.
   *)
 
-external assign_str_vecsxp  : vec_str  sxp -> int -> string -> unit = "r_assign_str_vecsxp"
+external assign_str_vecsxp  : vec_str  sxp -> int -> string -> unit = "ocamlr_assign_str_vecsxp"

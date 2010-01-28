@@ -1,11 +1,11 @@
 (* There's a lot of stuff concerning symbols and environments in the
    envir.c file of the R source code. *)
 
-external install : string -> sym sxp = "r_install"
+external install : string -> sym sxp = "ocamlr_install"
 
-external findvar : sym sxp -> prom sxp = "r_findvar"
+external findvar : sym sxp -> prom sxp = "ocamlr_findvar"
 
-external findfun : sym sxp -> prom sxp = "r_findfun"
+external findfun : sym sxp -> prom sxp = "ocamlr_findfun"
 
 let symbol ?(generic = false) s : sexp =
 
