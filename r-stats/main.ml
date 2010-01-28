@@ -4,6 +4,8 @@ module Stub = struct
 
   let lm = R.symbol "lm"
 
+  let stl = R.symbol "stl"
+
 end
 
 let cor x ?y ?use ?cor_method () =
