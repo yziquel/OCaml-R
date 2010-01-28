@@ -28,6 +28,7 @@
 #include <mlvalues.h>
 #include <alloc.h>
 #include <memory.h>
+#define MATHLIB_STANDALONE
 #include <Rmath.h>
 #include "wrappers.h"
 
