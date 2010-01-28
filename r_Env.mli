@@ -1,3 +1,5 @@
+(** {2 Declaration of environment - Initialisation.} *)
+
 module type Environment = sig
 (**  [Environment] is the type of a module containing all necessary
   *  informations and data in order to set up the R interpreter

@@ -1,3 +1,5 @@
+(** {2 Evaluation of R code and calls.} *)
+
 exception Runtime_error of lang sxp * string
 
 val eval_string : string -> 'a t

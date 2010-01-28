@@ -1,3 +1,5 @@
+(** {2 Low-level SEXP typing.} *)
+
 type sexp
 (**  A universal type for wrapped R values. *)
 

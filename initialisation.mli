@@ -1,4 +1,4 @@
-(**  {2 Initialisation}
+(**  {2 Initialisation.}
   *
   *  We provide two mechanisms to activate an R interpreter from OCaml-R:
   *

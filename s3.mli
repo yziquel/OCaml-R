@@ -1,4 +1,4 @@
-(* Wrapping S3 classes into Objective Caml. *)
+(** {2 S3 classes.} *)
 
 (**  Class type for S3 objects in R. *)
 class type ['a] s3 = object
