@@ -1,8 +1,17 @@
 module Stub = struct
 
+  let cor = R.symbol "cor"
+
   let lm = R.symbol "lm"
 
 end
+
+let cor x ?y ?use ?cor_method () =
+  R.eval Stub.cor [
+    R.arg (fun x -> x) x                   ;
+    R.opt (fun x -> x) "y" y               ;
+    R.opt (fun x -> x) "use" use           ;
+    R.opt (fun x -> x) "method" cor_method ]
 
 let lm formula ?data ?subset ?weights ?na_action ?lm_method ?model ?x ?y ?qr ?singular_ok ?contrasts ?offset () =
   R.eval Stub.lm [
