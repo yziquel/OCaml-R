@@ -23,6 +23,22 @@
   *  to invoke the [#require "R.interpreter"] directive to set up the interpreter.
   *)
 
+exception Initialisation_failed
+(**  Denotes failure to initialise the R interpreter. *)
+
+val init : ?name:string -> ?argv:string list -> ?env:(string * string) list -> ?sigs:bool -> unit -> unit
+(**  [init] initialises the embedded R interpreter.
+  *
+  *  @param name Name of program. Defaults to Sys.argv.(0).
+  *  @param argv Command line options given to [libR.so]. Defaults to rest of Sys.argv.
+  *  @param env Environment variables to be set for R. Defaults to reasonable values.
+  *  @param sigs If [false], stops R from setting his signal handlers. Defaults to [false].
+  *
+  *  @raise Initialisation_failed *)
+
+val terminate : unit -> unit
+(**  Terminates the R session. *)
+
 module type Interpreter = sig end
 (**  Module type of an R interpreter. *)
 
