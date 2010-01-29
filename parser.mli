@@ -19,6 +19,6 @@ val parse_string : ?max:int -> string -> lang sxp list
   *  number of statements to parse.
   *  @raise Parsing_failure When parsing fails. *)
 
-val parse : string -> lang sxp list
+val parse : string -> lang sxp
 (**  Parse the first R statement in the given R code. *)
 
