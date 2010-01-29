@@ -33,8 +33,7 @@ val init : ?name:string -> ?argv:string list -> ?env:(string * string) list -> ?
   *  @param argv Command line options given to [libR.so]. Defaults to rest of Sys.argv.
   *  @param env Environment variables to be set for R. Defaults to reasonable values.
   *  @param sigs If [false], stops R from setting his signal handlers. Defaults to [false].
-  *
-  *  @raise Initialisation_failed *)
+  *  @raise Initialisation_failed In case R could not be started. *)
 
 val terminate : unit -> unit
 (**  Terminates the R session. *)
