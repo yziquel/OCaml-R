@@ -103,6 +103,7 @@ r.mli: base.mli
 	  internal.mli          \
 	  s3.mli                \
 	  s4.mli                \
+	  parser.mli            \
 	  reduction.mli         \
 	  initialisation.mli    \
 	  base.mli              \
