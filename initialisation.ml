@@ -7,11 +7,17 @@ external init_error_hook : unit -> unit = "ocamlr_init_error_hook" "noalloc"
 
 exception Initialisation_failed
 
-let init ?(name    = try Sys.argv.(0) with _ -> "OCaml-R")
-         ?(argv    = try List.tl (Array.to_list Sys.argv) with _ -> [])
-         ?(env     = Standard.env)
-         ?(sigs    = Standard.signal_handlers) () =
-  List.iter (function name, value -> Unix.putenv name value) env;
+let init ?(name     = try Sys.argv.(0) with _ -> "OCaml-R")
+         ?(argv     = try List.tl (Array.to_list Sys.argv) with _ -> [])
+         ?(env      = Standard.env)
+         ?(packages = None)
+         ?(sigs     = Standard.signal_handlers) () =
+  let env_vars = match packages with
+    | None -> env
+    | Some [] -> ("R_DEFAULT_PACKAGES", "NULL")::env
+    | Some libs -> ("R_DEFAULT_PACKAGES", (String.concat ", " libs))::env
+    end in
+  List.iter (function name, value -> Unix.putenv name value) env_vars;
   let r_sigs = match sigs with true -> 0 | false -> 1 in
   match initialise (Array.of_list (name::argv)) r_sigs with
   | 1 -> let () = Callback.register_exception "OCaml-R generic error"
@@ -25,6 +31,7 @@ module Interpreter (Env : Environment) : Interpreter = struct
   let () = init ~name: Env.name
                 ~argv: Env.options
                 ~env:  Env.env
+                ~packages: Env.packages
                 ~sigs: Env.signal_handlers
                 ()
 

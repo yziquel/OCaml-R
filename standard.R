@@ -5,6 +5,7 @@ cat('module Standard : Environment = struct\n\n')
 cat('  let name="OCaml-R"\n')
 cat('  let options = ["--vanilla"; "--slave"]\n')
 cat('  let signal_handlers = false\n')
+cat('  let packages = Some []\n')
 cat('  let env = [\n')
 for (i in 1:length(IncludeVars)){
 	if (names(IncludeVars)[i] %in% ExcludeVars)

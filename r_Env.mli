@@ -37,5 +37,10 @@ module type Environment = sig
     *  values are determined when the binding itself is compiled.
     *)
 
+  val packages : string list option
+  (**  Packages loaded on startup. If set to [None], load the usual standard
+    *  library. Otherwise, if set to [Some p], load packages [p] in place of
+    *  the standard library. In the [Standard] module, this is set to [Some []]. *)
+
 end
 

@@ -21,5 +21,7 @@ sig
 
   val env : (string * string) list
 
+  val packages : string list option
+
 end
 
