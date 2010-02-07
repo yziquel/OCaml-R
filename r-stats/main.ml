@@ -8,7 +8,7 @@ module Stub = struct
 
   let stl = R.symbol "stl"
 
-  let fischer_test = R.symbol "fischer.test"
+  let fischer_test = R.symbol "fisher.test"
 
   let poisson_test = R.symbol "poisson.test"
 
