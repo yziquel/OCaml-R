@@ -12,7 +12,7 @@ let init ?(name     = try Sys.argv.(0) with _ -> "OCaml-R")
          ?(env      = Standard.env)
          ?(packages = None)
          ?(sigs     = Standard.signal_handlers) () =
-  let env_vars = match packages with
+  let env_vars = begin match packages with
     | None -> env
     | Some [] -> ("R_DEFAULT_PACKAGES", "NULL")::env
     | Some libs -> ("R_DEFAULT_PACKAGES", (String.concat ", " libs))::env
