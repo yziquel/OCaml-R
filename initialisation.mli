@@ -26,12 +26,13 @@
 exception Initialisation_failed
 (**  Denotes failure to initialise the R interpreter. *)
 
-val init : ?name:string -> ?argv:string list -> ?env:(string * string) list -> ?sigs:bool -> unit -> unit
+val init : ?name:string -> ?argv:string list -> ?env:(string * string) list -> ?packages:string list option -> ?sigs:bool -> unit -> unit
 (**  [init] initialises the embedded R interpreter.
   *
   *  @param name Name of program. Defaults to Sys.argv.(0).
   *  @param argv Command line options given to [libR.so]. Defaults to rest of Sys.argv.
   *  @param env Environment variables to be set for R. Defaults to reasonable values.
+  *  @param packages Packages to be loaded at startup. If [None], load the usual standard library.
   *  @param sigs If [false], stops R from setting his signal handlers. Defaults to [false].
   *  @raise Initialisation_failed In case R could not be started. *)
 
