@@ -36,17 +36,14 @@ val pow_di : float -> int -> float
 (** {2 Random number generators} *)
 
 val norm_rand : unit -> float
-(**  Random variates from the standard normal distribution.
-  *  Bug: currently systematically returns [-8.77332116900134373]. *)
+(**  Random variates from the standard normal distribution. *)
 
 val unif_rand : unit -> float
 (**  Random variates from the uniform distribution, using
-  *  Marsaglia MultiCarry methodology for random number generation.
-  *  Bug: currently systematically returns [1.16415321854039843e-10]. *)
+  *  Marsaglia MultiCarry methodology for random number generation. *)
 
 val exp_rand : unit -> float
-(**  Random variates from the standard exponential distribution.
-  *  Bug: currently systematically returns [22.1807097781510656]. *)
+(**  Random variates from the standard exponential distribution. *)
 
 (** {2 Normal distribution} *)
 
