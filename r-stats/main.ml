@@ -1,10 +1,16 @@
 module Stub = struct
 
+  let () = ignore (R.eval_string "require(stats, quietly=TRUE)")
+
   let cor = R.symbol "cor"
 
   let lm = R.symbol "lm"
 
   let stl = R.symbol "stl"
+
+  let fischer_test = R.symbol "fischer.test"
+
+  let poisson_test = R.symbol "poisson.test"
 
 end
 
