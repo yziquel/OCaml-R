@@ -1,0 +1,3 @@
+AUTOMAKE='automake --foreign' autoreconf -i
+./configure
+make
