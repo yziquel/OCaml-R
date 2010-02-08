@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page name="gettingstarted">
+<title><en>Getting started</en><fr>Guide de démarrage</fr></title>
+
+<section name="gs:intro">
+<title>Introduction</title>
+<p>OCaml-R is a collection of libraries enabling OCaml code to access the functionalities
+of the R language and of its statistical computing environment. OCaml-R has initially been
+written by <a href="http://cristal.inria.fr/~guesdon/">Maxence Guesdon</a>, for the benefit
+of the INRIA. <a href="http://yziquel.homelinux.org/topos/debian-ocamlr.html">Guillaume
+Yziquel</a> has decided to rewrite it almost entirely for two reasons:
+<ul>
+<li>Easing the integration of OCaml-R with findlib and the Debian distribution;</li>
+<li>Leveraging the full power of the R API.</li>
+</ul>
+</p>
+</section>
+
+<section name="gs:installation">
+<title>Installation of OCaml-R</title>
+<p>For installation from source, follow the instruction in the INSTALL file. If they do not
+work out properly, please be sure to provide feedback. There also exists some Debian packages
+for OCaml-R, provided by <a href="http://yziquel.homelinux.org/topos/debian-ocamlr.html">
+Guillaume Yziquel</a>.
+</p>
+</section>
+
+<section name="gs:overview">
+<title>Overview of OCaml-R</title>
+<p>OCaml-R is composed of a few modules, packaged inside various findlib packages:
+<ul>
+<li>The R package (library r.cm[xa/xs/a]) is the interface to the libR.so shared library for R,
+and contains all the logic needed interface Objective Caml with an embedded R interpreter.</li>
+<li>The R.interpreter package (library oCamlR.cm[x/o]) ensures us statically that the R
+interpreter will start up and bail out properly: you simply have to link in to this findlib package.
+Which is rather convenient should you want to package R libraries into OCaml.</li>
+<li>The R.math package (library rmath.cm[xa/a]) is an interface to the functionalities of R's
+standalone mathematical library, libRmath.so, and does not require an active R interpreter. As a
+matter of fact, R and R.math are two conflicting findlib packages.</li>
+<li>The R.base package (library rbase.cm[xa/a]) wraps up parts of the R base library.</li>
+<li>The R.stats package (library rstats.cm[xa/a]) wraps up parts of the R stats library.</li>
+</ul>
+</p>
+
+<p>The R package provides the interface to the R interpreter, and nothing more. It provides functions
+init and terminate to adminstrate R sessions, for instance.</p>
+
+<p>The R.interpreter package is somewhat peculiar: It does not provide any code, nor any usable module
+for the end user of OCaml-R. It nevertheless has two successive side-effects: It loads the R package,
+and therefore loads libR.so, and then, initialises cleanly the R intepreter. You therefore only need a
+#require "R.interpreter" in the toplevel to start up the R interpreter, and you only need to compile
+with ocamlfind ocamlc -package R.interpreter to ensure at compile-time that R will start up properly.
+Which is rather useful when you want to create a whole bunch of interdependent bindings of R libraries.</p>
+
+<p>The R.math package provides an interface to the libRmath.so standalone mathematical library of R. For
+instance, on Debian systems, libRmath.so has been compiled as to be independent of libR.so. One should
+avoid using simultaneously the R and R.math packages.</p>
+
+<p>The R.base and R.stats packages provide components of R's standard library. They are not provided
+with the R package because they require functions and constructions that are only available when the
+R interpreter is up and running. Nevertheless, type declarations do not require an active R interpreter
+and are therefore located in the R package.</p>
+
+</section>
+
+<section name="gs:tutorial">
+<title>Tutorial of OCaml-R</title>
+
+<p>Initialising the R interpreter</p>
+
+<p>To initialise R, you can use the init function, or more simply, rely on the R.interpreter package.</p>
+
+<p><pre>
+yziquel@seldon:~$ <span style="color: green;">ocaml</span>
+        Objective Caml version 3.11.1
+
+# <span style="color: green;">#use "topfind";;</span>
+- : unit = ()
+Findlib has been successfully loaded. Additional directives:
+  #require "package";;      to load a package
+  #list;;                   to list the available packages
+  #camlp4o;;                to load camlp4 (standard syntax)
+  #camlp4r;;                to load camlp4 (revised syntax)
+  #predicates "p,q,...";;   to set these predicates
+  Topfind.reset();;         to force that packages will be reloaded
+  #thread;;                 to enable threads
+
+- : unit = ()
+# <span style="color: green;">#require "R.interpreter";;</span>
+/usr/lib/ocaml/unix.cma: loaded
+/usr/lib/ocaml/str.cma: loaded
+/usr/lib/ocaml/calendar: added to search path
+/usr/lib/ocaml/calendar/calendarLib.cma: loaded
+/usr/lib/ocaml/R: added to search path
+/usr/lib/ocaml/R/r.cma: loaded
+/usr/lib/ocaml/R/oCamlR.cmo: loaded
+# 
+</pre></p>
+
+<p>The R interpreter is now active. Moreover, when the program will exit, the
+terminate function will be called to exit cleanly from the R session.</p>
+
+<p>Executing and parsing R code.</p>
+
+<p>To evaluate R code, for instance c(10.4, 5.6, 3.1, 6.4, 21.7), we can use the
+R.eval_string function in the following way:</p>
+
+<p><pre>
+# <span style="color: green;">let q = R.eval_string "c(10.4, 5.6, 3.1, 6.4, 21.7)";;</span>
+val q : '_a R.t = &lt;abstr&gt;
+</pre></p>
+
+<p>The polymorphic 'a R.t type represents an R value denoting an OCaml value of type 'a. We
+are now going to use R.floats_of_t to convert q into a list of floats:</p>
+
+<p><pre>
+# <span style="color: green;">let w = R.floats_of_t q;;</span>
+val w : float list = [10.4; 5.6; 3.1; 6.4; 21.7]
+</pre></p>
+
+<p>The type of q has then been unified to the type float list R.t:</p>
+
+<p><pre>
+# <span style="color: green;">q;;</span>
+- : float list R.t = &lt;abstr&gt;
+</pre></p>
+
+<p>The R.eval_string function operates in two stages: First, the provided character string
+is parsed by the R.parse function, which yields a value of type R.lang R.sxp. Such values
+are expressions that are executable within the R interpreter, and are evaluated via a call
+to R.eval_langsxp.</p>
+
+<p><pre>
+# <span style="color: green;">let e = R.parse "c(10.4, 5.6, 3.1, 6.4, 21.7)";;</span>
+val e : R.lang R.sxp = &lt;abstr&gt;
+# <span style="color: green;">let r = R.eval_langsxp e;;</span>
+val r : '_a R.t = &lt;abstr&gt;
+# <span style="color: green;">let t = R.floats_of_t r;;</span>
+val t : float list = [10.4; 5.6; 3.1; 6.4; 21.7]
+</pre></p>
+
+<p>We indeed get the same values for w and for t.</p>
+
+<p>R values in OCaml-R.</p>
+
+<p>We now have three R values available from Objective Caml: q, e and r. We will now examine
+these values in a bit more detail.</p>
+
+<p>q has type float list R.t. This means that it is an R value that corresponds to an OCaml
+value of type float list. As a matter of fact, there are two distinct typing schemes for R
+values in OCaml-R: The polymorphic type 'a R.t, and the monomorphic type R.sexp. The difference
+between these two types is that the first one contains type information about its OCaml
+equivalent, whereas the second one could apply to any R value wrapped into OCaml with OCaml-R.</p>
+
+<p>We can convert a value of type 'a R.t into an R.sexp value by a subtyping mechanism. Reciprocally,
+there is an R.cast function that converts R.sexp values into values of type 'a R.t. For instance, the
+subtyping mechanism allows us to use q as an argument to R.Pretty.t_of_sexp:</p>
+
+<p><pre>
+# <span style="color: green;">R.Pretty.t_of_sexp (q : float list R.t :&gt; R.sexp);;</span>
+- : R.Pretty.t = R.Pretty.FLOATS [10.4; 5.6; 3.1; 6.4; 21.7]
+</pre></p>
+
+<p>R.Pretty.t_of_sexp is a function that recursively analyses the internal structure of the R value
+passed as argument, and which outputs a condensed, legible, description of its internal structure.</p>
+
+<p>We would also like to apply it to e, but e has type R.lang R.sxp. 'a R.sxp also covers R values
+wrapped into OCaml via OCaml-R, but it is an internal type that should not be visible to the user (the
+API is still not perfect in this regard). We are therefore going to be extremely "dirty" by doing
+precisely what the typing scheme of OCaml-R aims at forbidding (i.e. use Obj.magic):</p>
+
+<p><pre>
+# <span style="color: green;">open R.Pretty;;</span>
+# <span style="color: green;">R.Pretty.t_of_sexp (Obj.magic e : R.sexp);;</span>
+- : R.Pretty.t =
+CALL (SYMBOL (Some ("c", SPECIAL 89)),
+ [(NULL, FLOATS [10.4]); (NULL, FLOATS [5.6]); (NULL, FLOATS [3.1]);
+  (NULL, FLOATS [6.4]); (NULL, FLOATS [21.7])])
+</pre></p>
+
+<p>This description means that e is an executable expression (a CALL), which consists of executing the
+function symbolised by "c", located at offset 89 in the table of R primitive functions, with arguments
+a list of anonymous arguments, each one denoting a floating point number.</p>
+
+<p>One should keep in mind that, behind the scenes, R is a weakly and dynamically typed language, which
+partly explains the internal structure of its values. One of the essential aspects of this dynamic
+typing is called the "sexptype" of R values, which can be accessed through the R.sexptype function:</p>
+
+<p><pre>
+# <span style="color: green;">R.sexptype (q : float list R.t :&gt; R.sexp);;</span>
+- : R.sexptype = R.RealSxp
+# <span style="color: green;">R.sexptype (Obj.magic e : R.sexp);;</span>
+- : R.sexptype = R.LangSxp
+</pre></p>
+
+<p>Interfacing an R function into Objective Caml.</p>
+
+<p>Now that we have seen how to start up the R interpreter, how to parse R code, execute R code, and
+that we have some understanding of the internal structure of R values, we are going to see how to
+interface an R function in order to make it available to the OCaml world. We are going to take, as an
+example, the sample function of the base library of R. The R help page informs us of the following,
+concerning function sample:</p>
+
+<p><pre><span style="color: brown;">sample                  package:base                   R Documentation
+
+Random Samples and Permutations
+
+Description:
+
+     'sample' takes a sample of the specified size from the elements of
+     'x' using either with or without replacement.
+
+Usage:
+
+     sample(x, size, replace = FALSE, prob = NULL)
+     
+     sample.int(n, size, replace = FALSE, prob = NULL)
+     
+Arguments:
+
+       x: Either a (numeric, complex, character or logical) vector of
+          more than one element from which to choose, or a positive
+          integer.
+
+       n: a non-negative integer, the number of items to choose from.
+
+    size: positive integer giving the number of items to choose.
+
+ replace: Should sampling be with replacement?
+
+    prob: A vector of probability weights for obtaining the elements of
+          the vector being sampled.</span></pre></p>
+
+<p>We will therefore consider x to be of type 'a list R.t, we will consider size as
+an OCaml integer, and replace and prob are optional arguments of respective type
+bool option and float list option. In this context, exporting sample to OCaml can be
+done in the following way:</p>
+
+<p><pre>
+# <span style="color: green;">let stub_sample = R.symbol "sample";;</span>
+val stub_sample : R.sexp = &lt;abstr&gt;
+# <span style="color: green;">let sample (x : 'a list R.t) size ?replace ?prob () : 'a list R.t =
+    R.eval stub_sample [
+      R.arg (fun x -&gt; x)             x       ;
+      R.arg R.int                    size    ;
+      R.opt R.bool         "replace" replace ;
+      R.opt R.floats       "prob"    prob    ];;</span>
+val sample :
+  'a list R.t -&gt;
+  int -&gt; ?replace:bool -&gt; ?prob:float list -&gt; unit -&gt; 'a list R.t = &lt;fun&gt;
+</pre></p>
+
+<p>A few words of explanation: R.symbol "sample" is a way to load in memory an object whose symbol,
+or symbolic name, is the string "sample". Roughly stub_sample is the R value that contains the
+function called "sample". We will then use the R.eval stub_sample [...] construction to make an R
+function call, calling stub_sample on the arguments between brackets.</p>
+
+<p>The calling conventions on R side are somewhat peculiar: Its a complex mixture, where arguments
+are named, and where, in the scope of evaluation, we try to match the name of the arguments to names
+that the R function expects. It is possible that such names do not match, or that there is no name
+for a given argument, that matching of names is only partial, et ceteræ...</p>
+
+<p>To conceal all this complexity to the end-user of OCaml-R, we use two auxiliary functions, R.arg
+and R.opt. R.arg concerns the OCaml arguments that are required, while R.opt concerns OCaml arguments
+that are optional. The function given as argument to R.opt or R.arg is a conversion function from OCaml
+side to R side. Then, for optional arguments, you have the name of the argument, and then the argument
+itself. It is a bit complicated at first sight, but not so much (and there is room for improvement.)</p>
+
+<p>Once the function is exported to Objective Caml, we can use it to take a sample of 4 elements out of
+a list of 10 elements. For example:</p>
+
+<p><pre>
+# <span style="color: green;">R.floats_of_t (sample (R.floats
+    [0.0; 0.1; 0.2; 0.3; 0.4; 0.5; 0.6; 0.7; 0.8; 0.9]) 4 ());;</span>
+- : float list = [0.; 0.7; 0.3; 0.4]
+</pre></p>
+
+</section>
+
+<section name="gs:todo">
+<title>What is done, what is to be done.</title>
+
+<p>What has indeed been done:</p>
+<ul>
+<li>A rather tight integration with findlib.</li>
+<li>A packaging for Debian.</li>
+<li>A mechanism to chain exceptions from R to OCaml.</li>
+<li>A mechanism chaining the R garbage collector with OCaml's GC.</li>
+</ul>
+
+<p>What indeeds remain to be done:</p>
+<ul>
+<li>Better typing, with fantom polymorphic variants.</li>
+<li>A better interaction between R and OCaml's GC.</li>
+<li>A conversion of R arrays to OCaml arrays instead of lists.</li>
+<li>An evaluation function of type ('a -> 'b) R.t -> 'a R.t -> 'b R.t.</li>
+<li>Support for S4 classes, currently inexistant.</li>
+<li>Documentation of current support for S3 classes.</li>
+<li>A "howto" package R packages into OCaml.</li>
+<li>An efficient syntax extension for R.</li>
+</ul>
+
+</section>
+</page>

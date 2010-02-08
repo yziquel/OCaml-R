@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page name="downloads" sidebar="true">
+<title><en>Downloads</en><fr>Téléchargements</fr>
+</title>
+<section name="downloads:general">
+<title>
+<en>General information</en>
+<fr>Informations générales</fr>
+</title>
+<p>
+<en>OCaml-R is </en>
+<fr>OCaml-R est </fr>
+<link href="http://download.gna.org/ocaml-r/"><en>downloadable here</en>
+<fr>téléchargeable ici</fr></link>.
+<br/>
+<en>You can also access the </en>
+<fr>Vous pouvez aussi accéder au </fr>
+<link href="https://gna.org/svn/?group=ocaml-r"><en>Subversion repository</en>
+<fr>Dépôt Subversion</fr></link>.
+</p>
+<p>
+<en>See the INSTALL file for installation procedure.</en>
+<fr>Voir le fichier INSTALL pour la procédure d'installation.</fr>
+</p>
+<p>
+<en>You can read the </en>
+<fr>Vous pouvez consulter le </fr>
+<a href="ChangeLog"><tt>ChangeLog</tt></a>.
+</p>
+</section>
+<include file="latest.xml"/>
+<section name="downloads:requirements">
+<title>
+<en>Requirements</en>
+<fr>Pré-requis</fr>
+</title>
+<p>
+<en>These are required to compile OCaml-R:</en>
+<fr>La compilation de OCaml-R requiert:</fr>
+</p>
+<ul>
+<li><link href="http://caml.inria.fr/">OCaml 3.11.0</link><en> or above,</en><fr> ou supérieur,</fr></li>
+<li><link href="http://www.r-project.org">R &gt;= 2.9, with development libraries </link>.</li>
+</ul>
+<p>
+<tt>make</tt>
+<en> is also required for the compilation process.</en>
+<fr> est également requis pour la compilation.</fr>
+</p>
+</section>
+</page>
