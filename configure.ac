@@ -5,6 +5,11 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_CC
 
+AC_PATH_PROG(R,R,no)
+if test "$R" = no ; then
+        AC_MSG_ERROR(Cannot find R.)
+fi
+
 AC_PROG_OCAML
 if test "$OCAMLC" = "no"; then
   AC_MSG_ERROR([You must install the OCaml compiler.])
