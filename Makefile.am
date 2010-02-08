@@ -37,13 +37,13 @@ rstats.cmxa: rstats.cmx
 	$(OCAMLOPT) -verbose -a -o rstats.cmxa rstats.cmx
 
 r.cmi: r.mli
-	$(OCAMLFIND) ocamlc -package calendar -verbose -c r.mli
+	$(OCAMLFIND) ocamlc -package $(OCAML_PKG_calendar) -verbose -c r.mli
 
 r.cmo: r.ml r.cmi
-	$(OCAMLFIND) ocamlc -package calendar -verbose -package unix -c r.ml
+	$(OCAMLFIND) ocamlc -package $(OCAML_PKG_calendar) -verbose -package $(OCAML_PKG_unix) -c r.ml
 
 r.cmx: r.ml r.cmi
-	$(OCAMLFIND) ocamlopt -package calendar -verbose -package unix -c r.ml
+	$(OCAMLFIND) ocamlopt -package $(OCAML_PKG_calendar) -verbose -package $(OCAML_PKG_unix) -c r.ml
 
 oCamlR.cmo:
 	$(OCAMLFIND) ocamlc -verbose -c oCamlR.ml
