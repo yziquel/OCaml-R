@@ -27,6 +27,7 @@
 
 # Various commands and dir
 ##########################
+OCAML    = @OCAML@
 OCAMLC   = @OCAMLC@ -warn-error FSPU -dtypes
 OCAMLOPT = @OCAMLOPT@ -warn-error FSPU -dtypes
 OCAMLDEP = @OCAMLDEP@

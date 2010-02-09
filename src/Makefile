@@ -157,7 +157,7 @@ clean:
 	rm -f standard.ml base.ml base.mli r.ml r.mli rbase.ml rbase.mli rstats.ml rstats.mli
 	rm -f *.o *.so *.a *.cmi *.cmo *.cmx *.cma *.cmxa *.cmxs *.annot
 
-test: build
+test: all
 	$(OCAML) -init ocamlinit
 
 doc: r.mli rbase.mli rstats.mli math/rmath.mli
