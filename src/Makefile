@@ -112,13 +112,15 @@ r.mli: \
 standard.ml: standard.R
 	R --silent --vanilla --slave < $< > $@
 
-base.ml: \
+BASE_ML_SOURCES=\
     base/incipit.ml       \
 	  base/listing.ml       \
 	  base/dataFrame.ml     \
 	  base/date.ml          \
 	  base/excipit.ml
-	cat $^ > $@
+
+base.ml: base.mli $(BASE_ML_SOURCES)
+	cat $(BASE_ML_SOURCES) > $@
 
 base.mli: \
 	  base/incipit.mli      \
@@ -128,12 +130,13 @@ base.mli: \
 	  base/excipit.mli
 	cat $^ > $@
 
-rbase.ml: \
+RBASE_ML_SOURCES= \
 	  r-base/main.ml        \
 	  r-base/listing.ml     \
 	  r-base/dataFrame.ml   \
 	  r-base/date.ml
-	cat $^ > $@
+rbase.ml: rbase.mli $(RBASE_ML_SOURCSE)
+	cat $(RBASE_ML_SOURCES) > $@
 
 rbase.mli: \
 	  r-base/main.mli       \
@@ -142,8 +145,8 @@ rbase.mli: \
 	  r-base/date.mli
 	cat $^ > $@
 
-rstats.ml: r-stats/main.ml
-	cat $^ > $@
+rstats.ml: rstats.mli r-stats/main.ml
+	cat r-stats/main.ml > $@
 
 rstats.mli: r-stats/main.mli
 	cat $^ > $@
