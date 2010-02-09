@@ -1,3 +1,8 @@
+2010-02-09  Maxence Guesdon  <Maxence.Guesdon@inria.fr>
+
+	* update website, clean configure and build process
+	* generate documentation
+
 2010-02-08  Guillaume Yziquel  <guillaume.yziquel@citycable.ch>
 
 	* release 0.2
