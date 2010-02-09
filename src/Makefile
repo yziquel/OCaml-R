@@ -69,7 +69,7 @@ rstats.cma: rstats.cmo
 rstats.cmxa: rstats.cmx
 	$(OCAMLOPT) -verbose -a -o rstats.cmxa rstats.cmx
 
-r.ml: \
+R_ML_SOURCES=\
 	  r_Env.ml              \
 	  standard.ml           \
 	  sexptype.ml           \
@@ -88,7 +88,9 @@ r.ml: \
 	  reduction.ml          \
 	  initialisation.ml     \
 	  base.ml
-	cat $^ > $@
+
+r.ml: r.mli $(R_ML_SOURCES)
+	cat $(R_ML_SOURCES) > $@
 
 r.mli: \
 	  incipit.mli           \
