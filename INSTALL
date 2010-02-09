@@ -1,7 +1,15 @@
-To create the Makefile via the use of autoconf / automake, simply do:
+        OCaml-R installation
 
-	autoreconf -i
 
-Then, run the ./configure script, followed by make. OCaml-R should now be compiled.
+*** What you need ***
+- OCaml 3.11.0 or above installed
+- R >= 2.9 with development libraries
+- make ;-)
 
-To automate both steps, you have the autoconf-build script.
+*** How to compile ***
+- ./configure
+- make all [or only 'make byte' if the native code compiler is not installed]
+- make install
+  The list of installed or not installed files is printed.
+
+
