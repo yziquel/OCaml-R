@@ -3,6 +3,8 @@ AC_INIT([ocaml-r], [0.2])
 m4_include([m4/ocaml.m4])
 
 AC_PROG_CC
+ROOT=`pwd`
+AC_SUBST(ROOT)
 
 AC_PATH_PROG(R,R,no)
 if test "$R" = no ; then

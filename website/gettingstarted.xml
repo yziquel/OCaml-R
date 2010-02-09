@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
 <page name="gettingstarted">
 <title><en>Getting started</en><fr>Guide de démarrage</fr></title>
 
@@ -9,11 +9,11 @@ of the R language and of its statistical computing environment. OCaml-R has init
 written by <a href="http://cristal.inria.fr/~guesdon/">Maxence Guesdon</a>, for the benefit
 of the INRIA. <a href="http://yziquel.homelinux.org/topos/debian-ocamlr.html">Guillaume
 Yziquel</a> has decided to rewrite it almost entirely for two reasons:
+</p>
 <ul>
 <li>Easing the integration of OCaml-R with findlib and the Debian distribution;</li>
 <li>Leveraging the full power of the R API.</li>
 </ul>
-</p>
 </section>
 
 <section name="gs:installation">
@@ -28,6 +28,7 @@ Guillaume Yziquel</a>.
 <section name="gs:overview">
 <title>Overview of OCaml-R</title>
 <p>OCaml-R is composed of a few modules, packaged inside various findlib packages:
+</p>
 <ul>
 <li>The R package (library r.cm[xa/xs/a]) is the interface to the libR.so shared library for R,
 and contains all the logic needed interface Objective Caml with an embedded R interpreter.</li>
@@ -40,7 +41,6 @@ matter of fact, R and R.math are two conflicting findlib packages.</li>
 <li>The R.base package (library rbase.cm[xa/a]) wraps up parts of the R base library.</li>
 <li>The R.stats package (library rstats.cm[xa/a]) wraps up parts of the R stats library.</li>
 </ul>
-</p>
 
 <p>The R package provides the interface to the R interpreter, and nothing more. It provides functions
 init and terminate to adminstrate R sessions, for instance.</p>
@@ -70,11 +70,11 @@ and are therefore located in the R package.</p>
 
 <p>To initialise R, you can use the init function, or more simply, rely on the R.interpreter package.</p>
 
-<p><pre>
-yziquel@seldon:~$ <span style="color: green;">ocaml</span>
+<command-line>
+yziquel@seldon:~$ ocaml
         Objective Caml version 3.11.1
 
-# <span style="color: green;">#use "topfind";;</span>
+# #use "topfind";;
 - : unit = ()
 Findlib has been successfully loaded. Additional directives:
   #require "package";;      to load a package
@@ -86,7 +86,7 @@ Findlib has been successfully loaded. Additional directives:
   #thread;;                 to enable threads
 
 - : unit = ()
-# <span style="color: green;">#require "R.interpreter";;</span>
+# #require "R.interpreter";;
 /usr/lib/ocaml/unix.cma: loaded
 /usr/lib/ocaml/str.cma: loaded
 /usr/lib/ocaml/calendar: added to search path
@@ -94,8 +94,8 @@ Findlib has been successfully loaded. Additional directives:
 /usr/lib/ocaml/R: added to search path
 /usr/lib/ocaml/R/r.cma: loaded
 /usr/lib/ocaml/R/oCamlR.cmo: loaded
-# 
-</pre></p>
+#
+</command-line>
 
 <p>The R interpreter is now active. Moreover, when the program will exit, the
 terminate function will be called to exit cleanly from the R session.</p>
@@ -105,39 +105,39 @@ terminate function will be called to exit cleanly from the R session.</p>
 <p>To evaluate R code, for instance c(10.4, 5.6, 3.1, 6.4, 21.7), we can use the
 R.eval_string function in the following way:</p>
 
-<p><pre>
-# <span style="color: green;">let q = R.eval_string "c(10.4, 5.6, 3.1, 6.4, 21.7)";;</span>
+<command-line>
+# let q = R.eval_string "c(10.4, 5.6, 3.1, 6.4, 21.7)";;
 val q : '_a R.t = &lt;abstr&gt;
-</pre></p>
+</command-line>
 
 <p>The polymorphic 'a R.t type represents an R value denoting an OCaml value of type 'a. We
 are now going to use R.floats_of_t to convert q into a list of floats:</p>
 
-<p><pre>
-# <span style="color: green;">let w = R.floats_of_t q;;</span>
+<command-line>
+# let w = R.floats_of_t q;;
 val w : float list = [10.4; 5.6; 3.1; 6.4; 21.7]
-</pre></p>
+</command-line>
 
 <p>The type of q has then been unified to the type float list R.t:</p>
 
-<p><pre>
-# <span style="color: green;">q;;</span>
+<command-line>
+# q;;
 - : float list R.t = &lt;abstr&gt;
-</pre></p>
+</command-line>
 
 <p>The R.eval_string function operates in two stages: First, the provided character string
 is parsed by the R.parse function, which yields a value of type R.lang R.sxp. Such values
 are expressions that are executable within the R interpreter, and are evaluated via a call
 to R.eval_langsxp.</p>
 
-<p><pre>
-# <span style="color: green;">let e = R.parse "c(10.4, 5.6, 3.1, 6.4, 21.7)";;</span>
+<command-line>
+# let e = R.parse "c(10.4, 5.6, 3.1, 6.4, 21.7)";;
 val e : R.lang R.sxp = &lt;abstr&gt;
-# <span style="color: green;">let r = R.eval_langsxp e;;</span>
+# let r = R.eval_langsxp e;;
 val r : '_a R.t = &lt;abstr&gt;
-# <span style="color: green;">let t = R.floats_of_t r;;</span>
+# let t = R.floats_of_t r;;
 val t : float list = [10.4; 5.6; 3.1; 6.4; 21.7]
-</pre></p>
+</command-line>
 
 <p>We indeed get the same values for w and for t.</p>
 
@@ -156,10 +156,10 @@ equivalent, whereas the second one could apply to any R value wrapped into OCaml
 there is an R.cast function that converts R.sexp values into values of type 'a R.t. For instance, the
 subtyping mechanism allows us to use q as an argument to R.Pretty.t_of_sexp:</p>
 
-<p><pre>
-# <span style="color: green;">R.Pretty.t_of_sexp (q : float list R.t :&gt; R.sexp);;</span>
+<command-line>
+# R.Pretty.t_of_sexp (q : float list R.t :&gt; R.sexp);;
 - : R.Pretty.t = R.Pretty.FLOATS [10.4; 5.6; 3.1; 6.4; 21.7]
-</pre></p>
+</command-line>
 
 <p>R.Pretty.t_of_sexp is a function that recursively analyses the internal structure of the R value
 passed as argument, and which outputs a condensed, legible, description of its internal structure.</p>
@@ -169,14 +169,14 @@ wrapped into OCaml via OCaml-R, but it is an internal type that should not be vi
 API is still not perfect in this regard). We are therefore going to be extremely "dirty" by doing
 precisely what the typing scheme of OCaml-R aims at forbidding (i.e. use Obj.magic):</p>
 
-<p><pre>
-# <span style="color: green;">open R.Pretty;;</span>
-# <span style="color: green;">R.Pretty.t_of_sexp (Obj.magic e : R.sexp);;</span>
+<command-line>
+# open R.Pretty;;
+# R.Pretty.t_of_sexp (Obj.magic e : R.sexp);;
 - : R.Pretty.t =
 CALL (SYMBOL (Some ("c", SPECIAL 89)),
  [(NULL, FLOATS [10.4]); (NULL, FLOATS [5.6]); (NULL, FLOATS [3.1]);
   (NULL, FLOATS [6.4]); (NULL, FLOATS [21.7])])
-</pre></p>
+</command-line>
 
 <p>This description means that e is an executable expression (a CALL), which consists of executing the
 function symbolised by "c", located at offset 89 in the table of R primitive functions, with arguments
@@ -186,12 +186,12 @@ a list of anonymous arguments, each one denoting a floating point number.</p>
 partly explains the internal structure of its values. One of the essential aspects of this dynamic
 typing is called the "sexptype" of R values, which can be accessed through the R.sexptype function:</p>
 
-<p><pre>
-# <span style="color: green;">R.sexptype (q : float list R.t :&gt; R.sexp);;</span>
+<command-line>
+# R.sexptype (q : float list R.t :&gt; R.sexp);;
 - : R.sexptype = R.RealSxp
-# <span style="color: green;">R.sexptype (Obj.magic e : R.sexp);;</span>
+# R.sexptype (Obj.magic e : R.sexp);;
 - : R.sexptype = R.LangSxp
-</pre></p>
+</command-line>
 
 <p>Interfacing an R function into Objective Caml.</p>
 
@@ -201,7 +201,7 @@ interface an R function in order to make it available to the OCaml world. We are
 example, the sample function of the base library of R. The R help page informs us of the following,
 concerning function sample:</p>
 
-<p><pre><span style="color: brown;">sample                  package:base                   R Documentation
+<sample>sample                  package:base                   R Documentation
 
 Random Samples and Permutations
 
@@ -213,9 +213,9 @@ Description:
 Usage:
 
      sample(x, size, replace = FALSE, prob = NULL)
-     
+
      sample.int(n, size, replace = FALSE, prob = NULL)
-     
+
 Arguments:
 
        x: Either a (numeric, complex, character or logical) vector of
@@ -229,26 +229,26 @@ Arguments:
  replace: Should sampling be with replacement?
 
     prob: A vector of probability weights for obtaining the elements of
-          the vector being sampled.</span></pre></p>
+          the vector being sampled.</sample>
 
 <p>We will therefore consider x to be of type 'a list R.t, we will consider size as
 an OCaml integer, and replace and prob are optional arguments of respective type
 bool option and float list option. In this context, exporting sample to OCaml can be
 done in the following way:</p>
 
-<p><pre>
-# <span style="color: green;">let stub_sample = R.symbol "sample";;</span>
+<command-line>
+# let stub_sample = R.symbol "sample";;
 val stub_sample : R.sexp = &lt;abstr&gt;
-# <span style="color: green;">let sample (x : 'a list R.t) size ?replace ?prob () : 'a list R.t =
+# let sample (x : 'a list R.t) size ?replace ?prob () : 'a list R.t =
     R.eval stub_sample [
       R.arg (fun x -&gt; x)             x       ;
       R.arg R.int                    size    ;
       R.opt R.bool         "replace" replace ;
-      R.opt R.floats       "prob"    prob    ];;</span>
+      R.opt R.floats       "prob"    prob    ];;
 val sample :
   'a list R.t -&gt;
   int -&gt; ?replace:bool -&gt; ?prob:float list -&gt; unit -&gt; 'a list R.t = &lt;fun&gt;
-</pre></p>
+</command-line>
 
 <p>A few words of explanation: R.symbol "sample" is a way to load in memory an object whose symbol,
 or symbolic name, is the string "sample". Roughly stub_sample is the R value that contains the
@@ -269,11 +269,11 @@ itself. It is a bit complicated at first sight, but not so much (and there is ro
 <p>Once the function is exported to Objective Caml, we can use it to take a sample of 4 elements out of
 a list of 10 elements. For example:</p>
 
-<p><pre>
-# <span style="color: green;">R.floats_of_t (sample (R.floats
-    [0.0; 0.1; 0.2; 0.3; 0.4; 0.5; 0.6; 0.7; 0.8; 0.9]) 4 ());;</span>
+<command-line>
+# R.floats_of_t (sample (R.floats
+    [0.0; 0.1; 0.2; 0.3; 0.4; 0.5; 0.6; 0.7; 0.8; 0.9]) 4 ());;
 - : float list = [0.; 0.7; 0.3; 0.4]
-</pre></p>
+</command-line>
 
 </section>
 

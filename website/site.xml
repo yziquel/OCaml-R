@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
 <site>
 <title>OCaml-R</title>
 <include file="sidemenu.xml"/>
@@ -83,7 +83,7 @@ The library reference documentation is <a href="refdoc/index.html">here</a>.
 <section name="author">
 <title><en>Author</en><fr>Auteur</fr></title>
 <p>
-<link href="http://pauillac.inria.fr/~guesdon/">Maxence Guesdon</link>.
+<link href="http://pauillac.inria.fr/~guesdon/">Maxence Guesdon</link>.<br/>
 <link href="http://yziquel.homelinux.org/topos/debian-ocamlr">Guillaume Yziquel</link>.
 </p>
 </section>
