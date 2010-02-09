@@ -18,11 +18,11 @@ XML_FILES=\
 
 all: $(XML_FILES)
 	$(MKDIR) $(DEST_DIR)
-#	$(MYSITE) site.xml -lang fr -o $(DEST_DIR)
+	$(MYSITE) site.xml -lang fr -o $(DEST_DIR)
 	$(MYSITE) site.xml -lang en -o $(DEST_DIR)
 	$(CP) news.rss $(DEST_DIR)
 	cp style.css $(DEST_DIR)
-	cp ../ChangeLog $(DEST_DIR)
+	cp ../Changelog $(DEST_DIR)
 	$(CP) $(DEST_DIR)/index.en.html $(DEST_DIR)/index.html
 	rpl "&amp;&amp;" "&&" $(DEST_DIR)/*.html
 

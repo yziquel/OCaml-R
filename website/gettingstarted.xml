@@ -2,28 +2,7 @@
 <page name="gettingstarted">
 <title><en>Getting started</en><fr>Guide de démarrage</fr></title>
 
-<section name="gs:intro">
-<title>Introduction</title>
-<p>OCaml-R is a collection of libraries enabling OCaml code to access the functionalities
-of the R language and of its statistical computing environment. OCaml-R has initially been
-written by <a href="http://cristal.inria.fr/~guesdon/">Maxence Guesdon</a>, for the benefit
-of the INRIA. <a href="http://yziquel.homelinux.org/topos/debian-ocamlr.html">Guillaume
-Yziquel</a> has decided to rewrite it almost entirely for two reasons:
-</p>
-<ul>
-<li>Easing the integration of OCaml-R with findlib and the Debian distribution;</li>
-<li>Leveraging the full power of the R API.</li>
-</ul>
-</section>
-
-<section name="gs:installation">
-<title>Installation of OCaml-R</title>
-<p>For installation from source, follow the instruction in the INSTALL file. If they do not
-work out properly, please be sure to provide feedback. There also exists some Debian packages
-for OCaml-R, provided by <a href="http://yziquel.homelinux.org/topos/debian-ocamlr.html">
-Guillaume Yziquel</a>.
-</p>
-</section>
+<section><fr>This page is only in english.</fr></section>
 
 <section name="gs:overview">
 <title>Overview of OCaml-R</title>
@@ -66,7 +45,7 @@ and are therefore located in the R package.</p>
 <section name="gs:tutorial">
 <title>Tutorial of OCaml-R</title>
 
-<p>Initialising the R interpreter</p>
+<section><title>Initialising the R interpreter</title>
 
 <p>To initialise R, you can use the init function, or more simply, rely on the R.interpreter package.</p>
 
@@ -99,8 +78,10 @@ Findlib has been successfully loaded. Additional directives:
 
 <p>The R interpreter is now active. Moreover, when the program will exit, the
 terminate function will be called to exit cleanly from the R session.</p>
+</section>
 
-<p>Executing and parsing R code.</p>
+<section>
+<title>Executing and parsing R code</title>
 
 <p>To evaluate R code, for instance c(10.4, 5.6, 3.1, 6.4, 21.7), we can use the
 R.eval_string function in the following way:</p>
@@ -140,8 +121,10 @@ val t : float list = [10.4; 5.6; 3.1; 6.4; 21.7]
 </command-line>
 
 <p>We indeed get the same values for w and for t.</p>
+</section>
 
-<p>R values in OCaml-R.</p>
+<section>
+<title>R values in OCaml-R</title>
 
 <p>We now have three R values available from Objective Caml: q, e and r. We will now examine
 these values in a bit more detail.</p>
@@ -192,8 +175,10 @@ typing is called the "sexptype" of R values, which can be accessed through the R
 # R.sexptype (Obj.magic e : R.sexp);;
 - : R.sexptype = R.LangSxp
 </command-line>
+</section>
 
-<p>Interfacing an R function into Objective Caml.</p>
+<section>
+<title>Interfacing an R function into Objective Caml</title>
 
 <p>Now that we have seen how to start up the R interpreter, how to parse R code, execute R code, and
 that we have some understanding of the internal structure of R values, we are going to see how to
@@ -274,6 +259,7 @@ a list of 10 elements. For example:</p>
     [0.0; 0.1; 0.2; 0.3; 0.4; 0.5; 0.6; 0.7; 0.8; 0.9]) 4 ());;
 - : float list = [0.; 0.7; 0.3; 0.4]
 </command-line>
+</section>
 
 </section>
 

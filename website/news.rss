@@ -8,7 +8,14 @@
     <managingEditor>zoggy@bat8.org</managingEditor>
     <webMaster>zoggy@bat8.org</webMaster>
     <pubDate>14 Apr 2009 16:00:00 +0000</pubDate>
-    <lastBuildDate>14 Apr 2009 16:00:00 +0000</lastBuildDate>
+    <lastBuildDate>09 Fev 2009 10:00:00 +0000</lastBuildDate>
+    <item>
+      <title>OCaml-R 0.2 is available</title>
+      <link>http://home.gna.org/ocaml-r/</link>
+      <description>OCaml-R 0.2 is available. This is a complete rewrite of most of the software.
+    </description>
+      <pubDate>02 Feb 2009 10:00:00 +0000</pubDate>
+    </item>
     <item>
       <title>New web site</title>
       <link>http://home.gna.org/ocaml-r/</link>

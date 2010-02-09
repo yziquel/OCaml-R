@@ -19,8 +19,10 @@
 <fr>Dépôt Subversion</fr></link>.
 </p>
 <p>
-<en>See the INSTALL file for installation procedure.</en>
-<fr>Voir le fichier INSTALL pour la procédure d'installation.</fr>
+<en>See the INSTALL file for installation procedure.
+If it does not work out properly, please be sure to provide feedback.</en>
+<fr>Voir le fichier INSTALL pour la procédure d'installation. Si celle-ci
+ne fonctionne pas, n'hésitez pas à faire un retour aux auteurs.</fr>
 </p>
 <p>
 <en>You can read the </en>
@@ -48,4 +50,16 @@
 <fr> est également requis pour la compilation.</fr>
 </p>
 </section>
+
+<section name="downloads:debian">
+<title>Debian package</title>
+<p>
+<en>There also exist some Debian packages for OCaml-R, provided </en>
+<fr>Il existe également des paquets debian, fournis </fr>
+<link href="http://yziquel.homelinux.org/topos/debian-ocamlr.html"><en>here</en><fr>ici</fr></link>
+<en> by </en>
+<fr> par </fr>Guillaume Yziquel.
+</p>
+</section>
+
 </page>
