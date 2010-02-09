@@ -133,7 +133,7 @@ clean:
 test: build
 	$(OCAML) -init ocamlinit
 
-install: remove
+install: all remove
 	$(OCAMLFIND) install R META *.a *.cm[ai] *.cmxa dllr_stubs.so
 
 remove:
