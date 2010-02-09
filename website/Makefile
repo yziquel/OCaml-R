@@ -31,8 +31,8 @@ news.xml: news.rss
 	$(RSS2CONTENT) $< >> $@
 
 refdoc: dummy
-	cd $(ROOT) && make doc
-	cp -r $(ROOT)/src/ocamldoc/* $(DEST_DIR)/refdoc/
+	cd ../src && make doc
+	cp -r ../src/ocamldoc/* $(DEST_DIR)/refdoc/
 
 clean:
 	$(RM) *~ \#*\#

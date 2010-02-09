@@ -160,6 +160,11 @@ clean:
 test: build
 	$(OCAML) -init ocamlinit
 
+doc: r.mli rbase.mli rstats.mli math/rmath.mli
+	$(MKDIR) ocamldoc
+	$(OCAMLFIND) ocamldoc -package calendar $(INCLUDES) \
+	-html -d ocamldoc $^
+
 install: all remove
 	$(OCAMLFIND) install R META *.a *.cm[ai] *.cmxa dllr_stubs.so
 
