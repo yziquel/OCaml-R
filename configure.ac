@@ -30,5 +30,5 @@ if test "$OCAML_PKG_calendar" = "no"; then
   AC_MSG_ERROR([Please install OCaml findlib module 'calendar'.])
 fi
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([master.Makefile])
 AC_OUTPUT
