@@ -1,8 +1,10 @@
 #################################################################################
 #                OCaml-R                                                        #
 #                                                                               #
-#    Copyright (C) 2008-2009 Institut National de Recherche en                  #
+#    Copyright (C) 2008-2010 Institut National de Recherche en                  #
 #    Informatique et en Automatique. All rights reserved.                       #
+#                                                                               #
+#    Copyright (C) 2009-2010 Guillaume Yziquel. All rights reserved.            #
 #                                                                               #
 #    This program is free software; you can redistribute it and/or modify       #
 #    it under the terms of the GNU General Public License as                    #
@@ -11,7 +13,7 @@
 #                                                                               #
 #    This program is distributed in the hope that it will be useful,            #
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of             #
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              #
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the               #
 #    GNU Library General Public License for more details.                       #
 #                                                                               #
 #    You should have received a copy of the GNU General Public                  #
@@ -20,177 +22,157 @@
 #    02111-1307  USA                                                            #
 #                                                                               #
 #    Contact: Maxence.Guesdon@inria.fr                                          #
-#                                                                               #
+#             guillaume.yziquel@citycable.ch                                    #
 #################################################################################
 
 include ../master.Makefile
 
-RLIBDIR=/usr/lib/R/lib
-RINCLUDES=-I . -I /usr/share/R/include
-INCLUDES=	-I +ocamldoc -I `ocamlc -where`/caml $(RINCLUDES)
+all: opt byte
+opt: libopt mathopt
+byte: lib math
 
-COMPFLAGS=$(INCLUDES)
-LINKFLAGS=$(INCLUDES) -ccopt -L$(RLIBDIR) -cclib -lR
-LINKFLAGS_BYTE=$(INCLUDES) -ccopt -L$(RLIBDIR)  -cclib -lR
-LINKFLAGS_MATH=$(INCLUDES) -ccopt -L$(RLIBDIR) -cclib -lRmath
-LINKFLAGS_MATH_BYTE=$(INCLUDES) -ccopt -L$(RLIBDIR)  -cclib -lRmath
+libopt: r.cmxa r.cmxs oCamlR.cmx rbase.cmxa rstats.cmxa rmath.cmxa
+lib: r.cma oCamlR.cmo rbase.cma rstats.cma rmath.cma
 
-#OCAMLPP=-pp "camlp4o "
+mathopt: rmath.cmxa
+math: rmath.cma
 
-# Compilation
-#############
+rmath.cma: dllrmath_stubs.so math/rmath.cmo
+	$(OCAMLC) -verbose -a -dllib dllrmath_stubs.so -dllib libRmath.so -o rmath.cma math/rmath.cmo
 
-LIB_CMOFILES=\
-	rdevices.cmo \
-	r.cmo
+rmath.cmxa: dllrmath_stubs.so math/rmath.cmx
+	$(OCAMLOPT) -verbose -a -cclib -lrmath_stubs -cclib -lRmath -o rmath.cmxa math/rmath.cmx
 
-LIB_CMXFILES=$(LIB_CMOFILES:.cmo=.cmx)
-LIB_CMIFILES= $(LIB_CMOFILES:.cmo=.cmi)
+librmath_stubs.a: math/rmath_stubs.o
+	ar rcs librmath_stubs.a math/rmath_stubs.o
 
-LIB_COBJ_FILES=r_base.o\
-#	r_devices.o
+dllrmath_stubs.so: librmath_stubs.a math/rmath_stubs.o
+	ocamlmklib -verbose -o rmath_stubs math/rmath_stubs.o
 
-LIBMATH_CMOFILES=\
-	rmath.cmo
+math/rmath_stubs.o: math/rmath_stubs.c
 
-PA_R=pa_ocamlr.cmo
+r.cma: dllr_stubs.so r.cmo
+	$(OCAMLC) -verbose -a -dllpath $(RLIBDIR) -dllib dllr_stubs.so -dllib libR.so -o r.cma r.cmo
 
-LIBMATH_CMXFILES=$(LIBMATH_CMOFILES:.cmo=.cmx)
-LIBMATH_CMIFILES= $(LIBMATH_CMOFILES:.cmo=.cmi)
+r.cmxa: dllr_stubs.so r.cmx
+	$(OCAMLOPT) -verbose -a -ccopt -L$(RLIBDIR) -cclib -lr_stubs -cclib -lR -o r.cmxa r.cmx
 
-LIBMATH_COBJ_FILES=r_math.o
+rbase.cma: rbase.cmo
+	$(OCAMLC) -verbose -a -o rbase.cma rbase.cmo
 
-############
-opt: lib
-byte: lib_byte $(PA_R)
-lib: $(LIB) $(LIB_CMI) $(LIBINTERP) $(LIBINTERP_CMI) $(LIBMATH) $(LIBMATH_CMI)
-lib_byte: $(LIB_BYTE) $(LIB_CMI) $(LIBINTERP_BYTE) $(LIBINTERP_CMI) $(LIBMATH_BYTE) $(LIBMATH_CMI)
+rbase.cmxa: rbase.cmx
+	$(OCAMLOPT) -verbose -a -o rbase.cmxa rbase.cmx
 
-all: byte opt
+rstats.cma: rstats.cmo
+	$(OCAMLC) -verbose -a -o rstats.cma rstats.cmo
 
-$(LIB_BYTE): dllr_base_stubs.so $(LIB_CMIFILES) $(LIB_CMOFILES)
-	$(OCAMLC) -a -dllpath /usr/lib/R/lib \
-	-dllib dllr_base_stubs.so \
-	-dllib libR.so -o $@ \
-	$(LIB_CMOFILES)
+rstats.cmxa: rstats.cmx
+	$(OCAMLOPT) -verbose -a -o rstats.cmxa rstats.cmx
 
-$(LIB): dllr_base_stubs.so $(LIB_CMIFILES) $(LIB_CMXFILES)
-	$(OCAMLOPT) -a -ccopt -L/usr/lib/R/lib \
-	-cclib -lr_base_stubs \
-	-cclib -lR \
-	-o $@ $(LIB_CMXFILES)
+R_ML_SOURCES=\
+	  r_Env.ml              \
+	  standard.ml           \
+	  sexptype.ml           \
+	  sexprec.ml            \
+	  data.ml               \
+	  allocation.ml         \
+	  read_internal.ml      \
+	  write_internal.ml     \
+	  lazy.ml               \
+	  symbols.ml            \
+	  conversion.ml         \
+	  internal.ml           \
+	  s3.ml                 \
+	  s4.ml                 \
+	  parser.ml             \
+	  reduction.ml          \
+	  initialisation.ml     \
+	  base.ml
 
-$(LIBINTERP_BYTE): oCamlR.cmi oCamlR.cmo
-	$(OCAMLC) -a -o $@ oCamlR.cmo
+r.ml: r.mli $(R_ML_SOURCES)
+	cat $(R_ML_SOURCES) > $@
 
-$(LIBINTERP): oCamlR.cmi oCamlR.cmx
-	$(OCAMLOPT) -a -o $@ oCamlR.cmx
+r.mli: \
+	  incipit.mli           \
+	  r_Env.mli             \
+	  standard.mli          \
+	  sexptype.mli          \
+	  data.mli              \
+	  symbols.mli           \
+	  conversion.mli        \
+	  internal.mli          \
+	  s3.mli                \
+	  s4.mli                \
+	  parser.mli            \
+	  reduction.mli         \
+	  initialisation.mli    \
+	  base.mli
+	cat $^ > $@
 
-$(LIBMATH_BYTE): dllr_math_stubs.so $(LIBMATH_CMIFILES) $(LIBMATH_CMOFILES)
-	$(OCAMLC) -a -dllib dllr_math_stubs.so -dllib libRmath.so \
-	-o $@ $(LIBMATH_CMOFILES)
+standard.ml: standard.R
+	R --silent --vanilla --slave < $< > $@
 
-$(LIBMATH): dllr_math_stubs.so $(LIBMATH_CMIFILES) $(LIBMATH_CMXFILES)
-	$(OCAMLOPT) -a -cclib -lr_math_stubs -cclib -lRmath \
-	-o $@ $(LIBMATH_CMXFILES)
+BASE_ML_SOURCES=\
+    base/incipit.ml       \
+	  base/listing.ml       \
+	  base/dataFrame.ml     \
+	  base/date.ml          \
+	  base/excipit.ml
 
-dllr_base_stubs.so: libr_base_stubs.a r_base.o
-	$(OCAMLMKLIB) -o r_base_stubs r_base.o
+base.ml: base.mli $(BASE_ML_SOURCES)
+	cat $(BASE_ML_SOURCES) > $@
 
-dllr_math_stubs.so: libr_math_stubs.a r_math.o
-	$(OCAMLMKLIB) -o r_math_stubs r_math.o
+base.mli: \
+	  base/incipit.mli      \
+	  base/listing.mli      \
+	  base/dataFrame.mli    \
+	  base/date.mli         \
+	  base/excipit.mli
+	cat $^ > $@
 
-libr_base_stubs.a: r_base.o
-	ar rcs libr_base_stubs.a r_base.o
+RBASE_ML_SOURCES= \
+	  r-base/main.ml        \
+	  r-base/listing.ml     \
+	  r-base/dataFrame.ml   \
+	  r-base/date.ml
+rbase.ml: rbase.mli $(RBASE_ML_SOURCSE)
+	cat $(RBASE_ML_SOURCES) > $@
 
-libr_math_stubs.a: r_math.o
-	ar rcs libr_math_stubs.a r_math.o
+rbase.mli: \
+	  r-base/main.mli       \
+	  r-base/listing.mli    \
+	  r-base/dataFrame.mli  \
+	  r-base/date.mli
+	cat $^ > $@
 
-$(PA_R): pa_ocamlr.ml
-	$(OCAMLC) -I +camlp4 -I +camlp4/Camlp4Parsers -c -pp camlp4of.opt $<
+rstats.ml: rstats.mli r-stats/main.ml
+	cat r-stats/main.ml > $@
 
-r.part2.ml: r.part2.R
-	$(R) --silent --vanilla --slave < r.part2.R > r.part2.ml
+rstats.mli: r-stats/main.mli
+	cat $^ > $@
 
-r.ml: r.part1.ml r.part2.ml r.part3.ml
-	cat r.part1.ml r.part2.ml r.part3.ml > r.ml
+libr_stubs.a: r_stubs.o
+	ar rcs libr_stubs.a r_stubs.o
 
-# Testing :
-###########
-test.x: $(LIB) $(LIBMATH) test.cmx
-	$(OCAMLOPT) -verbose -o $@ unix.cmxa $(LIBMATH) $(LIB) test.cmx
-test.byte: $(LIB_BYTE) $(LIBMATH_BYTE) test.cmo
-	$(OCAMLC) -verbose -o $@ unix.cma $(LIB_BYTE) $(LIBMATH_BYTE) test.cmo
+dllr_stubs.so: libr_stubs.a r_stubs.o
+	$(OCAMLMKLIB) -verbose -o r_stubs r_stubs.o
 
-tests/test_parse.x: $(LIB) tests/test_parse.ml
-	$(OCAMLOPT) -o $@ unix.cmxa $^
+clean:
+	$(MAKE) -C math clean
+	rm -f standard.ml base.ml base.mli r.ml r.mli rbase.ml rbase.mli rstats.ml rstats.mli
+	rm -f *.o *.so *.a *.cmi *.cmo *.cmx *.cma *.cmxa *.cmxs *.annot
 
-# Documentation :
-#################
-dump.odoc: *.mli
-	$(OCAMLDOCOPT) $(INCLUDES) -keep-code $(OCAMLPP) $(COMPFLAGS) -sort -dump $@ \
-	`ls $^ | grep -v example.ml | grep -v example2.ml | grep -v test`
+test: all
+	$(OCAML) -init ocamlinit
 
-doc: all dump.odoc
+doc: r.mli rbase.mli rstats.mli math/rmath.mli
 	$(MKDIR) ocamldoc
-	$(OCAMLDOCOPT) $(OCAMLPP) $(COMPFLAGS) \
-	-html \
-	-load dump.odoc \
-	-d ocamldoc -v -t "OCaml-R"
+	$(OCAMLFIND) ocamldoc -package calendar $(INCLUDES) \
+	-html -d ocamldoc $^
 
-dot: dep.dot
-dep.dot: dump.odoc
-	$(OCAMLDOCOPT) -load $< -o $@ -dot -dot-reduce
-dep.ps:dep.dot
-	dot -Tps -o $@ $<
+install: all remove
+	$(OCAMLFIND) install R META *.a *.cm[ai] *.cmxa dllr_stubs.so
 
-# backup, clean and depend :
-############################
-
-GENERATED_FILES=r.part2.ml r.ml
-
-cleanocamldoc:
-	$(RM) -r ocamldoc
-
-distclean: clean
-	$(MAKE) cleanocamldoc
-	$(RM) dump.odoc
-
-clean:: dummy
-	$(RM) *~ \#*\#
-	$(RM) *.a *.so
-	$(RM) *~ \#*\# *.cmo *.cmi *.cmx *.a *.o *.cma *.cmxa *.annot
-	$(RM) test.x
-	$(RM) $(GENERATED_FILES)
-
-.depend depend:
-	$(RM) .depend
-	$(OCAMLDEP) $(OCAMLPP) `ls *.ml *.mli | grep -v test_pa | grep -v pa_ocaml | grep -v r.part` > .depend
-
-alldepend: $(GENERATED_FILES)
-	$(MAKE) depend
-dummy:
-
-include .depend
-
-#################
-# Installation
-#################
-install: installlibs
-# installlibs installplugins
-
-
-installlibs: dummy
-	$(MKDIR) $(LIBDIR)
-	@for i in $(LIB) $(LIB_BYTE) $(LIB_CMI) $(LIBMATH) $(LIBMATH_BYTE) $(LIBMATH_CMI) \
-	$(LIB:.cmxa=.a) $(LIBMATH:.cmxa=.a) libr*.a dllr*.so META; do \
-	if test -f $$i; then \
-		$(CP) $$i $(LIBDIR)/; echo $(LIBDIR)/`basename $$i` installed; \
-	else \
-		echo $$i NOT installed ; \
-	fi; done
-
-###########################
-# additional dependencies
-###########################
+remove:
+	$(OCAMLFIND) remove R
 

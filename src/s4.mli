@@ -25,4 +25,3 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-include R.Interpreter (R.Standard)

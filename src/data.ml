@@ -25,4 +25,9 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-include R.Interpreter (R.Standard)
+type 'a t = sexp
+
+let cast : sexp -> 'a t = Obj.magic
+
+type 'a promise = 'a Lazy.t t
+

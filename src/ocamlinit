@@ -1,0 +1,4 @@
+#use "topfind";;
+#require "unix";;
+#load "r.cma";;
+#load "oCamlR.cmo";;

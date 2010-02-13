@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<section>
+<en>Latest release is </en>
+<fr>La dernière version est </fr>
+<link href="http://download.gna.org/ocaml-r/ocaml-r_0.2.tar.gz">0.2</link> (2010-02-08).
+
+<p class="warning">
+<en> Do not hesitate to download the nightly snapshot of the subversion trunk,
+with more features and bug fixes: </en>
+<fr> N'hésitez pas à télécharger la dernière version du dépôt, dans une archive créée chaque
+nuit: </fr>
+<link href="http://download.gna.org/ocaml-r/ocaml-r_snapshot.tar.gz">Nightly snapshot</link>.
+</p>
+</section>

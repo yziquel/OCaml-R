@@ -25,4 +25,17 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-include R.Interpreter (R.Standard)
+external sexp_equality : sexp -> sexp -> bool = "ocamlr_sexp_equality"
+
+(* R constants - global symbols in libR.so. *)
+(* We are looking for a clean solution
+   for the typing of the R NULL. What should it be
+   in OCaml? An 'a option mapping to None? *)
+external null_creator : unit -> nil sxp = "ocamlr_null"
+external dots_symbol_creator : unit -> sexp = "ocamlr_dots_symbol"
+external missing_arg_creator : unit -> sexp = "ocamlr_missing_arg"
+external base_env_creator : unit -> sexp = "ocamlr_base_env"
+
+(* R_GlobalEnv is not a constant, but rather a constant pointer,
+   that gets updated by R itself. *)
+external global_env : unit -> sexp = "ocamlr_global_env"

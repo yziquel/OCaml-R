@@ -1,4 +1,4 @@
-	Kom installation
+        OCaml-R installation
 
 
 *** What you need ***
@@ -8,7 +8,8 @@
 
 *** How to compile ***
 - ./configure
-- make depend
 - make all [or only 'make byte' if the native code compiler is not installed]
 - make install
   The list of installed or not installed files is printed.
+
+

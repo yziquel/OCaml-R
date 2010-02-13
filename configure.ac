@@ -25,89 +25,38 @@
 #             guillaume.yziquel@citycable.ch                                    #
 #################################################################################
 
-include master.Makefile
+AC_INIT([ocaml-r], [0.2])
+#AC_CONFIG_MACRO_DIR([m4])
+m4_include([m4/ocaml.m4])
 
-# Compilation
-#############
+AC_PROG_CC
+ROOT=`pwd`
+AC_SUBST(ROOT)
 
-first: src
-all:
-	cd src && $(MAKE) all
+AC_PATH_PROG(R,R,no)
+if test "$R" = no ; then
+        AC_MSG_ERROR(Cannot find R.)
+fi
 
-src: dummy
-	cd src && $(MAKE)
+AC_PROG_OCAML
+if test "$OCAMLC" = "no"; then
+  AC_MSG_ERROR([You must install the OCaml compiler.])
+fi
 
-install: dummy
-	cd src && $(MAKE) install
+AC_PROG_FINDLIB
+if test "$OCAMLFIND" = "no"; then
+  AC_MSG_ERROR([You must install OCaml findlib (the ocamlfind command)])
+fi
 
-re : depend clean all
+AC_CHECK_OCAML_PKG([unix])
+if test "$OCAML_PKG_unix" = "no"; then
+  AC_MSG_ERROR([Please install OCaml findlib module 'unix'.])
+fi
 
+AC_CHECK_OCAML_PKG([calendar])
+if test "$OCAML_PKG_calendar" = "no"; then
+  AC_MSG_ERROR([Please install OCaml findlib module 'calendar'.])
+fi
 
-# Documentation :
-#################
-doc: dummy
-	cd src && $(MAKE) doc
-
-# myself
-
-master.Makefile: master.Makefile.in config.status
-	./config.status
-
-config.status: configure master.Makefile.in
-	./config.status --recheck
-
-configure: configure.ac
-	autoconf
-
-# headers :
-###########
-HEADFILES= configure.ac configure \
-	master.Makefile.in Makefile \
-	src/*.ml src/*.mli src/*.c src/math/*.ml src/math/*.mli src/math/*.c \
-	src/Makefile
-headers: dummy
-	echo $(HEADFILES)
-	headache -h header -c .headache_config `ls $(HEADFILES)`
-
-noheaders: dummy
-	headache -r -c .headache_config `ls $(HEADFILES)`
-
-# backup, clean and depend :
-############################
-
-distclean: clean
-	$(RM) config.cache config.log config.status configure.lineno config.status.lineno
-	$(RM) master.Makefile
-	$(RM) config_check.log
-	$(RM) autom4te.cache
-
-clean:: dummy
-	$(RM) *~ \#*\#
-	cd src && $(MAKE) clean
-
-
-depend: dummy
-	cd src && $(MAKE) depend
-
-dummy:
-
-#################
-# code count
-#################
-codecount:
-	@echo `cat src/*.ml src/*.mli | wc -l` lines
-
-
-#################
-# installation
-#################
-
-install: dummy
-	cd src && $(MAKE) install
-
-
-###########################
-# additional dependencies
-###########################
-
-# DO NOT DELETE
+AC_CONFIG_FILES([master.Makefile])
+AC_OUTPUT

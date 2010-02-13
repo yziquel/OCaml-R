@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<site>
+<title>OCaml-R</title>
+<include file="sidemenu.xml"/>
+<header>
+<navig/><lang-switch/>
+</header>
+<footer>
+<navig/><lang-switch/>
+</footer>
+
+<page name="index" sidebar="true" rss="news.rss" >
+<title>OCaml-R</title>
+<include file="newspage.xml"/>
+<include file="download.xml"/>
+<include file="gettingstarted.xml"/>
+<include file="about.xml"/>
+<include file="sitemap.xml"/>
+
+<section name="main:whatis">
+<title><en>What is OCaml-R ?</en><fr>Qu'est-ce qu'OCaml-R ?</fr></title>
+<p>
+<en>OCaml-R is a collection of libraries enabling OCaml code to access the functionalities
+of the R language and of its statistical computing environment.
+</en>
+<fr>OCaml-R est un ensemble de bibliothèques permettant à du code OCaml
+d'accéder aux fonctionnalités de l'environnement de calcul statistique R.
+</fr>
+</p>
+<p>
+<en>OCaml-R is still in development, but should be quite usable. The API may undergo
+changes in the near or not so near future. Development effort now focuses on making
+binding of simple R libraries. Most of the R mathematical library functions are
+available. It is possible to evaluate R code, and import any R structure into OCaml.
+Design of OCaml-R allows static initialisation of R, which enables the users to wrap
+up and package R libraries into OCaml.
+</en>
+<fr>OCaml-R est encore en développement mais est déjà utilisable.
+L'API peut subir quelques changements dans à court ou long terme. Les efforts
+de développement portent maintenant sur des bindings vers des bibliothèques R simples.
+La plupart des fonctions de la bibliothèque Rmath sont disponibles. Il est possible
+d'évaluer du code R et importer une structure R dans OCaml. Le design d'OCaml(R
+permet l'initialisation statique de R, pour permettre aux utilisateurs d'enrober
+et d'empaqueter des bibliothèques R dans OCaml.
+</fr>
+</p>
+<p>
+<en>OCaml-R was initially written by </en>
+<fr>OCaml-R a été écrit initiallement par </fr>
+<link href="http://brion.inria.fr/~guesdon/">Maxence Guesdon</link>.
+<link href="http://yziquel.homelinux.org/topos/debian-ocamlr.html">Guillaume
+Yziquel</link>
+<en> rewrote it almost entirely for two reasons:</en>
+<fr> l'a en majeure partie réécrit, pour deux raisons: </fr>
+</p>
+<ul>
+<li><en>Easing the integration of OCaml-R with findlib and the Debian distribution</en>
+<fr>Faciliter l'intégration d'OCaml-R avec findlib et la distribution debian</fr> ;</li>
+<li>
+<en>Leveraging the full power of the R API.</en>
+<fr>Donner accès à toute la puissance de l'API de R.</fr>
+</li>
+</ul>
+<linkline>
+<link href="https://gna.org/projects/ocaml-r/"><en>Project page on Gna!</en><fr>Page du projet sur Gna!</fr></link>
+<link href="http://www.r-project.org/">The R project</link>
+<link href="http://caml.inria.fr/">Objective-Caml</link>
+<link href="http://yziquel.homelinux.org/topos/debian-ocamlr.html"><en>Tutorial and Debian packages</en><fr>Didacticiel et paquets Debian</fr></link>
+</linkline>
+
+</section>
+
+<section name="install"><title>Installation</title>
+<p>
+<en>See the </en>
+<fr>Voir la section </fr><local href="downloads"><en>downloads</en><fr>télécharger</fr></local>
+<en> section to get OCaml-R.</en>
+<fr> pour obtenir OCaml-R.</fr>
+</p>
+<p>
+<en>Then, follow the instructions in the </en>
+<fr>Ensuite, suivre les instructions du fichier </fr>
+<tt>INSTALL</tt>
+<en> file coming with the distribution archive.</en>
+<fr> inclus dans l'archive de distribution.</fr>
+</p>
+<p>
+<en>Debian packages are also available.</en>
+<fr>Des paquets debian sont également disponibles.</fr>
+</p>
+</section>
+
+<section name="doc">
+<title>Documentation</title>
+<p>
+<en>Here is a </en>
+<fr>On peut lire le </fr>
+<local href="gettingstarted"><en>short guide to get started</en><fr>petit guide de démarrage</fr></local>.
+</p>
+<p>
+<en>The library reference documentation is </en>
+<fr>La documentation de référence des bibliothèques se trouve </fr>
+<link href="refdoc/index.html"><en>here</en><fr>ici</fr></link>.
+</p>
+</section>
+
+<section name="license">
+<title>
+<en>License</en>
+<fr>Licence</fr>
+</title>
+<p>
+<en>OCaml-R is distributed under the GPL license.</en>
+<fr>OCaml-R est distribué sous licence GPL.</fr>
+</p>
+</section>
+
+<section name="author">
+<title><en>Author</en><fr>Auteur</fr></title>
+<p>
+<link href="http://pauillac.inria.fr/~guesdon/">Maxence Guesdon</link>.<br/>
+<link href="http://yziquel.homelinux.org/topos/debian-ocamlr">Guillaume Yziquel</link>.
+</p>
+</section>
+</page>
+</site>

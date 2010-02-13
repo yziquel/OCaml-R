@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<page name="sitemap" sidebar="false">
+<title>
+<en>Sitemap</en>
+<fr>Plan du site</fr>
+</title>
+<section>
+<site-toc/>
+</section>
+</page>

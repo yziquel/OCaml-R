@@ -1,8 +1,10 @@
 #################################################################################
 #                OCaml-R                                                        #
 #                                                                               #
-#    Copyright (C) 2008-2009 Institut National de Recherche en                  #
+#    Copyright (C) 2008-2010 Institut National de Recherche en                  #
 #    Informatique et en Automatique. All rights reserved.                       #
+#                                                                               #
+#    Copyright (C) 2009-2010 Guillaume Yziquel. All rights reserved.            #
 #                                                                               #
 #    This program is free software; you can redistribute it and/or modify       #
 #    it under the terms of the GNU General Public License as                    #
@@ -11,7 +13,7 @@
 #                                                                               #
 #    This program is distributed in the hope that it will be useful,            #
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of             #
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              #
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the               #
 #    GNU Library General Public License for more details.                       #
 #                                                                               #
 #    You should have received a copy of the GNU General Public                  #
@@ -20,37 +22,39 @@
 #    02111-1307  USA                                                            #
 #                                                                               #
 #    Contact: Maxence.Guesdon@inria.fr                                          #
-#                                                                               #
+#             guillaume.yziquel@citycable.ch                                    #
 #################################################################################
 
 # Various commands and dir
 ##########################
-OCAMLBIN= @OCAMLBIN@
+OCAML    = @OCAML@
 OCAMLC   = @OCAMLC@ -warn-error FSPU -dtypes
 OCAMLOPT = @OCAMLOPT@ -warn-error FSPU -dtypes
 OCAMLDEP = @OCAMLDEP@
-OCAMLLEX = @OCAMLLEX@
-OCAMLYACC= @OCAMLYACC@
 OCAMLLIB = @OCAMLLIB@
 OCAMLMKTOP = @OCAMLMKTOP@
 OCAMLMKLIB = @OCAMLMKLIB@
-CAMMKTOP = @CAMMKTOP@
 OCAMLDOCDIR= $(OCAMLLIB)/ocamldoc
 OCAMLBEST= @OCAMLBEST@
 OCAMLVERSION = @OCAMLVERSION@
 OCAMLFIND= @OCAMLFIND@
 EXTRAC_CRC = $(OCAMLLIB)/extract_crc
 OCAMLDOC= @OCAMLDOC@
-OCAMLDOCOPT= @OCAMLDOC_OPT@
 OCAMLPP=
 R=@R@
-LATEX=TEXINPUTS=$(ROOT)/doc: latex
-HEVEA=hevea -fix -francais -I $(ROOT)/doc -exec xxdate.exe
-HACHA=hacha
-DVIPS=dvips
-DVIPDF=dvipdf
-BIBTEX=bibtex
-HEVEA_CSS_STYLE=@LOC_WWW@@LOC_DOC@style.css
+
+OCAML_PKG_calendar = @OCAML_PKG_calendar@
+OCAML_PKG_unix = @OCAML_PKG_unix@
+
+RLIBDIR = /usr/lib/R/lib
+RINCLUDES = -I . -I /usr/share/R/include
+INCLUDES = -I +ocamldoc -I $(OCAMLLIB)/caml -I math $(RINCLUDES)
+COMPFLAGS = $(INCLUDES) -verbose
+LINKFLAGS = $(INCLUDES) -ccopt -L$(RLIBDIR) -cclib -lR
+LINKFLAGS_BYTE = $(INCLUDES) -ccopt -L$(RLIBDIR)  -cclib -lR
+
+LINKFLAGS_MATH=$(INCLUDES) -cclib -lRmath
+LINKFLAGS_MATH_BYTE=$(INCLUDES) -cclib -lRmath
 
 
 # For installation
@@ -67,17 +71,13 @@ LIBDIR=$(DESTDIR)@LIBDIR@
 
 #CROTTE=@datarootdir@
 
-LIB=@LIB@
-LIB_BYTE=@LIB_BYTE@
-LIB_CMI=@LIB_CMI@
+LIB=r.cmxa
+LIB_BYTE=r.cma
+LIB_CMI=r.cmi
 
-LIBINTERP=@LIBINTERP@
-LIBINTERP_BYTE=@LIBINTERP_BYTE@
-LIBINTERP_CMI=@LIBINTERP_CMI@
-
-LIBMATH=@LIBMATH@
-LIBMATH_BYTE=@LIBMATH_BYTE@
-LIBMATH_CMI=@LIBMATH_CMI@
+LIBMATH=rmath.cmxa
+LIBMATH_BYTE=rmath.cma
+LIBMATH_CMI=rmath.cmi
 
 # Compilation
 #############
@@ -86,49 +86,31 @@ ROOT=@ROOT@
 
 # generic rules :
 #################
-.SUFFIXES: .mli .ml .cmi .cmo .cmx .mll .mly \
-	.html .tex .dvi .ps .pdf
+.SUFFIXES: .mli .ml .cmi .cmo .cmx .cmxa .cmxs
 
 %.cmi:%.mli
-	$(OCAMLC) $(OCAMLPP) $(COMPFLAGS) -c $<
+	$(OCAMLFIND) ocamlc -package calendar $(COMPFLAGS) -c $<
 
 %.cmo:%.ml
 	if test -f `dirname $<`/`basename $< .ml`.mli && test ! -f `dirname $<`/`basename $< .ml`.cmi ; then \
-	$(OCAMLC) $(OCAMLPP) $(COMPFLAGS) -c `dirname $<`/`basename $< .ml`.mli; fi
-	$(OCAMLC) $(OCAMLPP) $(COMPFLAGS) -c $<
+  	$(OCAMLFIND) ocamlc -package calendar $(COMPFLAGS) -c `dirname $<`/`basename $< .ml`.mli; fi
+	$(OCAMLFIND) ocamlc -package calendar $(COMPFLAGS) -c $<
 
 %.cmi %.cmo:%.ml
 	if test -f `dirname $<`/`basename $< .ml`.mli && test ! -f `dirname $<`/`basename $< .ml`.cmi ; then \
-	$(OCAMLC) $(OCAMLPP) $(COMPFLAGS) -c `dirname $<`/`basename $< .ml`.mli; fi
-	$(OCAMLC) $(OCAMLPP) $(COMPFLAGS) -c $<
+		$(OCAMLFIND) ocamlc -package calendar $(COMPFLAGS) -c `dirname $<`/`basename $< .ml`.mli; fi
+	$(OCAMLFIND) ocamlc -package calendar $(COMPFLAGS) -c $<
 
 %.cmx %.o:%.ml
-	$(OCAMLOPT) $(OCAMLPP) $(COMPFLAGS) -c $<
+	if test -f `dirname $<`/`basename $< .ml`.mli && test ! -f `dirname $<`/`basename $< .ml`.cmi ; then \
+		$(OCAMLFIND) ocamlopt -package calendar $(COMPFLAGS) -c `dirname $<`/`basename $< .ml`.mli; fi
+	$(OCAMLFIND) ocamlopt -package calendar $(COMPFLAGS) -c $<
+
+%.cmxs: %.cmxa
+	$(OCAMLOPT) -shared -linkall $(LINKFLAGS) -o $@ $<
+	#$(OCAMLOPT) -shared -linkall -ccopt -L/usr/lib/R/lib -ccopt -L. -o $@ $<
 
 %.o: %.c
-	$(OCAMLOPT) -ccopt -Wall $(COMPFLAGS) -ccopt -fPIC -c $<
+	$(OCAMLFIND) ocamlopt -package calendar $(COMPFLAGS) -ccopt -Wall -ccopt -fPIC -c $< \
+	&& ($(MV) `basename $@` `dirname $@` || true)
 
-%.ml:%.mll
-	$(OCAMLLEX) $<
-
-%.mli %.ml:%.mly
-	$(OCAMLYACC) -v $<
-
-%.dvi: %.tex
-	$(LATEX) $<
-	$(BIBTEX) `basename $< .tex`
-	$(LATEX) $<
-	$(LATEX) $<
-
-%.ps: %.dvi
-	$(DVIPS) -o $@ $<
-
-%.pdf: %.dvi
-	$(DVIPDF) $< $@
-
-%.html: %.tex
-	$(HEVEA) $<
-	$(HACHA) $@
-	rpl '<META name="GENERATOR" content="hevea 1.08">' \
-	'<link href="$(HEVEA_CSS_STYLE)" rel="stylesheet" type="text/css"> <META name="GENERATOR" content="hevea 1.08">' \
-	*.html
