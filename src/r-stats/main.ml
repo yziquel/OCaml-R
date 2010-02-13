@@ -12,6 +12,8 @@ module Stub = struct
 
   let poisson_test = R.symbol "poisson.test"
 
+  let fitted = R.symbol "fitted"
+
 end
 
 let cor x ?y ?use ?cor_method () =

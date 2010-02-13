@@ -1,8 +1,16 @@
 module Stub = struct
 
+  (*   Information about the content of R standard library:
+    *  http://stat.ethz.ch/R-manual/R-patched/doc/html/packages.html *)
+
+  (*   Information about the R base package:
+    *  http://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html *)
+
   let sample = R.symbol "sample"
 
   let lapply = R.symbol "lapply"
+
+  let tilde = R.symbol "~"
 
 end
 
@@ -27,3 +35,8 @@ let lapply (x : 'a list R.t) (func : 'b R.t) : 'c list R.t =
   R.eval Stub.lapply [
     (R.arg (fun x -> x) x)    ;
     (R.arg (fun x -> x) func) ]
+
+let tilde (x : 'a R.t) (y : 'a R.t) : 'c R.t =
+  R.eval Stub.tilde [
+    (R.arg (fun x -> x) x)    ;
+    (R.arg (fun x -> x) y)    ]
