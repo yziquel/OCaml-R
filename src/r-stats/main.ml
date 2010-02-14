@@ -16,6 +16,14 @@ module Stub = struct
 
   let fitted = R.symbol "fitted"
 
+  let SSgompertz = R.symbol "SSgompertz"
+
+  (* The log normal distribution. *)
+  let dlnorm = R.symbol "dlnorm"
+  let plnorm = R.symbol "plnorm"
+  let qlnorm = R.symbol "qlnorm"
+  let rlnorm = R.symbol "rlnorm"
+
 end
 
 let cor x ?y ?use ?cor_method () =
