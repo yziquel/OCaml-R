@@ -8,9 +8,11 @@ module Stub = struct
 
   let stl = R.symbol "stl"
 
-  let fischer_test = R.symbol "fisher.test"
+  let fisher_test = R.symbol "fisher.test"
 
   let poisson_test = R.symbol "poisson.test"
+
+  let shapiro_test = R.symbol "shapiro.test"
 
   let fitted = R.symbol "fitted"
 
