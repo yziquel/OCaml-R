@@ -12,6 +12,12 @@ module Stub = struct
 
   let tilde = R.symbol "~"
 
+  let t = R.symbol "t"
+
+  let cbind = R.symbol "cbind"
+
+  let rbind = R.symbol "rbind"
+
 end
 
 let sample (x : 'a list R.t) size ?replace ?(prob: float list option) () : 'a list R.t =
