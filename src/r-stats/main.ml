@@ -16,7 +16,7 @@ module Stub = struct
 
   let fitted = R.symbol "fitted"
 
-  let SSgompertz = R.symbol "SSgompertz"
+  let sSgompertz = R.symbol "SSgompertz"
 
   (* The log normal distribution. *)
   let dlnorm = R.symbol "dlnorm"
