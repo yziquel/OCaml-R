@@ -72,9 +72,9 @@ rstats.cmxa: rstats.cmx
 R_ML_SOURCES=\
 	  r_Env.ml              \
 	  standard.ml           \
+	  data.ml               \
 	  sexptype.ml           \
 	  sexprec.ml            \
-	  data.ml               \
 	  allocation.ml         \
 	  read_internal.ml      \
 	  write_internal.ml     \
@@ -96,8 +96,8 @@ r.mli: \
 	  incipit.mli           \
 	  r_Env.mli             \
 	  standard.mli          \
-	  sexptype.mli          \
 	  data.mli              \
+	  sexptype.mli          \
 	  symbols.mli           \
 	  conversion.mli        \
 	  internal.mli          \

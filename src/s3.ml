@@ -33,24 +33,24 @@
 
 external s3_class : sexp -> sexp = "ocamlr_s3_class"
 
-external aux_get_attrib : sexp -> sexp -> sexp = "ocamlr_get_attrib"
+external aux_get_attrib : sexp -> symsxp -> sexp = "ocamlr_get_attrib"
 let get_attrib s name = aux_get_attrib s (install name)
 
-external get_attributes : sexp -> sexp = "ocamlr_get_attributes"
+external get_attributes : sexp -> pairlist = "ocamlr_get_attributes"
 
 class type ['a] s3 = object
   val underlying    : 'a t
-  method attribute  : 'b. string -> 'b t
+  method attribute  : string -> sexp
   method attributes : (Specification.symbol * sexp) list
   method classes    : string list
 end
 
 class ['a] s3_from_R r : ['a] s3 = object
   val underlying = r
-  method attribute s = get_attrib underlying s
+  method attribute s = get_attrib (underlying : 'a t :> sexp) s
   method attributes = List.map
     begin function (a, x) -> (Specification.of_symbol a), x end
-    (list_of_lisplist (get_attributes underlying))
-  method classes = strings_of_t (get_attrib underlying "class")
+    (list_of_pairlist (get_attributes (underlying : 'a t :> sexp)))
+  method classes = strings_of_t ((get_attrib (underlying : 'a t :> sexp) "class") : sexp :> string list t)
 end
 

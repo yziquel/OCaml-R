@@ -31,7 +31,7 @@ external sexp_equality : sexp -> sexp -> bool = "ocamlr_sexp_equality"
 (* We are looking for a clean solution
    for the typing of the R NULL. What should it be
    in OCaml? An 'a option mapping to None? *)
-external null_creator : unit -> nil sxp = "ocamlr_null"
+external null_creator : unit -> nilsxp = "ocamlr_null"
 external dots_symbol_creator : unit -> sexp = "ocamlr_dots_symbol"
 external missing_arg_creator : unit -> sexp = "ocamlr_missing_arg"
 external base_env_creator : unit -> sexp = "ocamlr_base_env"

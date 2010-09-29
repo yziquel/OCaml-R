@@ -50,7 +50,7 @@ CAMLprim value ocamlr_write_lisplist_tagval (value lisplist, value tag) {
   *  and sets the vector's offset element to the boolean's value.
   */
 
-CAMLprim value ocamlr_assign_lgl_vecsxp (value lglsxp, value offset, value b) {
+CAMLprim value ocamlr_assign_lglvecsxp (value lglsxp, value offset, value b) {
   LOGICAL((int *) Vecsexp_val(lglsxp))[Int_val(offset)] = Bool_val(b);
   return Val_unit;
 }
@@ -65,7 +65,7 @@ CAMLprim value ocamlr_assign_lgl_vecsxp (value lglsxp, value offset, value b) {
   *  Question: should we rather map R's integers to int32s?
   */
 
-CAMLprim value ocamlr_assign_int_vecsxp (value intsxp, value offset, value i) {
+CAMLprim value ocamlr_assign_intvecsxp (value intsxp, value offset, value i) {
   INTEGER((int *) Vecsexp_val(intsxp))[Int_val(offset)] = Int_val(i);
   return Val_unit;
 }
@@ -78,7 +78,7 @@ CAMLprim value ocamlr_assign_int_vecsxp (value intsxp, value offset, value i) {
   *  and sets the vector's offset element to the real number's value.
   */
 
-CAMLprim value ocamlr_assign_real_vecsxp (value realsxp, value offset, value x) {
+CAMLprim value ocamlr_assign_realvecsxp (value realsxp, value offset, value x) {
   REAL((double *) Vecsexp_val(realsxp))[Int_val(offset)] = Double_val(x);
   return Val_unit;
 }
@@ -91,7 +91,7 @@ CAMLprim value ocamlr_assign_real_vecsxp (value realsxp, value offset, value x) 
   *  and sets the vector's offset element to the string's value.
   */
 
-CAMLprim value ocamlr_assign_str_vecsxp (value strsxp, value offset, value s) {
+CAMLprim value ocamlr_assign_strvecsxp (value strsxp, value offset, value s) {
   STRING_PTR((int *) Vecsexp_val(strsxp))[Int_val(offset)] = mkChar(String_val(s));
   return Val_unit;
 }

@@ -27,9 +27,9 @@
 
 (** {2 Evaluation of R code and calls.} *)
 
-exception Runtime_error of lang sxp * string
+exception Runtime_error of langsxp * string
 
-val eval_langsxp : lang sxp -> 'a t
+val eval_langsxp : langsxp -> 'a t
 (**  [eval_langsxp] takes a R value containing an R executable expression.
   *  Also known as a [LANGSXP]. You get the resulting value back. *)
 

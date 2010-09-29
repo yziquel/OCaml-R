@@ -25,9 +25,9 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-external force_promsxp : prom sxp -> sexp = "ocamlr_eval_sxp"
+external force_promsxp : promsxp -> sexp = "ocamlr_eval_sxp"
 
-let force : 'a promise -> 'a t = force_promsxp
+(*let force : 'a promise -> 'a t = force_promsxp*)
 
 (* For lazy evaluation, we have an issue here: R promises
    are recursively forced by eval. This means that the

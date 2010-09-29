@@ -38,7 +38,7 @@ type parse_status =
 exception Parsing_failure of parse_status * string
 (**  Exception raised when parsing fails. *)
 
-val parse_string : ?max:int -> string -> lang sxp list
+val parse_string : ?max:int -> string -> langsxp list
 (**  Parse a string of R code into R calls.
   *
   *  @param max If omitted, parse the whole R code, even if
@@ -46,6 +46,6 @@ val parse_string : ?max:int -> string -> lang sxp list
   *  number of statements to parse.
   *  @raise Parsing_failure When parsing fails. *)
 
-val parse : string -> lang sxp
+val parse : string -> langsxp
 (**  Parse the first R statement in the given R code. *)
 

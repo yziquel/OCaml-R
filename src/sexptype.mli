@@ -27,23 +27,20 @@
 
 (** {2 Low-level SEXP typing.} *)
 
-type sexp
-(**  A universal type for wrapped R values. *)
-
-type 'a sxp
+(*type 'a sxp*)
 (**  A polymorphic type for wrapped R values. ['a] represents
   *  the dynamic typing of the underlying R value. *)
 
-type env
+(*type env*)
 (**  Phantom type representing the ENVSXP dynamic R sexptype. *)
 
-type lang
+(*type lang*)
 (**  Phantom type representing the LANGSXP dynamic R sexptype. *)
 
-type 'a vec
+(*type 'a vec*)
 (**  Polymorphic phantom type representing R array sexptypes. *)
 
-type 'a vecsxp = 'a vec sxp
+(*type 'a vecsxp = 'a vec sxp*)
 (**  Type abreviation for R array values. *)
 
 type sexptype =

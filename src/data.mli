@@ -25,6 +25,8 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+(* Legacy, commented code.
+
 (** {2 Casting and subtyping to low-level.} *)
 
 type 'a t = private sexp
@@ -37,4 +39,49 @@ val cast : sexp -> 'a t
   *  value to a semantically typed ['a R.t] value. This is
   *  a useful function, as R is a dynamically typed language.
   *)
+
+*)
+
+
+(** {2 The type system of OCaml-R.} *)
+
+type untyped
+
+type -'a typed = private untyped
+type -'a sexptyped = private untyped constraint 'a =
+  [< `Nil
+  |  `Sym
+  |  `List of [< `Pair | `Call ]
+  |  `Clo
+  |  `Env
+  |  `Prom
+  |  `Special
+  |  `Builtin
+  |  `Vec of [< `Char | `Lgl | `Int | `Real | `Str | `Raw | `Expr ]
+  ]
+
+type -'typing obj = private sexp
+and +'a t = 'a typed obj
+and +'a sxp = 'a sexptyped obj
+and sexp = private untyped obj
+
+
+(** {2 Types aliases. } *)
+
+type nilsxp         = [`Nil]                                      sxp
+type symsxp         = [`Sym]                                      sxp
+type 'a listsxp     = [`List of [< `Pair | `Call ] as 'a]         sxp
+and 'a internallist = [`Nil | `List of [< `Pair | `Call] as 'a]   sxp
+type langsxp        = [`List of [`Call]]                          sxp
+type closxp         = [`Clo]                                      sxp
+type envsxp         = [`Env]                                      sxp
+type promsxp        = [`Prom]                                     sxp
+type builtinsxp     = [`Builtin]                                  sxp
+type charvecsxp     = [`Vec  of [`Char]]                          sxp
+type lglvecsxp      = [`Vec  of [`Lgl ]]                          sxp
+type intvecsxp      = [`Vec  of [`Int ]]                          sxp
+type realvecsxp     = [`Vec  of [`Real]]                          sxp
+type strvecsxp      = [`Vec  of [`Str ]]                          sxp
+type rawvecsxp      = [`Vec  of [`Raw ]]                          sxp
+type exprvecsxp     = [`Vec  of [`Raw ]]                          sxp
 

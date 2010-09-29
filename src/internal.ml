@@ -29,24 +29,24 @@ module Specification = struct
 
   type symbol = (string * (sexp option)) option option
 
-  let of_symbol (s : sym sxp) =
+  let of_symbol (s : symsxp) =
     let pname    = inspect_symsxp_pname    s
     and value    = inspect_symsxp_value    s
     and internal = inspect_symsxp_internal s in
     match (sexptype pname), (sexptype value), (sexptype internal) with
-    | (NilSxp,  _, NilSxp) when sexp_equality s value -> None
+    | (NilSxp,  _, NilSxp) when sexp_equality (s : symsxp :> sexp) value -> None
     | (CharSxp, SymSxp, NilSxp) ->
-        begin match (sexp_equality s value) &&
-                    ("" = string_of_charsxp pname) with
+        begin match (sexp_equality (s : symsxp :> sexp) value) &&
+                    ("" = string_of_charsxp (pname : sexp :> charvecsxp)) with
         | true -> Some None | false ->
-        begin match (sexp_equality value (inspect_symsxp_value value))  &&
-                    (NilSxp = sexptype (inspect_symsxp_pname value))    &&
-                    (NilSxp = sexptype (inspect_symsxp_internal value)) with
-        | true -> Some (Some ((string_of_charsxp pname), None))
+        begin match (sexp_equality value (inspect_symsxp_value (value : sexp :> symsxp)))  &&
+                    (NilSxp = sexptype (inspect_symsxp_pname (value : sexp :> symsxp)))    &&
+                    (NilSxp = sexptype (inspect_symsxp_internal (value : sexp :> symsxp))) with
+        | true -> Some (Some ((string_of_charsxp (pname : sexp :> charvecsxp)), None))
         | false -> assert false
         end end
     | (CharSxp, _, NilSxp) ->
-        let symbol_name = string_of_charsxp pname in
+        let symbol_name = string_of_charsxp (pname : sexp :> charvecsxp) in
         Some (Some (symbol_name, (Some value)))
     | _ -> assert false
 
@@ -141,40 +141,40 @@ module CTypes = struct
     match sexptype s with
     | NilSxp     -> Val { content = NILSXP }
     | SymSxp     -> Val { content = SYMSXP {
-        pname      = rec_build (inspect_symsxp_pname    s);
-        sym_value  = rec_build (inspect_symsxp_value    s);
-        internal   = rec_build (inspect_symsxp_internal s)}}
+        pname      = rec_build (inspect_symsxp_pname    (s : sexp :> symsxp));
+        sym_value  = rec_build (inspect_symsxp_value    (s : sexp :> symsxp));
+        internal   = rec_build (inspect_symsxp_internal (s : sexp :> symsxp))}}
     | ListSxp    -> Val { content = LISTSXP {
-        carval     = rec_build (inspect_listsxp_carval s);
-        cdrval     = rec_build (inspect_listsxp_cdrval s);
-        tagval     = rec_build (inspect_listsxp_tagval s)}}
+        carval     = rec_build (inspect_listsxp_carval  (s : sexp :> pairlistsxp));
+        cdrval     = rec_build (inspect_listsxp_cdrval  (s : sexp :> pairlistsxp));
+        tagval     = rec_build (inspect_listsxp_tagval  (s : sexp :> pairlistsxp))}}
     | CloSxp     -> Val { content = CLOSXP {
-        formals    = rec_build (inspect_closxp_formals s);
-        body       = rec_build (inspect_closxp_body    s);
-        clos_env   = rec_build (inspect_closxp_env     s)}}
+        formals    = rec_build (inspect_closxp_formals  (s : sexp :> closxp));
+        body       = rec_build (inspect_closxp_body     (s : sexp :> closxp));
+        clos_env   = rec_build (inspect_closxp_env      (s : sexp :> closxp))}}
     | EnvSxp     -> Val { content = ENVSXP {
-        frame      = rec_build (inspect_envsxp_frame   s);
-     (* enclos     = rec_build (inspect_envsxp_enclos  s); *)
-     (* hashtab    = rec_build (inspect_envsxp_hashtab s) *) }}
+        frame      = rec_build (inspect_envsxp_frame    (s : sexp :> envsxp));
+     (* enclos     = rec_build (inspect_envsxp_enclos   s); *)
+     (* hashtab    = rec_build (inspect_envsxp_hashtab  s) *) }}
     | PromSxp    -> Val { content = PROMSXP {
-        prom_value = rec_build (inspect_promsxp_value s);
-        expr       = rec_build (inspect_promsxp_expr  s);
-        prom_env   = rec_build (inspect_promsxp_env   s)}}
+        prom_value = rec_build (inspect_promsxp_value  (s : sexp :> promsxp));
+        expr       = rec_build (inspect_promsxp_expr   (s : sexp :> promsxp));
+        prom_env   = rec_build (inspect_promsxp_env    (s : sexp :> promsxp))}}
     | LangSxp    -> Val { content = LANGSXP {
-        carval     = rec_build (inspect_listsxp_carval s);
-        cdrval     = rec_build (inspect_listsxp_cdrval s);
-        tagval     = rec_build (inspect_listsxp_tagval s)}}
+        carval     = rec_build (inspect_listsxp_carval (s : sexp :> langsxp));
+        cdrval     = rec_build (inspect_listsxp_cdrval (s : sexp :> langsxp));
+        tagval     = rec_build (inspect_listsxp_tagval (s : sexp :> langsxp))}}
     | SpecialSxp -> Val { content = SPECIALSXP }
-    | BuiltinSxp -> Val { content = BUILTINSXP (inspect_primsxp_offset s)}
-    | CharSxp    -> Val { content = CHARSXP (string_of_charsxp s) }
-    | LglSxp     -> Val { content = LGLSXP (bool_list_of_lgl_vecsxp s)}
-    | IntSxp     -> Val { content = INTSXP (int_list_of_int_vecsxp s)}
-    | RealSxp    -> Val { content = REALSXP (float_list_of_real_vecsxp s)}
+    | BuiltinSxp -> Val { content = BUILTINSXP (inspect_primsxp_offset (s : sexp :> builtinsxp))}
+    | CharSxp    -> Val { content = CHARSXP (string_of_charsxp (s : sexp :> charvecsxp)) }
+    | LglSxp     -> Val { content = LGLSXP (bool_list_of_lglvecsxp (s : sexp :> lglvecsxp))}
+    | IntSxp     -> Val { content = INTSXP (int_list_of_intvecsxp (s : sexp :> intvecsxp))}
+    | RealSxp    -> Val { content = REALSXP (float_list_of_realvecsxp (s : sexp :> realvecsxp))}
     | CplxSxp    -> Val { content = CPLXSXP }
-    | StrSxp     -> Val { content = STRSXP (string_list_of_str_vecsxp s)}
+    | StrSxp     -> Val { content = STRSXP (string_list_of_strvecsxp (s: sexp :> strvecsxp))}
     | DotSxp     -> Val { content = DOTSXP }
     | AnySxp     -> Val { content = ANYSXP }
-    | VecSxp     -> Val { content = VECSXP (List.map rec_build (sexp_list_of_sexp_vecsxp s))}
+    | VecSxp     -> Val { content = VECSXP (List.map rec_build (sexp_list_of_rawvecsxp (s : sexp :> rawvecsxp)))}
     | ExprSxp    -> Val { content = EXPRSXP }
     | BcodeSxp   -> Val { content = BCODESXP }
     | ExtptrSxp  -> Val { content = EXTPTRSXP }
@@ -219,16 +219,16 @@ module PrettyTypes = struct
   exception Sexp_to_inspect of sexp
   exception Esoteric of sexp
 
-  let symbol_of_symsxp builder (s : sym sxp) =
+  let symbol_of_symsxp builder (s : symsxp) =
     match begin try Some (Specification.of_symbol s) with
                 | Assert_failure _ -> None end with
-    | None -> raise (Esoteric s)
+    | None -> raise (Esoteric (s : symsxp :> sexp))
     | Some None -> SYMBOL None
     | Some (Some None) -> PLACE
     | Some (Some (Some (symbol_name, None))) -> ARG symbol_name
     | Some (Some (Some (symbol_name, Some v))) -> SYMBOL (Some (symbol_name, (builder v)))  
 
-  let rec list_of_listsxp builder s =
+  let rec list_of_listsxp builder (s : 'a listsxp) =
     let carval = inspect_listsxp_carval s
     and cdrval = inspect_listsxp_cdrval s
     and tagval = inspect_listsxp_tagval s in
@@ -243,7 +243,7 @@ module PrettyTypes = struct
     LIST begin ((builder tagval), (builder carval))::
       begin match builder cdrval with
       | LIST l -> l | NULL -> []
-      | _ -> raise (Esoteric s) end
+      | _ -> raise (Esoteric (s : 'a listsxp :> sexp)) end
     end
 
   let rec build rec_build =
@@ -252,40 +252,40 @@ module PrettyTypes = struct
     | NilSxp     -> NULL
     | SymSxp     -> begin try phi symbol_of_symsxp (Obj.magic s) with
                     | Esoteric _ -> Unknown end
-    | ListSxp    -> begin try phi list_of_listsxp s with
+    | ListSxp    -> begin try phi list_of_listsxp (s : sexp :> 'a listsxp) with
                     | Esoteric _ -> Unknown end
     | CloSxp     -> CLOSURE {
-        formals  = rec_build (inspect_closxp_formals s);
-        body     = rec_build (inspect_closxp_body    s);
-        clos_env = rec_build (inspect_closxp_env     s)}
+        formals  = rec_build (inspect_closxp_formals (s : sexp :> closxp));
+        body     = rec_build (inspect_closxp_body    (s : sexp :> closxp));
+        clos_env = rec_build (inspect_closxp_env     (s : sexp :> closxp))}
     | EnvSxp     -> ENV {
-        frame   = rec_build (inspect_envsxp_frame   s);
+        frame    = rec_build (inspect_envsxp_frame   (s : sexp :> envsxp));
      (* enclos  = rec_build (inspect_envsxp_enclos  s); *) (* We do not care for now. *)
      (* hashtab = rec_build (inspect_envsxp_hashtab s)  *) }
     | PromSxp    -> PROMISE {
-        value    = rec_build (inspect_promsxp_value s);
-        expr     = rec_build (inspect_promsxp_expr  s);
-        prom_env = rec_build (inspect_promsxp_env   s)}
+        value    = rec_build (inspect_promsxp_value  (s : sexp :> promsxp));
+        expr     = rec_build (inspect_promsxp_expr   (s : sexp :> promsxp));
+        prom_env = rec_build (inspect_promsxp_env    (s : sexp :> promsxp))}
     | LangSxp    ->
-        let carval = inspect_listsxp_carval s
-        and cdrval = inspect_listsxp_cdrval s
-        and tagval = inspect_listsxp_tagval s in
+        let carval = inspect_listsxp_carval (s : sexp :> langsxp)
+        and cdrval = inspect_listsxp_cdrval (s : sexp :> langsxp)
+        and tagval = inspect_listsxp_tagval (s : sexp :> langsxp) in
         begin match build rec_build cdrval with
         | LIST l -> begin match sexptype tagval with
                     | NilSxp -> CALL ((build rec_build carval), l)
                     | _ -> Unknown end
         | _ -> Unknown end
-    | SpecialSxp -> SPECIAL (inspect_primsxp_offset s)
+    | SpecialSxp -> SPECIAL (inspect_primsxp_offset (s : sexp :> specialsxp))
     | BuiltinSxp -> BUILTIN
-    | CharSxp    -> STRING  (string_of_charsxp s)
-    | LglSxp     -> BOOLS   (bool_list_of_lgl_vecsxp s)
-    | IntSxp     -> INTS    (int_list_of_int_vecsxp s)
-    | RealSxp    -> FLOATS  (float_list_of_real_vecsxp s)
+    | CharSxp    -> STRING  (string_of_charsxp (s : sexp :> charvecsxp))
+    | LglSxp     -> BOOLS   (bool_list_of_lglvecsxp (s : sexp :> lglvecsxp))
+    | IntSxp     -> INTS    (int_list_of_intvecsxp (s : sexp :> intvecsxp))
+    | RealSxp    -> FLOATS  (float_list_of_realvecsxp (s : sexp :> realvecsxp))
     | CplxSxp    -> Unknown
-    | StrSxp     -> STRINGS (string_list_of_str_vecsxp s)
+    | StrSxp     -> STRINGS (string_list_of_strvecsxp (s : sexp :> strvecsxp))
     | DotSxp     -> Unknown
     | AnySxp     -> Unknown
-    | VecSxp     -> VECSXP  (List.map rec_build (sexp_list_of_sexp_vecsxp s))
+    | VecSxp     -> VECSXP  (List.map rec_build (sexp_list_of_rawvecsxp (s : sexp :> rawvecsxp)))
     | ExprSxp    -> Unknown
     | BcodeSxp   -> Unknown
     | ExtptrSxp  -> Unknown

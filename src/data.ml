@@ -25,9 +25,61 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-type 'a t = sexp
+(* Legacy, commented, code. *)
+
+(*type 'a t = sexp
 
 let cast : sexp -> 'a t = Obj.magic
 
-type 'a promise = 'a Lazy.t t
+type 'a promise = 'a Lazy.t t*)
+
+
+(* The type system of OCaml-R. *)
+
+type untyped
+
+type -'a typed = private untyped
+type -'a sexptyped = private untyped constraint 'a =
+  [< `Nil
+  |  `Sym
+  |  `List of [< `Pair | `Call ]
+  |  `Clo
+  |  `Env
+  |  `Prom
+  |  `Special
+  |  `Builtin
+  |  `Vec of [< `Char | `Lgl | `Int | `Real | `Str | `Raw | `Expr ]
+  ]
+
+type -'typing obj = private sexp
+and +'a t = 'a typed obj
+and +'a sxp = 'a sexptyped obj
+and sexp = private untyped obj
+
+
+(* Type aliases. *)
+
+type nilsxp         = [`Nil]                                      sxp
+type symsxp         = [`Sym]                                      sxp
+type 'a listsxp     = [`List of [< `Pair | `Call ] as 'a]         sxp
+and 'a internallist = [`Nil | `List of [< `Pair | `Call ] as 'a ] sxp
+type langsxp        = [`List of [`Call]]                          sxp
+type pairlistsxp    = [`List of [`Pair]]                          sxp
+and pairlist        = [`Nil | `List of [`Pair]]                   sxp
+type closxp         = [`Clo]                                      sxp
+type envsxp         = [`Env]                                      sxp
+type promsxp        = [`Prom]                                     sxp
+type specialsxp     = [`Special]                                  sxp
+type builtinsxp     = [`Builtin]                                  sxp
+type 'a vecsxp      = [`Vec  of
+    [< `Char | `Lgl | `Int  | `Real
+    | `Str  | `Raw | `Expr ] as 'a
+  ] sxp
+type charvecsxp  = [`Vec  of [`Char]]                             sxp
+type lglvecsxp   = [`Vec  of [`Lgl ]]                             sxp
+type intvecsxp   = [`Vec  of [`Int ]]                             sxp
+type realvecsxp  = [`Vec  of [`Real]]                             sxp
+type strvecsxp   = [`Vec  of [`Str ]]                             sxp
+type rawvecsxp   = [`Vec  of [`Raw ]]                             sxp
+type exprvecsxp  = [`Vec  of [`Raw ]]                             sxp
 

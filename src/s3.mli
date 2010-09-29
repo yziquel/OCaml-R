@@ -33,7 +33,7 @@ class type ['a] s3 = object
   val underlying : 'a t
   (**  Access to the underlying R data structure. *)
 
-  method attribute  : 'b. string -> 'b t
+  method attribute  : string -> sexp
   (**  [attribute attr_name] returns the R data structure
     *  which is the object's attribute of name [attr_name].
     *  The typing of this method is deliberately unsafe, in

@@ -28,18 +28,18 @@
 (* There's a lot of stuff concerning symbols and environments in the
    envir.c file of the R source code. *)
 
-external install : string -> sym sxp = "ocamlr_install"
+external install : string -> symsxp = "ocamlr_install"
 
-external findvar : sym sxp -> prom sxp = "ocamlr_findvar"
+external findvar : symsxp -> promsxp = "ocamlr_findvar"
 
-external findfun : sym sxp -> prom sxp = "ocamlr_findfun"
+external findfun : symsxp -> promsxp = "ocamlr_findfun"
 
 let symbol ?(generic = false) s : sexp =
 
   let findfunction = match generic with
     | false -> findvar | true -> findfun in
 
-  let var = force (findfunction (install s)) in
+  let var = force_promsxp (findfunction (install s)) in
 
   (* If we try to retrieve a function, we should use findfun. If we
      use findvar, we indeed get a closure, but a closure for a generic
@@ -53,4 +53,4 @@ let symbol ?(generic = false) s : sexp =
 
   match is_function var with
   | false -> var
-  | true -> force (findfun (install s))
+  | true -> force_promsxp (findfun (install s))

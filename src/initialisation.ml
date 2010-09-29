@@ -48,7 +48,9 @@ let init ?(name     = try Sys.argv.(0) with _ -> "OCaml-R")
   let r_sigs = match sigs with true -> 0 | false -> 1 in
   match initialise (Array.of_list (name::argv)) r_sigs with
   | 1 -> let () = Callback.register_exception "OCaml-R generic error"
-           (Runtime_error ((null_creator ()), "")) in init_error_hook ()
+           (* The Runtime_error is initialised with a nilsxp casted to a langsxp.
+              This is ugly, but not unsafe. *)
+           (Runtime_error ((((null_creator ()) : nilsxp :> sexp ) : sexp :> langsxp ), "")) in init_error_hook ()
   | _ -> raise Initialisation_failed
 
 module type Interpreter = sig end

@@ -27,9 +27,9 @@
 
 (* The following exception needs to be registered
    in a callback when the R interpreter is initialised. *)
-exception Runtime_error of lang sxp * string
+exception Runtime_error of langsxp * string
 
-external eval_langsxp : lang sxp -> 'a t = "ocamlr_eval_sxp"
+external eval_langsxp : langsxp -> 'a t = "ocamlr_eval_sxp"
 
 let eval_string s = eval_langsxp (parse s)
 
