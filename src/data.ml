@@ -36,6 +36,9 @@ type 'a promise = 'a Lazy.t t*)
 
 (* The type system of OCaml-R. *)
 
+(* TODO: This typing scheme has been invalidated by Jacques Guarrigue,
+   when he removed the subtyping feature / bug in OCaml 3.11->3.12.
+
 type untyped
 
 type -'a typed = private untyped
@@ -54,7 +57,24 @@ type -'a sexptyped = private untyped constraint 'a =
 type -'typing obj = private sexp
 and +'a t = 'a typed obj
 and +'a sxp = 'a sexptyped obj
-and sexp = private untyped obj
+and sexp = private untyped obj*)
+
+type sexp
+type +'a sxp = private sexp constraint 'a =
+  [< `Nil
+  |  `Sym
+  |  `List of [< `Pair | `Call ]
+  |  `Clo
+  |  `Env
+  |  `Prom
+  |  `Special
+  |  `Builtin
+  |  `Vec of [< `Char | `Lgl | `Int | `Real | `Str | `Raw | `Expr ]
+  ]
+type +'a t = private sexp
+
+external cast_to_sxp : sexp -> 'a sxp = "%identity"
+external cast : sexp -> 'a t = "%identity"
 
 
 (* Type aliases. *)
@@ -62,7 +82,10 @@ and sexp = private untyped obj
 type nilsxp         = [`Nil]                                      sxp
 type symsxp         = [`Sym]                                      sxp
 type 'a listsxp     = [`List of [< `Pair | `Call ] as 'a]         sxp
-and 'a internallist = [`Nil | `List of [< `Pair | `Call ] as 'a ] sxp
+and 'a internallist = [`Nil | `List of [< `Pair | `Call ] as 'a ] sxp  (**  Type of low-level internal list. In R, such
+                                                                         *  internal lists may be empty, a pairlist or
+                                                                         *  a call which is somewhat similar to closure
+                                                                         *  ready for execution. *)
 type langsxp        = [`List of [`Call]]                          sxp
 type pairlistsxp    = [`List of [`Pair]]                          sxp
 and pairlist        = [`Nil | `List of [`Pair]]                   sxp

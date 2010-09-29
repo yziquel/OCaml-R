@@ -38,19 +38,13 @@ let get_attrib s name = aux_get_attrib s (install name)
 
 external get_attributes : sexp -> pairlist = "ocamlr_get_attributes"
 
-class type ['a] s3 = object
-  val underlying    : 'a t
-  method attribute  : string -> sexp
-  method attributes : (Specification.symbol * sexp) list
-  method classes    : string list
-end
-
-class ['a] s3_from_R r : ['a] s3 = object
-  val underlying = r
-  method attribute s = get_attrib (underlying : 'a t :> sexp) s
+class virtual s3 = object (self : 'a)
+  val virtual __underlying : 'a t
+  method private attribute s = cast (get_attrib (__underlying : 'a t :> sexp) s)
   method attributes = List.map
-    begin function (a, x) -> (Specification.of_symbol a), x end
-    (list_of_pairlist (get_attributes (underlying : 'a t :> sexp)))
-  method classes = strings_of_t ((get_attrib (underlying : 'a t :> sexp) "class") : sexp :> string list t)
+    begin function a, x -> (Specification.of_symbol a), x end
+    (list_of_pairlist (get_attributes (__underlying : 'a t :> sexp)))
+  method classes = strings_of_t (cast (get_attrib (__underlying : 'a t :> sexp) "class") : string list t)
 end
 
+let s3 (r : 'a t) = object inherit s3 val __underlying = r end

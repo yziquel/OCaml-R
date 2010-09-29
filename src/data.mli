@@ -25,45 +25,24 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-(* Legacy, commented code.
-
-(** {2 Casting and subtyping to low-level.} *)
-
-type 'a t = private sexp
-(**  This is the type of a wrapped R value whose semantics
-  *  is the corresponding ['a] type in Objective Caml.
-  *)
-
-val cast : sexp -> 'a t
-(**  This unsafe function allows us to cast a given [R.sexp]
-  *  value to a semantically typed ['a R.t] value. This is
-  *  a useful function, as R is a dynamically typed language.
-  *)
-
-*)
-
-
 (** {2 The type system of OCaml-R.} *)
 
-type untyped
-
-type -'a typed = private untyped
-type -'a sexptyped = private untyped constraint 'a =
+type sexp
+type +'a sxp = private sexp constraint 'a =
   [< `Nil
   |  `Sym
   |  `List of [< `Pair | `Call ]
   |  `Clo
   |  `Env
   |  `Prom
-  |  `Special
+  |  `Special       
   |  `Builtin
   |  `Vec of [< `Char | `Lgl | `Int | `Real | `Str | `Raw | `Expr ]
   ]
+type +'a t = private sexp
 
-type -'typing obj = private sexp
-and +'a t = 'a typed obj
-and +'a sxp = 'a sexptyped obj
-and sexp = private untyped obj
+external cast_to_sxp : sexp -> 'a sxp = "%identity"
+external cast : sexp -> 'a t = "%identity"
 
 
 (** {2 Types aliases. } *)
@@ -84,4 +63,3 @@ type realvecsxp     = [`Vec  of [`Real]]                          sxp
 type strvecsxp      = [`Vec  of [`Str ]]                          sxp
 type rawvecsxp      = [`Vec  of [`Raw ]]                          sxp
 type exprvecsxp     = [`Vec  of [`Raw ]]                          sxp
-

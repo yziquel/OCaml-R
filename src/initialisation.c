@@ -41,21 +41,21 @@
   *         handlers when embedding R. Requires R >= 2.3.1.
   *  @return 1 if R is correctly initialised.
   */
-CAMLprim value ocamlr_initEmbeddedR (value argv, value sigs) {
+CAMLprim value ocamlr_initEmbeddedR (value ml_argv, value ml_sigs) {
 
-  int length = Wosize_val(argv);
-  char* argv2[length];
+  int length = Wosize_val(ml_argv);
+  char* argv[length];
   int i;
 
   // We duplicate the OCaml array into a C array.
-  for (i=0; i<length; i++) argv2[i]=String_val(Field(argv, i));
+  for (i=0; i<length; i++) argv[i]=String_val(Field(ml_argv, i));
 
   /* Don't let R set up its own signal handlers when sigs = 1.
      This requires R >= 2.3.1. */
-  if (Int_val(sigs)) R_SignalHandlers = 0;
+  if (Int_val(ml_sigs)) R_SignalHandlers = 0;
 
   // This is the libR.so function.
-  i = Rf_initEmbeddedR(length, argv2);
+  i = Rf_initEmbeddedR(length, argv);
 
   // Returns 1 if R is correctly initialised.
   return Val_int(i);
