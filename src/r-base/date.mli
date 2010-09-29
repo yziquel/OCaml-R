@@ -1,3 +1,6 @@
-(** Constructs an {!R.Base.date} from an R date. *)
-class date_from_R : R.Base.date R.t -> R.Base.date
-
+(** Virtual class for dates in R. *)
+class virtual date : object
+  inherit R.s3
+  method as_float : float
+  method as_date : CalendarLib.Calendar.Date.t
+end

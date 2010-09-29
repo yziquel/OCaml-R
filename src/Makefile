@@ -86,8 +86,7 @@ R_ML_SOURCES=\
 	  s4.ml                 \
 	  parser.ml             \
 	  reduction.ml          \
-	  initialisation.ml     \
-	  base.ml
+	  initialisation.ml
 
 r.ml: r.mli $(R_ML_SOURCES)
 	cat $(R_ML_SOURCES) > $@
@@ -105,30 +104,11 @@ r.mli: \
 	  s4.mli                \
 	  parser.mli            \
 	  reduction.mli         \
-	  initialisation.mli    \
-	  base.mli
+	  initialisation.mli
 	cat $^ > $@
 
 standard.ml: standard.R
 	R --silent --vanilla --slave < $< > $@
-
-BASE_ML_SOURCES=\
-    base/incipit.ml       \
-	  base/listing.ml       \
-	  base/dataFrame.ml     \
-	  base/date.ml          \
-	  base/excipit.ml
-
-base.ml: base.mli $(BASE_ML_SOURCES)
-	cat $(BASE_ML_SOURCES) > $@
-
-base.mli: \
-	  base/incipit.mli      \
-	  base/listing.mli      \
-	  base/dataFrame.mli    \
-	  base/date.mli         \
-	  base/excipit.mli
-	cat $^ > $@
 
 RBASE_ML_SOURCES= \
 	  r-base/main.ml        \

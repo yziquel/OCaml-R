@@ -27,10 +27,9 @@
 
 (**  Get the S3 class of a given SEXP.
   *
-  *  r_s3_class takes a SEXP as argument, and returns the S3 class
+  *  s3_class takes a SEXP as argument, and returns the S3 class
   *  attribute of the given SEXP.
   *)
-
 external s3_class : sexp -> sexp = "ocamlr_s3_class"
 
 external aux_get_attrib : sexp -> symsxp -> sexp = "ocamlr_get_attrib"
@@ -38,13 +37,13 @@ let get_attrib s name = aux_get_attrib s (install name)
 
 external get_attributes : sexp -> pairlist = "ocamlr_get_attributes"
 
-class virtual s3 = object (self : 'a)
-  val virtual __underlying : 'a t
-  method private attribute s = cast (get_attrib (__underlying : 'a t :> sexp) s)
+class virtual s3 = object
+  val virtual __underlying : sexp
+  method private attribute : 'a. string -> 'a t = function s -> cast (get_attrib __underlying s)
   method attributes = List.map
     begin function a, x -> (Specification.of_symbol a), x end
-    (list_of_pairlist (get_attributes (__underlying : 'a t :> sexp)))
-  method classes = strings_of_t (cast (get_attrib (__underlying : 'a t :> sexp) "class") : string list t)
+    (list_of_pairlist (get_attributes __underlying))
+  method classes = strings_of_t (cast (get_attrib __underlying "class") : string list t)
 end
 
-let s3 (r : 'a t) = object inherit s3 val __underlying = r end
+let s3 (r : 'a t) = object inherit s3 val __underlying = (r : 'a t :> sexp) end

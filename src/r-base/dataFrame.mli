@@ -1,3 +1,8 @@
-(**  Constructs a {!R.Base.dataframe} object from a R data frame. *)
-class dataframe_from_R : R.Base.dataframe R.t -> R.Base.dataframe
+(**  Virtual class for R data frame S3 objects. *)
+class virtual dataframe : object
+  inherit listing
+  method row_names : string list
+  method column : 'a. int -> 'a R.t
+  method element : 'a. int -> int -> 'a R.t
+end
 

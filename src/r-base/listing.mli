@@ -1,3 +1,5 @@
-(**  Constructs an {!R.Base.listing} from an R list. *)
-class listing_from_R : R.Base.listing R.t -> R.Base.listing
-
+(**  Virtual class for R list S3 objects. *)
+class virtual listing : object
+  inherit R.s3
+  method names : string list
+end

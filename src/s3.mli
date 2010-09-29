@@ -27,13 +27,13 @@
 
 (** {2 S3 classes.} *)
 
-(**  Class type for S3 objects in R. *)
-class type ['a] s3 = object
+(**  Virtual class for S3 objects in R. *)
+class virtual s3 : object
 
-  val underlying : 'a t
+  val virtual __underlying : sexp
   (**  Access to the underlying R data structure. *)
 
-  method attribute  : string -> sexp
+  method private attribute  : 'a. string -> 'a t
   (**  [attribute attr_name] returns the R data structure
     *  which is the object's attribute of name [attr_name].
     *  The typing of this method is deliberately unsafe, in
@@ -48,6 +48,5 @@ class type ['a] s3 = object
 
 end
 
-class ['a] s3_from_R : 'a t -> ['a] s3
 (**  Constructor of an [s3] object from an R S3 object. *)
-
+val s3 : 'a t -> s3
