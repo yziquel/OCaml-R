@@ -7,3 +7,7 @@ rbase.ml
 rbase.mli
 rstats.ml
 rstats.mli
+config.log
+config.status
+master.Makefile
+*.swp
