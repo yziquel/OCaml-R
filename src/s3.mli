@@ -48,7 +48,7 @@ class virtual s3 : object
 
 end
 
-class instance : object inherit s3 end
+class instance : 'a t -> object inherit s3 val __underlying : sexp end
 
 (**  Constructor of an [s3] object from an R S3 object. *)
 val s3 : 'a t -> s3
