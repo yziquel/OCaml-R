@@ -46,4 +46,6 @@ class virtual s3 = object
   method classes = strings_of_t (cast (get_attrib __underlying "class") : string list t)
 end
 
-let s3 (r : 'a t) = object inherit s3 val __underlying = (r : 'a t :> sexp) end
+class instance r = object inherit s3 val __underlying = (r : 'a t :> sexp) end
+
+let s3 (r : 'a t) = object inherit instance r end
