@@ -163,12 +163,12 @@ test: all
 
 doc: r.mli rbase.mli rstats.mli math/rmath.mli
 	$(MKDIR) ocamldoc
-	$(OCAMLFIND) ocamldoc -package calendar $(INCLUDES) \
+	ocamlfind ocamldoc -package calendar $(INCLUDES) \
 	-html -d ocamldoc $^
 
 install: all remove
-	$(OCAMLFIND) install R META *.cma *.so *.o *.cmx *.cmxs oCamlR.cmo *Hook.cmo r.mli r.cmi
+	cd _build; ocamlfind install R ../META *.cma *.so *.o *.cmx *.cmxs oCamlR.cmo *Hook.cmo r.mli r.cmi
 
 remove:
-	$(OCAMLFIND) remove R
+	ocamlfind remove R
 
