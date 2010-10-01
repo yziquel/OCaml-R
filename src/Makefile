@@ -31,8 +31,8 @@ all: opt byte
 opt: libopt mathopt
 byte: lib math
 
-libopt: r.cmxa r.cmxs oCamlR.cmx rbase.cmxa rstats.cmxa rmath.cmxa
-lib: r.cma oCamlR.cmo rbase.cma rstats.cma rmath.cma
+libopt: r.cmxa r.cmxs oCamlR.cmx rbase.cmxa rstats.cmxa rmath.cmxa rmethods.cmxa
+lib: r.cma oCamlR.cmo rbase.cma rstats.cma rmath.cma rmethods.cma
 
 mathopt: rmath.cmxa
 math: rmath.cma
@@ -68,6 +68,12 @@ rstats.cma: rstats.cmo
 
 rstats.cmxa: rstats.cmx
 	$(OCAMLOPT) -verbose -a -o rstats.cmxa rstats.cmx
+
+rmethods.cma : rmethods.cmo
+	$(OCAMLC) -verbose -a -o rmethods.cma rmethods.cmo
+
+rmethods.cmxa: rmethods.cmx
+	$(OCAMLOPT) -verbose -a -o rmethods.cmxa rmethods.cmx
 
 R_ML_SOURCES=\
 	  r_Env.ml              \
@@ -129,6 +135,12 @@ rstats.ml: rstats.mli r-stats/main.ml
 	cat r-stats/main.ml > $@
 
 rstats.mli: r-stats/main.mli
+	cat $^ > $@
+
+rmethods.ml: rmethods.mli r-methods/main.ml
+	cat r-methods/main.ml > $@
+
+rmethods.mli: r-methods/main.mli
 	cat $^ > $@
 
 libr_stubs.a: r_stubs.o

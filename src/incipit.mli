@@ -25,7 +25,7 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-(**  Binding for R Interpreter. It encapsulates the
+(**  Binding for the R interpreter. It encapsulates the
   *  functionalities of the [libR.so] shared library provided by the R
   *  software. This enables us to {b embed the R interpreter} into Objective
   *  Caml, to execute R code from Objective Caml and to exchange data
@@ -36,8 +36,8 @@
   *
   *  It is important to understand that this binding is a rather low-level
   *  binding of R functionality. As such, it is no more thread-safe than R
-  *  itself. Therefore, avoid real threading unless you know what you're
-  *  doing...
+  *  itself, which is not thread-safe at all. Therefore, avoid real threading
+  *  unless you know what you're doing...
   *)
 
 (**  {b DATA CONVERSION}

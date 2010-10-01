@@ -30,10 +30,7 @@
 module type Environment = sig
 (**  [Environment] is the type of a module containing all necessary
   *  informations and data in order to set up the R interpreter
-  *  properly.
-  *
-  *  We still have to find a mechanism to strip down the R packages
-  *  loaded at startup. *)
+  *  properly. *)
 
   val name : string
   (**  This is the [name] of the first argument of [argv] for R.
@@ -53,7 +50,7 @@ module type Environment = sig
   val signal_handlers : bool
   (**  If set to [false], asks R not to install its signal handlers. I've
     *  been experiencing weird issues with R signal handlers, since, for
-    *  instance, a [SIGSEGV] is sometimes caught by [libR.so], and R asks then
+    *  instance, a [SIGSEGV] is sometimes caught by [libR.so], and R then
     *  asks whether or not you want to save your workspace, et ceteræ... By
     *  default, set to false.
     *)

@@ -28,6 +28,14 @@ package "base" (
   archive(native) = "rbase.cmxa"
 )
 
+package "methods" (
+  version = "0.2"
+  description = "R library for formal methods and classes"
+  requires = "R.interpreter"
+  archive(byte) = "rmethods.cma"
+  archive(native) = "rmethods.cmxa"
+)
+
 package "stats" (
   version = "0.2"
   description = "R statistics library"
