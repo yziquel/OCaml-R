@@ -31,10 +31,23 @@ RINCLUDE = /usr/share/R/include
 all: byte native
 
 byte: r.cmi r.cmo r.cma oCamlR.cmo
+	make -C math byte
+	make -C r-base byte
+	make -C r-stats byte
+	make -C r-methods byte
+
 native: r.cmi r.cmx r.cmxa oCamlR.cmx
+	make -C math byte
+	make -C r-base byte
+	make -C r-stats byte
+	make -C r-methods byte
 
 clean:
 	rm -f standard.ml *.o *.a *.so *.cmi *.cmo *.cmx
+	make -C math clean
+	make -C r-base clean
+	make -C r-stats clean
+	make -C r-methods clean
 
 standard.ml: standard.R
 	R --silent --vanilla --slave < $< > $@
@@ -65,9 +78,11 @@ r_stubs.o: r_stubs.c
 
 oCamlR.cmo: oCamlR.ml r.cmi
 	ocamlfind ocamlc -c oCamlR.ml
+	rm -f oCamlR.cmi
 
 oCamlR.cmx: oCamlR.ml r.cmi
 	ocamlfind ocamlopt -c oCamlR.ml
+	rm -f oCamlR.cmi
 
 librmath_stubs.a: math/rmath_stubs.o
 	ar rcs librmath_stubs.a math/rmath_stubs.o
@@ -140,7 +155,7 @@ doc: r.mli rbase.mli rstats.mli math/rmath.mli
 	-html -d ocamldoc $^
 
 install: all remove
-	ocamlfind install R META *.cma *.so *.o *.cmx *.cmxs oCamlR.cmo *Hook.cmo r.mli r.cmi
+	ocamlfind install R META *.cma *.cmxa *.cmi oCamlR.cmo *.cmx
 
 remove:
 	ocamlfind remove R

@@ -5,9 +5,10 @@ COMPFLAGS=$(INCLUDES)
 LINKFLAGS=$(INCLUDES) -cclib -lRmath
 LINKFLAGS_BYTE=$(INCLUDES) -cclib -lRmath
 
-all: build
+all: byte native
 
-build: rmath.cma rmath.cmxa
+byte: rmath.cma
+native: rmath.cmxa
 
 rmath.cma: dllrmath_stubs.so rmath.cmo
 	ocamlc -verbose -a -dllib dllrmath_stubs.so -dllib libRmath.so -o rmath.cma rmath.cmo
