@@ -25,54 +25,24 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-(**  {2 Inspection and specification of internals.} *)
+open Data
 
-(**  Provides a module with strong data types and typing,
-  *  aiming to be an indirect specification of low-level
-  *  structure of SEXPs.
-  *)
-module Specification : sig
+external force_promsxp : promsxp -> sexp = "ocamlr_eval_sxp"
 
-  (** Semantic description of [SYMSXP] structures. *)
-  type symbol = (string * (sexp option)) option option
+(*let force : 'a promise -> 'a t = force_promsxp*)
 
-end
+(* For lazy evaluation, we have an issue here: R promises
+   are recursively forced by eval. This means that the
+   OCaml type system would be broken, because we would need
+   to have 'a Lazy.t R.t = 'a Lazy.t Lazy.t R.t. There's two
+   solutions:
 
-(**  Provides facilities to inspect internal structure of
-  *  SEXPs. Useful in the toplevel when you encounter
-  *  unexpected R values. *)
-module Pretty : sig
+   -1- 'a R.t would denote a R value of type 'a, lazy or not.
+       This is suboptimal, because the OCaml type system could
+       and should express these lazy semantics.
 
-  (**  Semantic interpretation and description of SEXPs. *)
-  type t =
-    | Recursive of t Lazy.t
-    | NULL
-    | SYMBOL of (string * t) option
-    | ARG of string
-    | PLACE
-    | LIST of pairlist
-    | CLOSURE of closure
-    | ENV of environment
-    | PROMISE of promise
-    | CALL of t * pairlist
-    | SPECIAL of int
-    | BUILTIN
-    | STRING of string
-    | STRINGS of string list
-    | INTS of int list
-    | VECSXP of t list
-    | BOOLS of bool list
-    | FLOATS of float list
-    | Unknown
-
-  and closure     = { formals: t; body: t; clos_env: t }
-  and environment = { frame: t }
-  and promise     = { value: t; expr: t; prom_env: t }
-
-  and pairlist = (t * t) list
-
-  (**  Analyses recursively the structure of a given SEXP. *)
-  val t_of_sexp : sexp -> t
-
-end
+   -2- Make a dynamic check on the nature of the argument of
+       the force function. If it is a lazy lazy value, we
+       should force it manually, with OCaml semantics. If not,
+       we can run eval on it. *)
 

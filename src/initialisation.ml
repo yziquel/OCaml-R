@@ -25,6 +25,12 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+open Data
+open Reduction
+open Conversion
+open Sexprec
+open Environment
+
 (* Functions to initialise and terminate the R interpreter. *)
 
 external initialise : string array -> int -> int = "ocamlr_initEmbeddedR" "noalloc"

@@ -25,6 +25,11 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+open Data
+open Symbols
+open Internal
+open Conversion
+
 (**  Get the S3 class of a given SEXP.
   *
   *  s3_class takes a SEXP as argument, and returns the S3 class

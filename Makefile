@@ -25,8 +25,6 @@
 #             guillaume.yziquel@citycable.ch                                    #
 #################################################################################
 
-include master.Makefile
-
 # Compilation
 #############
 

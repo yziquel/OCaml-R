@@ -25,14 +25,20 @@
 #             guillaume.yziquel@citycable.ch                                    #
 #################################################################################
 
-include ../master.Makefile
+all: ocamlbuild
 
-all: opt byte
+clean:
+	rm -f standard.ml
+	ocamlbuild -clean
+
+ocamlbuild: R.itarget standard.ml
+	ocamlbuild R.otarget
+
 opt: libopt mathopt
 byte: lib math
 
-libopt: r.cmxa r.cmxs oCamlR.cmx rbase.cmxa rstats.cmxa rmath.cmxa rmethods.cmxa
-lib: r.cma oCamlR.cmo rbase.cma rstats.cma rmath.cma rmethods.cma
+libopt: r.cmxa r.cmxs oCamlR.cmx rbase.cmxa rstats.cmxa rmethodsHook.cmo rmethods.cmxa
+lib: r.cma oCamlR.cmo rbase.cma rstats.cma rmath.cma rmethodsHook.cmo rmethods.cma
 
 mathopt: rmath.cmxa
 math: rmath.cma
@@ -143,16 +149,14 @@ rmethods.ml: rmethods.mli r-methods/main.ml
 rmethods.mli: r-methods/main.mli
 	cat $^ > $@
 
+rmethodsHook.ml:
+	cp r-methods/hook.ml rmethodsHook.ml
+
 libr_stubs.a: r_stubs.o
 	ar rcs libr_stubs.a r_stubs.o
 
 dllr_stubs.so: libr_stubs.a r_stubs.o
 	$(OCAMLMKLIB) -verbose -o r_stubs r_stubs.o
-
-clean:
-	$(MAKE) -C math clean
-	rm -f standard.ml base.ml base.mli r.ml r.mli rbase.ml rbase.mli rstats.ml rstats.mli
-	rm -f *.o *.so *.a *.cmi *.cmo *.cmx *.cma *.cmxa *.cmxs *.annot
 
 test: all
 	$(OCAML) -init ocamlinit
@@ -163,7 +167,7 @@ doc: r.mli rbase.mli rstats.mli math/rmath.mli
 	-html -d ocamldoc $^
 
 install: all remove
-	$(OCAMLFIND) install R META *.a *.cm[ai] *.cmxa dllr_stubs.so
+	$(OCAMLFIND) install R META *.cma *.so *.o *.cmx *.cmxs oCamlR.cmo *Hook.cmo r.mli r.cmi
 
 remove:
 	$(OCAMLFIND) remove R

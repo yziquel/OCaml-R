@@ -25,6 +25,8 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+open Data
+
 (** {2 Parsing R code.} *)
 
 type parse_status =

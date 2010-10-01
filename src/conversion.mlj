@@ -25,6 +25,8 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+open Data
+
 (** {2 Conversion functions.} *)
 
 val bools_of_t : bool list t -> bool list

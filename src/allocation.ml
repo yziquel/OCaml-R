@@ -25,6 +25,8 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+open Data
+
 (* This file contains wrappers around allocation functions,
    returning uninitialised pairlists and vectors. *)
 

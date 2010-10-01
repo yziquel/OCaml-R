@@ -25,6 +25,13 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+open Data
+open Sexptype
+open Read_internal
+open Allocation
+open Write_internal
+open Sexprec
+
 let rec list_of_pairlist (ll : 'a internallist) =
   match sexptype (ll : 'a internallist :> sexp) with
   | NilSxp -> [] | ListSxp | LangSxp | DotSxp ->

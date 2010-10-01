@@ -25,6 +25,8 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+open R_Env
+
 (**  {2 Initialisation.}
   *
   *  We provide two mechanisms to activate an R interpreter from OCaml-R:

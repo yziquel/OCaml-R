@@ -25,6 +25,8 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+open Data
+
 (* TODO: We will have to use polymorphic variants and private
    type abreviations to leverage the typing system to its full
    extent to type R statically. *)
