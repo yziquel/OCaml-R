@@ -37,10 +37,10 @@ byte: r.cmi r.cmo r.cma oCamlR.cmo
 	make -C r-methods byte
 
 native: r.cmi r.cmx r.cmxa oCamlR.cmx
-	make -C math byte
-	make -C r-base byte
-	make -C r-stats byte
-	make -C r-methods byte
+	make -C math native
+	make -C r-base native
+	make -C r-stats native
+	make -C r-methods native
 
 clean:
 	rm -f standard.ml *.o *.a *.so *.cmi *.cmo *.cmx
@@ -155,7 +155,11 @@ doc: r.mli rbase.mli rstats.mli math/rmath.mli
 	-html -d ocamldoc $^
 
 install: all remove
-	ocamlfind install R META *.cma *.cmxa *.cmi oCamlR.cmo *.cmx
+	ocamlfind install R META *.[oa] *.so *.cm[axi] *.cmxa oCamlR.cmo \
+	  math/*.[oa] math/*.so math/*.cm[axi] math/*.cmxa \
+	  r-base/_build/*.[oa] r-base/_build/*.cm[axi] r-base/_build/*.cmxa \
+	  r-stats/_build/*.[oa] r-stats/_build/*.cm[axi] r-stats/_build/*.cmxa r-stats/rstatsHook.cm[ox] \
+	  r-methods/_build/*.[oa] r-methods/_build/*.cm[axi] r-methods/_build/*.cmxa r-methods/rmethodsHook.cm[ox]
 
 remove:
 	ocamlfind remove R

@@ -18,10 +18,10 @@ $(RPACKAGE)Hook.cmx: _build/$(RPACKAGE).native.otarget $(RPACKAGE)Hook.ml
 	rm -f $(RPACKAGE)Hook.cmi
 
 _build/$(RPACKAGE).otarget: $(RPACKAGE).itarget
-	ocamlbuild $(RPACKAGE).otarget
+	ocamlbuild -no-hygiene $(RPACKAGE).otarget
 
 _build/$(RPACKAGE).byte.otarget: $(RPACKAGE).byte.itarget
-	ocamlbuild $(RPACKAGE).byte.otarget
+	ocamlbuild -no-hygiene $(RPACKAGE).byte.otarget
 
 _build/$(RPACKAGE).native.otarget: $(RPACKAGE).native.itarget
-	ocamlbuild $(RPACKAGE).native.otarget
+	ocamlbuild -no-hygiene $(RPACKAGE).native.otarget

@@ -33,6 +33,7 @@ package "methods" (
   package "load" (
     version = "0.2"
     description = "Loading of R methods library"
+    requires = "R.interpreter"
     archive(byte) = "rmethodsHook.cmo"
     archive(native) = "rmethodsHook.cmx"
   )
@@ -49,6 +50,7 @@ package "stats" (
   package "load" (
     version = "0.2"
     description = "Loading of R statistics library"
+    requires = "R.interpreter"
     archive(byte) = "rstatsHook.cmo"
     archive(native) = "rstatsHook.cmx"
   )
