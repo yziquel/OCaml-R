@@ -1,5 +1,7 @@
 module Stub = struct
 
+  let () = ignore (R.eval_string "require(methods, quietly=TRUE)")
+
   (*   Information about the content of R standard library:
     *  http://stat.ethz.ch/R-manual/R-patched/doc/html/packages.html *)
 
