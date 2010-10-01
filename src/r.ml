@@ -26,26 +26,26 @@
 (*********************************************************************************)
 
 
-INCLUDE "environment.ml.p4"
+INCLUDE "environment.ml"
 
 module Standard : Environment = struct
 
-  INCLUDE "standard.ml.p4"
+  INCLUDE "standard.ml"
 
 end
 
-INCLUDE "data.ml.p4"
-INCLUDE "sexptype.ml.p4"
-INCLUDE "sexprec.ml.p4"
-INCLUDE "allocation.ml.p4"
-INCLUDE "read_internal.ml.p4"
-INCLUDE "write_internal.ml.p4"
-INCLUDE "promise.ml.p4"
-INCLUDE "symbols.ml.p4"
-INCLUDE "conversion.ml.p4"
-INCLUDE "internal.ml.p4"
-INCLUDE "s3.ml.p4"
-INCLUDE "s4.ml.p4"
-INCLUDE "parser.ml.p4"
-INCLUDE "reduction.ml.p4"
-INCLUDE "initialisation.ml.p4"
+INCLUDE "data.ml"
+INCLUDE "sexptype.ml"
+INCLUDE "sexprec.ml"
+INCLUDE "allocation.ml"
+INCLUDE "read_internal.ml"
+INCLUDE "write_internal.ml"
+INCLUDE "promise.ml"
+INCLUDE "symbols.ml"
+INCLUDE "conversion.ml"
+INCLUDE "internal.ml"
+INCLUDE "s3.ml"
+INCLUDE "s4.ml"
+INCLUDE "parser.ml"
+INCLUDE "reduction.ml"
+INCLUDE "initialisation.ml"
