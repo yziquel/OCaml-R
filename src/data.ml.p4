@@ -25,39 +25,7 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-(* Legacy, commented, code. *)
-
-(*type 'a t = sexp
-
-let cast : sexp -> 'a t = Obj.magic
-
-type 'a promise = 'a Lazy.t t*)
-
-
 (* The type system of OCaml-R. *)
-
-(* TODO: This typing scheme has been invalidated by Jacques Guarrigue,
-   when he removed the subtyping feature / bug in OCaml 3.11->3.12.
-
-type untyped
-
-type -'a typed = private untyped
-type -'a sexptyped = private untyped constraint 'a =
-  [< `Nil
-  |  `Sym
-  |  `List of [< `Pair | `Call ]
-  |  `Clo
-  |  `Env
-  |  `Prom
-  |  `Special
-  |  `Builtin
-  |  `Vec of [< `Char | `Lgl | `Int | `Real | `Str | `Raw | `Expr ]
-  ]
-
-type -'typing obj = private sexp
-and +'a t = 'a typed obj
-and +'a sxp = 'a sexptyped obj
-and sexp = private untyped obj*)
 
 type sexp
 type +'a sxp = private sexp constraint 'a =

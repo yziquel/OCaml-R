@@ -25,8 +25,6 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-open Data
-
 (* Low-level data manipulation functions. *)
 
 (* What follows is low-level accessor functions, in order to inspect

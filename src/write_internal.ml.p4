@@ -25,52 +25,51 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-open Data
-open Reduction
-open Conversion
-open Sexprec
-open Environment
+external write_listsxp_carval : 'a listsxp -> sexp -> unit = "ocamlr_write_lisplist_carval"
+external write_listsxp_tagval : 'a listsxp -> sexp -> unit = "ocamlr_write_lisplist_tagval"
 
-(* Functions to initialise and terminate the R interpreter. *)
+let write_listsxp_element l tag elmnt =
+  let () = write_listsxp_tagval l tag in
+  let () = write_listsxp_carval l elmnt in
+  ()
 
-external initialise : string array -> int -> int = "ocamlr_initEmbeddedR" "noalloc"
-external terminate : unit -> unit = "ocamlr_endEmbeddedR" "noalloc"
+(**  Sets the element of a logical vector.
+  *
+  *  assign_lgl_vecsxp takes a logical vector as first argument,
+  *  an offset as second argument, and a boolean as third argument,
+  *  and sets the vector's offset element to the boolean's value.
+  *)
 
-external init_error_hook : unit -> unit = "ocamlr_init_error_hook" "noalloc"
+external assign_lglvecsxp  : lglvecsxp -> int -> bool -> unit = "ocamlr_assign_lglvecsxp"
 
-exception Initialisation_failed
 
-let init ?(name     = try Sys.argv.(0) with _ -> "OCaml-R")
-         ?(argv     = try List.tl (Array.to_list Sys.argv) with _ -> [])
-         ?(env      = Standard.env)
-         ?(packages = None)
-         ?(sigs     = Standard.signal_handlers) () =
-  let env_vars = begin match packages with
-    | None -> env
-    | Some [] -> ("R_DEFAULT_PACKAGES", "NULL")::env
-    | Some libs -> ("R_DEFAULT_PACKAGES", (String.concat ", " libs))::env
-    end in
-  List.iter (function name, value -> Unix.putenv name value) env_vars;
-  let r_sigs = match sigs with true -> 0 | false -> 1 in
-  match initialise (Array.of_list (name::argv)) r_sigs with
-  | 1 -> let () = Callback.register_exception "OCaml-R generic error"
-           (* The Runtime_error is initialised with a nilsxp casted to a langsxp.
-              This is ugly, but not unsafe. *)
-           (Runtime_error ((cast_to_sxp ((null_creator ()) : nilsxp :> sexp ) : langsxp ), "")) in init_error_hook ()
-  | _ -> raise Initialisation_failed
+(**  Sets the element of a vector of integers.
+  *
+  *  assign_int_vecsxp takes a vector of integers as first argument,
+  *  an offset as second argument, and an integer as third argument,
+  *  and sets the vector's offset element to the integer's value.
+  *
+  *  Question: should we rather map R's integers to int32s?
+  *)
 
-module type Interpreter = sig end
+external assign_intvecsxp  : intvecsxp -> int -> int -> unit = "ocamlr_assign_intvecsxp"
 
-module Interpreter (Env : Environment) : Interpreter = struct
 
-  let () = init ~name: Env.name
-                ~argv: Env.options
-                ~env:  Env.env
-                ~packages: Env.packages
-                ~sigs: Env.signal_handlers
-                ()
+(**  Sets the element of a vector of real numbers.
+  *
+  *  assign_real_vecsxp takes a vector of real numbers as first argument,
+  *  an offset as second argument, and a real number as third argument,
+  *  and sets the vector's offset element to the real number's value.
+  *)
 
-  let () = at_exit terminate
+external assign_realvecsxp : realvecsxp -> int -> float -> unit = "ocamlr_assign_realvecsxp"
 
-end
 
+(**  Sets the element of a vector of string.
+  *
+  *  assign_str_vecsxp takes a vector of strings as first argument,
+  *  an offset as second argument, and a string as third argument,
+  *  and sets the vector's offset element to the string's value.
+  *)
+
+external assign_strvecsxp  : strvecsxp -> int -> string -> unit = "ocamlr_assign_strvecsxp"

@@ -25,53 +25,23 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-open Data
+(* The following exception needs to be registered
+   in a callback when the R interpreter is initialised. *)
+exception Runtime_error of langsxp * string
 
-external write_listsxp_carval : 'a listsxp -> sexp -> unit = "ocamlr_write_lisplist_carval"
-external write_listsxp_tagval : 'a listsxp -> sexp -> unit = "ocamlr_write_lisplist_tagval"
+external eval_langsxp : langsxp -> 'a t = "ocamlr_eval_sxp"
 
-let write_listsxp_element l tag elmnt =
-  let () = write_listsxp_tagval l tag in
-  let () = write_listsxp_carval l elmnt in
-  ()
+let eval_string s = eval_langsxp (parse s)
 
-(**  Sets the element of a logical vector.
-  *
-  *  assign_lgl_vecsxp takes a logical vector as first argument,
-  *  an offset as second argument, and a boolean as third argument,
-  *  and sets the vector's offset element to the boolean's value.
-  *)
+let rec prepare_args = function
+  | (Some x)::l -> x::(prepare_args l)
+  | None::l     -> prepare_args l
+  | []          -> []
 
-external assign_lglvecsxp  : lglvecsxp -> int -> bool -> unit = "ocamlr_assign_lglvecsxp"
+let arg f ?name x = Some (name, (Obj.magic (f x)))
+let opt f name x = match x with
+  | None -> None
+  | Some x -> Some ((Some name), (Obj.magic (f x)))
 
-
-(**  Sets the element of a vector of integers.
-  *
-  *  assign_int_vecsxp takes a vector of integers as first argument,
-  *  an offset as second argument, and an integer as third argument,
-  *  and sets the vector's offset element to the integer's value.
-  *
-  *  Question: should we rather map R's integers to int32s?
-  *)
-
-external assign_intvecsxp  : intvecsxp -> int -> int -> unit = "ocamlr_assign_intvecsxp"
-
-
-(**  Sets the element of a vector of real numbers.
-  *
-  *  assign_real_vecsxp takes a vector of real numbers as first argument,
-  *  an offset as second argument, and a real number as third argument,
-  *  and sets the vector's offset element to the real number's value.
-  *)
-
-external assign_realvecsxp : realvecsxp -> int -> float -> unit = "ocamlr_assign_realvecsxp"
-
-
-(**  Sets the element of a vector of string.
-  *
-  *  assign_str_vecsxp takes a vector of strings as first argument,
-  *  an offset as second argument, and a string as third argument,
-  *  and sets the vector's offset element to the string's value.
-  *)
-
-external assign_strvecsxp  : strvecsxp -> int -> string -> unit = "ocamlr_assign_strvecsxp"
+let eval phi (args: (string option * sexp) option list) =
+  eval_langsxp (langsxp phi (prepare_args args))

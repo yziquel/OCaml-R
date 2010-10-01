@@ -25,19 +25,7 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-open Data
+external is_s4_object : sexp -> bool = "ocamlr_is_s4_object"
 
-external sexp_equality : sexp -> sexp -> bool = "ocamlr_sexp_equality"
+external do_new_object : sexp -> sexp = "ocamlr_do_new_object"
 
-(* R constants - global symbols in libR.so. *)
-(* We are looking for a clean solution
-   for the typing of the R NULL. What should it be
-   in OCaml? An 'a option mapping to None? *)
-external null_creator : unit -> nilsxp = "ocamlr_null"
-external dots_symbol_creator : unit -> sexp = "ocamlr_dots_symbol"
-external missing_arg_creator : unit -> sexp = "ocamlr_missing_arg"
-external base_env_creator : unit -> sexp = "ocamlr_base_env"
-
-(* R_GlobalEnv is not a constant, but rather a constant pointer,
-   that gets updated by R itself. *)
-external global_env : unit -> sexp = "ocamlr_global_env"

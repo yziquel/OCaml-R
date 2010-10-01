@@ -25,24 +25,17 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-open Data
+external sexp_equality : sexp -> sexp -> bool = "ocamlr_sexp_equality"
 
-external force_promsxp : promsxp -> sexp = "ocamlr_eval_sxp"
+(* R constants - global symbols in libR.so. *)
+(* We are looking for a clean solution
+   for the typing of the R NULL. What should it be
+   in OCaml? An 'a option mapping to None? *)
+external null_creator : unit -> nilsxp = "ocamlr_null"
+external dots_symbol_creator : unit -> sexp = "ocamlr_dots_symbol"
+external missing_arg_creator : unit -> sexp = "ocamlr_missing_arg"
+external base_env_creator : unit -> sexp = "ocamlr_base_env"
 
-(*let force : 'a promise -> 'a t = force_promsxp*)
-
-(* For lazy evaluation, we have an issue here: R promises
-   are recursively forced by eval. This means that the
-   OCaml type system would be broken, because we would need
-   to have 'a Lazy.t R.t = 'a Lazy.t Lazy.t R.t. There's two
-   solutions:
-
-   -1- 'a R.t would denote a R value of type 'a, lazy or not.
-       This is suboptimal, because the OCaml type system could
-       and should express these lazy semantics.
-
-   -2- Make a dynamic check on the nature of the argument of
-       the force function. If it is a lazy lazy value, we
-       should force it manually, with OCaml semantics. If not,
-       we can run eval on it. *)
-
+(* R_GlobalEnv is not a constant, but rather a constant pointer,
+   that gets updated by R itself. *)
+external global_env : unit -> sexp = "ocamlr_global_env"

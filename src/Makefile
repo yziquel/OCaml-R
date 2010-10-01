@@ -25,14 +25,23 @@
 #             guillaume.yziquel@citycable.ch                                    #
 #################################################################################
 
-all: ocamlbuild
+all: byte native
+
+byte: r.cmi r.cmo r.cma
+native: r.cmi r.cmx r.cmxa
 
 clean:
-	rm -f standard.ml
-	ocamlbuild -clean
+	rm -f standard.ml.p4
+	rm *.o *.cmi *.cmo *.cmx
 
-ocamlbuild: R.itarget standard.ml
-	ocamlbuild R.otarget
+r.cmi: r.mli
+	ocamlfind ocamlc r.mli
+
+r.cmo: r.ml r.cmi standard.ml.p4
+	ocamlfind ocamlc -c -package camlp4.macro -syntax camlp4o r.ml
+
+r.cmx: r.ml r.cmi standard.ml.p4
+	ocamlfind ocamlopt -c -package camlp4.macro -syntax camlp4o r.ml
 
 opt: libopt mathopt
 byte: lib math
@@ -81,45 +90,7 @@ rmethods.cma : rmethods.cmo
 rmethods.cmxa: rmethods.cmx
 	$(OCAMLOPT) -verbose -a -o rmethods.cmxa rmethods.cmx
 
-R_ML_SOURCES=\
-	  r_Env.ml              \
-	  standard.ml           \
-	  data.ml               \
-	  sexptype.ml           \
-	  sexprec.ml            \
-	  allocation.ml         \
-	  read_internal.ml      \
-	  write_internal.ml     \
-	  lazy.ml               \
-	  symbols.ml            \
-	  conversion.ml         \
-	  internal.ml           \
-	  s3.ml                 \
-	  s4.ml                 \
-	  parser.ml             \
-	  reduction.ml          \
-	  initialisation.ml
-
-r.ml: r.mli $(R_ML_SOURCES)
-	cat $(R_ML_SOURCES) > $@
-
-r.mli: \
-	  incipit.mli           \
-	  r_Env.mli             \
-	  standard.mli          \
-	  data.mli              \
-	  sexptype.mli          \
-	  symbols.mli           \
-	  conversion.mli        \
-	  internal.mli          \
-	  s3.mli                \
-	  s4.mli                \
-	  parser.mli            \
-	  reduction.mli         \
-	  initialisation.mli
-	cat $^ > $@
-
-standard.ml: standard.R
+standard.ml.p4: standard.R
 	R --silent --vanilla --slave < $< > $@
 
 RBASE_ML_SOURCES= \

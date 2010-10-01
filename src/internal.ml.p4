@@ -25,13 +25,6 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-open Data
-open Sexptype
-open Read_internal
-open Sexprec
-open Conversion
-open Promise
-
 module Specification = struct
 
   type symbol = (string * (sexp option)) option option

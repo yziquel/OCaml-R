@@ -25,14 +25,22 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-open Data
+external force_promsxp : promsxp -> sexp = "ocamlr_eval_sxp"
 
-(* This file contains wrappers around allocation functions,
-   returning uninitialised pairlists and vectors. *)
+(*let force : 'a promise -> 'a t = force_promsxp*)
 
-external alloc_list        : int -> 'a internallist = "ocamlr_alloc_list"
-external alloc_lgl_vector  : int -> lglvecsxp       = "ocamlr_alloc_lgl_vector"
-external alloc_int_vector  : int -> intvecsxp       = "ocamlr_alloc_int_vector"
-external alloc_real_vector : int -> realvecsxp      = "ocamlr_alloc_real_vector"
-external alloc_str_vector  : int -> strvecsxp       = "ocamlr_alloc_str_vector"
+(* For lazy evaluation, we have an issue here: R promises
+   are recursively forced by eval. This means that the
+   OCaml type system would be broken, because we would need
+   to have 'a Lazy.t R.t = 'a Lazy.t Lazy.t R.t. There's two
+   solutions:
+
+   -1- 'a R.t would denote a R value of type 'a, lazy or not.
+       This is suboptimal, because the OCaml type system could
+       and should express these lazy semantics.
+
+   -2- Make a dynamic check on the nature of the argument of
+       the force function. If it is a lazy lazy value, we
+       should force it manually, with OCaml semantics. If not,
+       we can run eval on it. *)
 

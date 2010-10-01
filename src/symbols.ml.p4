@@ -25,27 +25,32 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-open Data
-open Parser
-open Conversion
+(* There's a lot of stuff concerning symbols and environments in the
+   envir.c file of the R source code. *)
 
-(* The following exception needs to be registered
-   in a callback when the R interpreter is initialised. *)
-exception Runtime_error of langsxp * string
+external install : string -> symsxp = "ocamlr_install"
 
-external eval_langsxp : langsxp -> 'a t = "ocamlr_eval_sxp"
+external findvar : symsxp -> promsxp = "ocamlr_findvar"
 
-let eval_string s = eval_langsxp (parse s)
+external findfun : symsxp -> promsxp = "ocamlr_findfun"
 
-let rec prepare_args = function
-  | (Some x)::l -> x::(prepare_args l)
-  | None::l     -> prepare_args l
-  | []          -> []
+let symbol ?(generic = false) s : sexp =
 
-let arg f ?name x = Some (name, (Obj.magic (f x)))
-let opt f name x = match x with
-  | None -> None
-  | Some x -> Some ((Some name), (Obj.magic (f x)))
+  let findfunction = match generic with
+    | false -> findvar | true -> findfun in
 
-let eval phi (args: (string option * sexp) option list) =
-  eval_langsxp (langsxp phi (prepare_args args))
+  let var = force_promsxp (findfunction (install s)) in
+
+  (* If we try to retrieve a function, we should use findfun. If we
+     use findvar, we indeed get a closure, but a closure for a generic
+     function in the sense of R objects:
+
+     CLOSURE {formals = LIST [(ARG "object", PLACE); (ARG "...", PLACE)];
+
+     and you get runtime errors. This is why we have a dynamic type check
+     here, and this is why this symbol should be used as little as
+     possible at R runtime. *)
+
+  match is_function var with
+  | false -> var
+  | true -> force_promsxp (findfun (install s))
