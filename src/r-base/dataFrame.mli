@@ -6,3 +6,4 @@ class virtual dataframe : object
   method element : 'a. int -> int -> 'a R.t
 end
 
+val dataframe : dataframe R.t -> dataframe

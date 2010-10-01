@@ -12,3 +12,4 @@ class virtual dataframe = object (self)
     R.arg R.int        y              ]
 end
 
+let dataframe r = object inherit dataframe inherit R.instance r end
