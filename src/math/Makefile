@@ -26,7 +26,7 @@ rmath.cmx: rmath.ml rmath.cmi
 	ocamlfind ocamlopt -verbose -c rmath.ml
 
 rmath_stubs.o: rmath_stubs.c
-	ocamlopt -verbose -ccopt -Wall $(COMPFLAGS) -ccopt -fPIC -c $<
+	ocamlopt -verbose -ccopt -Werror $(COMPFLAGS) -ccopt -fPIC -c $<
 
 librmath_stubs.a: rmath_stubs.o
 	ar rcs librmath_stubs.a rmath_stubs.o

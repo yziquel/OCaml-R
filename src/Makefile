@@ -74,7 +74,7 @@ dllr_stubs.so: libr_stubs.a r_stubs.o
 	ocamlmklib -verbose -o r_stubs r_stubs.o
 
 r_stubs.o: r_stubs.c
-	ocamlopt -verbose -ccopt -Wall -ccopt -fPIC -ccopt -I$(RINCLUDE) -c r_stubs.c
+	ocamlopt -verbose -ccopt -Werror -ccopt -fPIC -ccopt -I$(RINCLUDE) -c r_stubs.c
 
 oCamlR.cmo: oCamlR.ml r.cmi
 	ocamlfind ocamlc -c oCamlR.ml
