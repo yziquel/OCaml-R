@@ -54,7 +54,7 @@ val dnorm : ?mean:float -> ?sd:float -> ?log:bool -> float -> float
   *  of the normal distribution.
   *  @param mean Mean of the normal distribution.
   *  @param sd Standard deviation of the normal distribution.
-  *  @log If true, returns the logarithm of the density. *)
+  *  @param log If true, returns the logarithm of the density. *)
 
 val pnorm :
   ?mean:float ->
