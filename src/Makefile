@@ -43,7 +43,7 @@ native: r.cmi r.cmx r.cmxa oCamlR.cmx
 	make -C r-methods native
 
 clean:
-	rm -f standard.ml *.o *.a *.so *.cmi *.cmo *.cmx
+	rm -f standard.ml *.o *.a *.so *.cmi *.cmo *.cmx *.cma *.cmxa
 	make -C math clean
 	make -C r-base clean
 	make -C r-stats clean
