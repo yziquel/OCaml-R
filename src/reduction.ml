@@ -32,6 +32,8 @@ exception Runtime_error of langsxp * string
 external eval_langsxp : langsxp -> 'a t = "ocamlr_eval_sxp"
 
 let eval_string s = eval_langsxp (parse s)
+(* TODO: May segfault if stumbling on a symbol that
+ * hasn't yet been loaded. *)
 
 let rec prepare_args = function
   | (Some x)::l -> x::(prepare_args l)

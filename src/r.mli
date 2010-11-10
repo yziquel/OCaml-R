@@ -410,7 +410,12 @@ val eval_string : string -> 'a t
 (**  [eval_string] takes a string containing R code, and feeds it to the
   *  R interpreter. You get the resulting value back. The typing of this
   *  function is deliberately unsafe in order to allow the user to type
-  *  it precisely. *)
+  *  it precisely.
+  *
+  *  Bug: currently, if you try to execute a statement that refers to
+  *  symbols that haven't been loaded, you get a segfault. For instance,
+  *  evaluating a string containing the [rbinom] symbol without the
+  *  [R.stats] package being loaded raises a segfault. *)
 
 val arg : ('a -> 'b t) -> ?name:string -> 'a -> (string option * sexp) option
 (**  Convenience function to wrap up arguments, when mapping R functions
