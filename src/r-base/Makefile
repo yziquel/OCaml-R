@@ -33,7 +33,7 @@ r.cmi: ../r.cmi
 	cp ../r.cmi r.cmi
 
 $(RPACKAGE).ml: main.ml
-	camlp4o -o $(RPACKAGE).ml -parser Camlp4MacroParser main.ml
+	camlp4o -o $(RPACKAGE).ml -printer Camlp4OCamlPrinter -parser Camlp4MacroParser main.ml
 
 $(RPACKAGE).mli: main.mli
-	camlp4o -o $(RPACKAGE).mli -parser Camlp4MacroParser main.mli
+	camlp4o -o $(RPACKAGE).mli -printer Camlp4OCamlPrinter -parser Camlp4MacroParser main.mli
