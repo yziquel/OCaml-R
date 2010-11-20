@@ -9,3 +9,4 @@ standard.ml
 *.cmxa
 *.o
 .chamo.sourceview.buffers
+ocamlinit.png
