@@ -4,6 +4,6 @@ module Stub = struct
 
   let png = R.symbol "png"
 
-  let dev = R.symbol "dev"
+  (* TODO: This segfaults: let dev = R.symbol "dev" *)
 
 end
