@@ -122,6 +122,8 @@
    R.base and R.stats are embryonic bindings of R's standard
    library. Help is very welcome on this side.
 
+   The OCaml-R API:     http://yziquel.homelinux.org/api/ocaml-r
+
 
 -7-  The author, and contact information
 ========================================
