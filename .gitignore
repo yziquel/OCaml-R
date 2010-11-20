@@ -1,2 +1,11 @@
 standard.ml
 *.swp
+*.so
+*.a
+*.cma
+*.cmi
+*.cmo
+*.cmx
+*.cmxa
+*.o
+.chamo.sourceview.buffers

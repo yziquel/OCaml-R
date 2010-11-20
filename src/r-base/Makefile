@@ -9,17 +9,6 @@ clean:
 byte: _build/$(RPACKAGE).byte.otarget
 native: _build/$(RPACKAGE).native.otarget
 
-# No hooks are necessary for the base package. In a sense, the
-# hooks are oCamlR.cmo / oCamlR.cmx themselves.
-#
-#$(RPACKAGE)Hook.cmo: _build/$(RPACKAGE).byte.otarget $(RPACKAGE)Hook.ml
-#	ocamlfind ocamlc -I .. -c $(RPACKAGE)Hook.ml
-#	rm -f $(RPACKAGE)Hook.cmi
-#
-#$(RPACKAGE)Hook.cmx: _build/$(RPACKAGE).native.otarget $(RPACKAGE)Hook.ml
-#	ocamlfind ocamlopt -I .. -c $(RPACKAGE)Hook.ml
-#	rm -f $(RPACKAGE)Hook.cmi
-
 _build/$(RPACKAGE).otarget: r.cmi $(RPACKAGE).ml $(RPACKAGE).mli $(RPACKAGE).itarget
 	ocamlbuild -no-hygiene $(RPACKAGE).otarget
 
