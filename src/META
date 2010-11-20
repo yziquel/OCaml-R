@@ -51,3 +51,11 @@ package "graphics" (
   archive(byte) = "rgraphics.cma"
   archive(native) = "rgraphics.cmxa"
 )
+
+package "grDevices" (
+  version = "0.2"
+  description = "R grDevices library"
+  requires = "R.interpreter"
+  archive(byte) = "rgrDevices.cma"
+  archive(native) = "rgrDevices.cmxa"
+)

@@ -2,7 +2,8 @@
 #require "R.stats";;
 #require "R.graphics";;
 
-let _ = print_endline "Beginning."
+let _ = print_endline "Beginning.";;
 
-let _ = R.eval_string "rbindat<-rbinom(1000,50,.8)"
-let _ = R.eval_string "hist(bindat,breaks=seq(30,50,1))"
+let _ = R.eval_string "bindat<-rbinom(1000,50,.8)";;
+let _ = R.eval_string "hist(bindat,breaks=seq(30,50,1))";;
+let _ = R.eval_string "lines(seq(30,50,1),dbinom(seq(30,50,1),50,0.8)* 1e+3 ,col=\"green\")";;

@@ -36,6 +36,7 @@ byte: r.cmi r.cmo r.cma oCamlR.cmo
 	make -C r-stats byte
 	make -C r-methods byte
 	make -C r-graphics byte
+	make -C r-grDevices byte
 
 native: r.cmi r.cmx r.cmxa oCamlR.cmx
 	make -C math native
@@ -43,6 +44,7 @@ native: r.cmi r.cmx r.cmxa oCamlR.cmx
 	make -C r-stats native
 	make -C r-methods native
 	make -C r-graphics native
+	make -C r-grDevices native
 
 clean:
 	rm -f standard.ml *.o *.a *.so *.cmi *.cmo *.cmx *.cma *.cmxa
@@ -51,6 +53,7 @@ clean:
 	make -C r-stats clean
 	make -C r-methods clean
 	make -C r-graphics clean
+	make -C r-grDevices clean
 
 standard.ml: standard.R
 	R --silent --vanilla --slave < $< > $@
@@ -145,7 +148,8 @@ install: all remove
 	  r-base/_build/*.[oa] r-base/_build/*.cm[axi] r-base/_build/*.cmxa \
 	  r-stats/_build/*.[oa] r-stats/_build/*.cm[axi] r-stats/_build/*.cmxa \
 	  r-graphics/_build/*.[oa] r-graphics/_build/*.cm[axi] r-graphics/_build/*.cmxa \
-	  r-methods/_build/*.[oa] r-methods/_build/*.cm[axi] r-methods/_build/*.cmxa
+	  r-methods/_build/*.[oa] r-methods/_build/*.cm[axi] r-methods/_build/*.cmxa \
+	  r-grDevices/_build/*.[oa] r-grDevices/_build/*.cm[axi] r-grDevices/_build/*.cmxa
 
 remove:
 	ocamlfind remove -destdir /usr/lib/ocaml R
