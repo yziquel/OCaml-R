@@ -35,12 +35,14 @@ byte: r.cmi r.cmo r.cma oCamlR.cmo
 	make -C r-base byte
 	make -C r-stats byte
 	make -C r-methods byte
+	make -C r-graphics byte
 
 native: r.cmi r.cmx r.cmxa oCamlR.cmx
 	make -C math native
 	make -C r-base native
 	make -C r-stats native
 	make -C r-methods native
+	make -C r-graphics native
 
 clean:
 	rm -f standard.ml *.o *.a *.so *.cmi *.cmo *.cmx *.cma *.cmxa
@@ -48,6 +50,7 @@ clean:
 	make -C r-base clean
 	make -C r-stats clean
 	make -C r-methods clean
+	make -C r-graphics clean
 
 standard.ml: standard.R
 	R --silent --vanilla --slave < $< > $@
@@ -98,24 +101,6 @@ rmath.cmxa: dllrmath_stubs.so math/rmath.cmx
 
 math/rmath_stubs.o: math/rmath_stubs.c
 
-rbase.cma: rbase.cmo
-	$(OCAMLC) -verbose -a -o rbase.cma rbase.cmo
-
-rbase.cmxa: rbase.cmx
-	$(OCAMLOPT) -verbose -a -o rbase.cmxa rbase.cmx
-
-rstats.cma: rstats.cmo
-	$(OCAMLC) -verbose -a -o rstats.cma rstats.cmo
-
-rstats.cmxa: rstats.cmx
-	$(OCAMLOPT) -verbose -a -o rstats.cmxa rstats.cmx
-
-rmethods.cma : rmethods.cmo
-	$(OCAMLC) -verbose -a -o rmethods.cma rmethods.cmo
-
-rmethods.cmxa: rmethods.cmx
-	$(OCAMLOPT) -verbose -a -o rmethods.cmxa rmethods.cmx
-
 RBASE_ML_SOURCES= \
 	  r-base/main.ml        \
 	  r-base/listing.ml     \
@@ -142,9 +127,6 @@ rmethods.ml: rmethods.mli r-methods/main.ml
 
 rmethods.mli: r-methods/main.mli
 	cat $^ > $@
-
-rmethodsHook.ml:
-	cp r-methods/hook.ml rmethodsHook.ml
 
 test:
 	ocaml -init ocamlinit

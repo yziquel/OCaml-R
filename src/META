@@ -29,7 +29,6 @@ package "base" (
 )
 
 package "methods" (
-
   version = "0.2"
   description = "R library for formal methods and classes"
   requires = "R.interpreter"
@@ -38,10 +37,17 @@ package "methods" (
 )
 
 package "stats" (
-
   version = "0.2"
   description = "R statistics library"
   requires = "R.interpreter"
   archive(byte) = "rstats.cma"
   archive(native) = "rstats.cmxa"
+)
+
+package "graphics" (
+  version = "0.2"
+  description = "R graphics library"
+  requires = "R.interpreter"
+  archive(byte) = "rgraphics.cma"
+  archive(native) = "rgraphics.cmxa"
 )
