@@ -155,12 +155,12 @@ doc: r.mli rbase.mli rstats.mli math/rmath.mli
 	-html -d ocamldoc $^
 
 install: all remove
-	ocamlfind install R META *.[oa] *.so *.cm[axi] *.cmxa oCamlR.cmo \
+	ocamlfind install -destdir /usr/lib/ocaml R META *.[oa] *.so *.cm[axi] *.cmxa oCamlR.cmo \
 	  math/*.[oa] math/*.so math/*.cm[axi] math/*.cmxa \
 	  r-base/_build/*.[oa] r-base/_build/*.cm[axi] r-base/_build/*.cmxa \
-	  r-stats/_build/*.[oa] r-stats/_build/*.cm[axi] r-stats/_build/*.cmxa r-stats/rstatsHook.cm[ox] \
-	  r-methods/_build/*.[oa] r-methods/_build/*.cm[axi] r-methods/_build/*.cmxa r-methods/rmethodsHook.cm[ox]
+	  r-stats/_build/*.[oa] r-stats/_build/*.cm[axi] r-stats/_build/*.cmxa \
+	  r-methods/_build/*.[oa] r-methods/_build/*.cm[axi] r-methods/_build/*.cmxa
 
 remove:
-	ocamlfind remove R
+	ocamlfind remove -destdir /usr/lib/ocaml R
 
