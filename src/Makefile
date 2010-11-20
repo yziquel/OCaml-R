@@ -144,6 +144,7 @@ install: all remove
 	  math/*.[oa] math/*.so math/*.cm[axi] math/*.cmxa \
 	  r-base/_build/*.[oa] r-base/_build/*.cm[axi] r-base/_build/*.cmxa \
 	  r-stats/_build/*.[oa] r-stats/_build/*.cm[axi] r-stats/_build/*.cmxa \
+	  r-graphics/_build/*.[oa] r-graphics/_build/*.cm[axi] r-graphics/_build/*.cmxa \
 	  r-methods/_build/*.[oa] r-methods/_build/*.cm[axi] r-methods/_build/*.cmxa
 
 remove:
