@@ -146,8 +146,11 @@ rmethods.mli: r-methods/main.mli
 rmethodsHook.ml:
 	cp r-methods/hook.ml rmethodsHook.ml
 
-test: all
-	$(OCAML) -init ocamlinit
+test:
+	ocaml -init ocamlinit
+
+debug:
+	gdb --args ocamlrun ocaml -init ocamlinit
 
 doc: r.mli rbase.mli rstats.mli math/rmath.mli
 	$(MKDIR) ocamldoc

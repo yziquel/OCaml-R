@@ -1,4 +1,4 @@
 #use "topfind";;
-#require "unix";;
-#load "r.cma";;
-#load "oCamlR.cmo";;
+#require "R.stats";;
+
+let binom_sample = R.eval_string "rbinom(1000,50,.8)"

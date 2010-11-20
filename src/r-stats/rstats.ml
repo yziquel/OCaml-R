@@ -1,3 +1,5 @@
+let () = ignore (R.eval_string "require(stats, quietly=TRUE)")
+
 module Stub = struct
 
   let cor = R.symbol "cor"

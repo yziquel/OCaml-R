@@ -9,14 +9,17 @@ clean:
 byte: _build/$(RPACKAGE).byte.otarget
 native: _build/$(RPACKAGE).native.otarget
 
-_build/$(RPACKAGE).otarget: r.cmi $(RPACKAGE).itarget
+_build/$(RPACKAGE).otarget: $(RPACKAGE).itarget
+	cp ../r.cmi .
 	ocamlbuild -no-hygiene $(RPACKAGE).otarget
+	rm -f r.cmi
 
-_build/$(RPACKAGE).byte.otarget: r.cmi $(RPACKAGE).byte.itarget
+_build/$(RPACKAGE).byte.otarget: $(RPACKAGE).byte.itarget
+	cp ../r.cmi .
 	ocamlbuild -no-hygiene $(RPACKAGE).byte.otarget
+	rm -f r.cmi
 
-_build/$(RPACKAGE).native.otarget: r.cmi $(RPACKAGE).native.itarget
+_build/$(RPACKAGE).native.otarget: $(RPACKAGE).native.itarget
+	cp ../r.cmi .
 	ocamlbuild -no-hygiene $(RPACKAGE).native.otarget
-
-r.cmi: ../r.cmi
-	cp ../r.cmi r.cmi
+	rm -f r.cmi
