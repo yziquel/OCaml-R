@@ -8,13 +8,16 @@ LINKFLAGS_BYTE=$(INCLUDES) -cclib -lRmath
 all: byte native
 
 byte: rmath.cma
-native: rmath.cmxa
+native: rmath.cmxa rmath.cmxs
 
 rmath.cma: dllrmath_stubs.so rmath.cmo
 	ocamlc -verbose -a -dllib dllrmath_stubs.so -dllib libRmath.so -o rmath.cma rmath.cmo
 
 rmath.cmxa: dllrmath_stubs.so rmath.cmx
 	ocamlopt -verbose -a -cclib -lrmath_stubs -cclib -lRmath -o rmath.cmxa rmath.cmx
+
+rmath.cmxs: dllrmath_stubs.so rmath.cmx rmath_stubs.o
+	ocamlopt -verbose -shared rmath_stubs.o -o rmath.cmxs rmath.cmx
 
 rmath.cmi: rmath.mli
 	ocamlfind ocamlc -verbose -c rmath.mli

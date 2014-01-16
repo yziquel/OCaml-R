@@ -38,7 +38,7 @@ byte: r.cmi r.cmo r.cma oCamlR.cmo
 	make -C r-graphics byte
 	make -C r-grDevices byte
 
-native: r.cmi r.cmx r.cmxa oCamlR.cmx
+native: r.cmi r.cmx r.cmxa r.cmxs oCamlR.cmx
 	make -C math native
 	make -C r-base native
 	make -C r-stats native
@@ -47,7 +47,7 @@ native: r.cmi r.cmx r.cmxa oCamlR.cmx
 	make -C r-grDevices native
 
 clean:
-	rm -f standard.ml *.o *.a *.so *.cmi *.cmo *.cmx *.cma *.cmxa
+	rm -f standard.ml *.o *.a *.so *.cmi *.cmo *.cmx *.cma *.cmxa *.cmxs
 	make -C math clean
 	make -C r-base clean
 	make -C r-stats clean
@@ -72,6 +72,9 @@ r.cma: dllr_stubs.so r.cmo
 
 r.cmxa: dllr_stubs.so r.cmx
 	ocamlfind ocamlopt -verbose -a -ccopt -L$(RLIBDIR) -cclib -lr_stubs -cclib -lR -o r.cmxa r.cmx
+
+r.cmxs: dllr_stubs.so r.cmx r_stubs.o
+	ocamlfind ocamlopt -verbose -shared r_stubs.o -cclib -lR -o r.cmxs r.cmx
 
 libr_stubs.a: r_stubs.o
 	ar rcs libr_stubs.a r_stubs.o
@@ -101,6 +104,9 @@ rmath.cma: dllrmath_stubs.so math/rmath.cmo
 
 rmath.cmxa: dllrmath_stubs.so math/rmath.cmx
 	$(OCAMLOPT) -verbose -a -cclib -lrmath_stubs -cclib -lRmath -o rmath.cmxa math/rmath.cmx
+
+rmath.cmxs: dllrmath_stubs.so math/rmath.cmx rmath_stubs.o
+	$(OCAMLOPT) -verbose -shared rmath_stubs.o -cclib -lRmath -o rmath.cmxs math/rmath.cmx
 
 math/rmath_stubs.o: math/rmath_stubs.c
 
@@ -143,8 +149,8 @@ doc: r.mli rbase.mli rstats.mli math/rmath.mli
 	-html -d ocamldoc $^
 
 install: all remove
-	ocamlfind install -destdir /usr/lib/ocaml R META *.[oa] *.so *.cm[axi] *.cmxa oCamlR.cmo \
-	  math/*.[oa] math/*.so math/*.cm[axi] math/*.cmxa \
+	ocamlfind install R META *.[oa] *.so *.cm[axi] *.cmxa *.cmxs oCamlR.cmo \
+	  math/*.[oa] math/*.so math/*.cm[axi] math/*.cmxa math/*.cmxs \
 	  r-base/_build/*.[oa] r-base/_build/*.cm[axi] r-base/_build/*.cmxa \
 	  r-stats/_build/*.[oa] r-stats/_build/*.cm[axi] r-stats/_build/*.cmxa \
 	  r-graphics/_build/*.[oa] r-graphics/_build/*.cm[axi] r-graphics/_build/*.cmxa \
