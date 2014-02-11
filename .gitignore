@@ -7,6 +7,7 @@ standard.ml
 *.cmo
 *.cmx
 *.cmxa
+*.cmxs
 *.o
 .chamo.sourceview.buffers
 ocamlinit.png
